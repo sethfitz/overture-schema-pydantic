@@ -1,6 +1,6 @@
 """Division models for Overture Maps divisions theme."""
 
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import Field, field_validator, model_validator
 
@@ -12,6 +12,14 @@ from overture.schema.core.base import (
 from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
+)
+from overture.schema.validation import (
+    CountryCode,
+    NoWhitespaceString,
+    RegionCode,
+    theme_literal,
+    type_literal,
+    UniqueItemsConstraint,
 )
 from overture.schema.divisions.common.models import (
     DivisionClass,
@@ -25,6 +33,10 @@ from overture.schema.divisions.common.models import (
 class DivisionProperties(OvertureFeatureProperties):
     """Properties specific to division features."""
 
+    # Override theme and type with constraint-based validation
+    theme: theme_literal("divisions") = Field("divisions", description="Feature theme")
+    type: type_literal("division") = Field("division", description="Feature type")
+
     # Required properties
     subtype: PlaceType = Field(..., description="Administrative level")
 
@@ -34,20 +46,16 @@ class DivisionProperties(OvertureFeatureProperties):
     )
 
     # Geographic context
-    country: str = Field(
-        ..., pattern=r"^[A-Z]{2}$", description="ISO 3166-1 alpha-2 country code"
-    )
-    region: Optional[str] = Field(
-        None, pattern=r"^[A-Z]{2}-[A-Z0-9]{1,3}$", description="ISO 3166-2 region code"
-    )
+    country: CountryCode = Field(..., description="ISO 3166-1 alpha-2 country code")
+    region: Optional[RegionCode] = Field(None, description="ISO 3166-2 region code")
 
     # Relationships
-    parent_division_id: Optional[str] = Field(
-        None, min_length=1, pattern=r"^\S+$", description="Parent division identifier"
+    parent_division_id: Optional[NoWhitespaceString] = Field(
+        None, min_length=1, description="Parent division identifier"
     )
-    capital_division_ids: Optional[List[str]] = Field(
-        None, min_length=1, description="Capital division identifiers"
-    )
+    capital_division_ids: Optional[
+        Annotated[List[NoWhitespaceString], UniqueItemsConstraint()]
+    ] = Field(None, min_length=1, description="Capital division identifiers")
     capital_of_divisions: Optional[List[Dict[str, Any]]] = Field(
         None, min_length=1, description="Divisions this is capital of"
     )
@@ -79,20 +87,6 @@ class DivisionProperties(OvertureFeatureProperties):
     sources: Optional[List[AdvancedSourceItem]] = Field(
         None, min_length=1, description="Advanced source information"
     )
-
-    @field_validator("theme")
-    @classmethod
-    def validate_theme(cls, v):
-        if v != "divisions":
-            raise ValueError("Division theme must be 'divisions'")
-        return v
-
-    @field_validator("type")
-    @classmethod
-    def validate_type(cls, v):
-        if v != "division":
-            raise ValueError("Division type must be 'division'")
-        return v
 
     @field_validator("hierarchies")
     @classmethod
@@ -126,34 +120,6 @@ class DivisionProperties(OvertureFeatureProperties):
             )
 
         return self
-
-    @field_validator("capital_division_ids")
-    @classmethod
-    def validate_capital_division_ids_unique(cls, v):
-        """Ensure capital division IDs are unique."""
-        if v is None:
-            return v
-
-        if len(v) != len(set(v)):
-            raise ValueError("Capital division IDs must be unique")
-
-        return v
-
-    @field_validator("capital_division_ids")
-    @classmethod
-    def validate_capital_division_ids_not_whitespace(cls, v):
-        """Reject whitespace-only capital division IDs."""
-        if v is None:
-            return v
-
-        import re
-
-        pattern = re.compile(r"^\S+$")
-        for div_id in v:
-            if not pattern.match(div_id):
-                raise ValueError(f"'{div_id}' does not match pattern")
-
-        return v
 
     @field_validator("capital_of_divisions")
     @classmethod

@@ -1,9 +1,14 @@
 """Place feature models for Overture Maps places theme."""
 
 import re
-from typing import Dict, List, Optional
+from typing import Annotated, Dict, List, Optional
 
 from pydantic import AnyUrl, BaseModel, EmailStr, Field, field_validator
+
+from overture.schema.validation import (
+    CategoryPatternConstraint,
+    UniqueItemsConstraint,
+)
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -15,37 +20,20 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.validation.types import (
+    CategoryPattern,
+    theme_literal,
+    type_literal,
+)
 
 
 class PlaceCategories(BaseModel):
     """Place categories with primary and alternate classification."""
 
-    primary: str = Field(
-        ...,
-        pattern=r"^[a-z0-9]+(_[a-z0-9]+)*$",
-        description="Primary category (required)",
+    primary: CategoryPattern = Field(..., description="Primary category (required)")
+    alternate: Optional[Annotated[List[CategoryPattern], UniqueItemsConstraint()]] = (
+        Field(None, min_length=1, description="Alternate categories")
     )
-    alternate: Optional[List[str]] = Field(
-        None, min_length=1, description="Alternate categories"
-    )
-
-    @field_validator("alternate")
-    @classmethod
-    def validate_alternate_unique(cls, v):
-        """Ensure alternate categories are unique."""
-        if v is None:
-            return v
-
-        if len(v) != len(set(v)):
-            raise ValueError("Alternate categories must be unique")
-
-        # Validate each alternate category pattern
-        pattern = re.compile(r"^[a-z0-9]+(_[a-z0-9]+)*$")
-        for category in v:
-            if not pattern.match(category):
-                raise ValueError(f"Invalid category format: {category}")
-
-        return v
 
     @field_validator("primary")
     @classmethod
@@ -155,6 +143,10 @@ class PlaceConfidence(BaseModel):
 class PlaceProperties(OvertureFeatureProperties):
     """Properties specific to place features."""
 
+    # Override theme and type with constraint-based validation
+    theme: theme_literal("places") = Field("places", description="Feature theme")
+    type: type_literal("place") = Field("place", description="Feature type")
+
     # Optional properties
     categories: Optional[PlaceCategories] = Field(None, description="Place categories")
 
@@ -171,84 +163,23 @@ class PlaceProperties(OvertureFeatureProperties):
     )
 
     # Contact information
-    websites: Optional[List[str]] = Field(
+    websites: Optional[Annotated[List[str], UniqueItemsConstraint()]] = Field(
         None, min_length=1, description="Website URLs"
     )
-    socials: Optional[List[str]] = Field(
+    socials: Optional[Annotated[List[str], UniqueItemsConstraint()]] = Field(
         None, min_length=1, description="Social media URLs"
     )
-    emails: Optional[List[EmailStr]] = Field(
+    emails: Optional[Annotated[List[EmailStr], UniqueItemsConstraint()]] = Field(
         None, min_length=1, description="Email addresses"
     )
-    phones: Optional[List[str]] = Field(None, min_length=1, description="Phone numbers")
+    phones: Optional[Annotated[List[str], UniqueItemsConstraint()]] = Field(
+        None, min_length=1, description="Phone numbers"
+    )
 
     # Quality indicators
     confidence: Optional[float] = Field(
         None, ge=0.0, le=1.0, description="Confidence score (0.0-1.0)"
     )
-
-    @field_validator("theme")
-    @classmethod
-    def validate_theme(cls, v):
-        if v != "places":
-            raise ValueError("Place theme must be 'places'")
-        return v
-
-    @field_validator("type")
-    @classmethod
-    def validate_type(cls, v):
-        if v != "place":
-            raise ValueError("Place type must be 'place'")
-        return v
-
-    @field_validator("websites")
-    @classmethod
-    def validate_websites_unique(cls, v):
-        """Ensure websites are unique."""
-        if v is None:
-            return v
-
-        if len(v) != len(set(v)):
-            raise ValueError("Websites must be unique")
-
-        return v
-
-    @field_validator("socials")
-    @classmethod
-    def validate_socials_unique(cls, v):
-        """Ensure social URLs are unique."""
-        if v is None:
-            return v
-
-        if len(v) != len(set(v)):
-            raise ValueError("Social URLs must be unique")
-
-        return v
-
-    @field_validator("emails")
-    @classmethod
-    def validate_emails_unique(cls, v):
-        """Ensure emails are unique."""
-        if v is None:
-            return v
-
-        email_strings = [str(email) for email in v]
-        if len(email_strings) != len(set(email_strings)):
-            raise ValueError("Emails must be unique")
-
-        return v
-
-    @field_validator("phones")
-    @classmethod
-    def validate_phones_unique(cls, v):
-        """Ensure phone numbers are unique."""
-        if v is None:
-            return v
-
-        if len(v) != len(set(v)):
-            raise ValueError("Phone numbers must be unique")
-
-        return v
 
 
 class PlaceFeature(OvertureFeature):

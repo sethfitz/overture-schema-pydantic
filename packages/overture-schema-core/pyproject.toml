@@ -9,6 +9,7 @@ description = "Core schemas for Overture Maps"
 dependencies = [
     "pydantic>=2.0",
     "typing-extensions",
+    "overture-schema-validation",
 ]
 
 [tool.hatch.build.targets.wheel]

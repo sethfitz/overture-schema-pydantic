@@ -12,6 +12,7 @@ authors = [
 dependencies = [
     "pydantic>=2.0",
     "overture-schema-core",
+    "overture-schema-validation",
     "overture-schema-transportation-common",
     "overture-schema-transportation-rules",
 ]

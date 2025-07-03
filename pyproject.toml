@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
     "overture-schema-connector-type",
     "overture-schema-core",
+    "overture-schema-validation",
     "overture-schema-segment-type",
     "overture-schema-transportation-common",
     "overture-schema-transportation-rules",
@@ -113,6 +114,7 @@ disallow_untyped_defs = true
 
 [tool.uv.sources]
 overture-schema-core = { path = "packages/overture-schema-core", editable = true }
+overture-schema-validation = { path = "packages/overture-schema-validation", editable = true }
 overture-schema-transportation-rules = { path = "packages/overture-schema-transportation-rules", editable = true }
 overture-schema-transportation-common = { path = "packages/overture-schema-transportation-common", editable = true }
 overture-schema-segment-type = { path = "packages/overture-schema-segment-type", editable = true }

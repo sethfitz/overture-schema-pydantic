@@ -1,9 +1,14 @@
 """Transportation rule models using mix-in architecture."""
 
 from enum import Enum
-from typing import List, Literal, Optional, Union
+from typing import Annotated, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+
+from overture.schema.validation import (
+    CompositeUniqueConstraint,
+    UniqueItemsConstraint,
+)
 
 from overture.schema.core.common import (
     GeometricRangeScopeContainer,
@@ -192,33 +197,15 @@ class DestinationRule(BaseModel):
     final_heading: Literal["forward", "backward"] = Field(
         ..., description="Final direction on target segment"
     )
-    labels: List[DestinationLabel] = Field(
-        ..., min_length=1, description="Destination labels"
-    )
-    symbols: Optional[List[DestinationSignSymbol]] = Field(
-        None, description="Route symbols"
-    )
+    labels: Annotated[
+        List[DestinationLabel], CompositeUniqueConstraint("value", "type")
+    ] = Field(..., min_length=1, description="Destination labels")
+    symbols: Optional[
+        Annotated[List[DestinationSignSymbol], UniqueItemsConstraint()]
+    ] = Field(None, description="Route symbols")
     when: Optional[DestinationWhenClause] = Field(
         None, description="Scoping conditions"
     )
-
-    @field_validator("labels")
-    @classmethod
-    def validate_labels_unique(cls, v):
-        """Ensure destination labels are unique."""
-        # Create tuples of (value, type) for comparison
-        label_tuples = [(label.value, label.type) for label in v]
-        if len(label_tuples) != len(set(label_tuples)):
-            raise ValueError("Destination labels must be unique")
-        return v
-
-    @field_validator("symbols")
-    @classmethod
-    def validate_symbols_unique(cls, v):
-        """Ensure symbols are unique if provided."""
-        if v is not None and len(v) != len(set(v)):
-            raise ValueError("Destination symbols must be unique")
-        return v
 
 
 class ProhibitedTransitionSequence(BaseModel):
@@ -231,7 +218,10 @@ class ProhibitedTransitionSequence(BaseModel):
 class ProhibitedTransitionRule(GeometricRangeScopeContainer):
     """Prohibited transition (turn restriction) rule."""
 
-    sequence: List[ProhibitedTransitionSequence] = Field(
+    sequence: Annotated[
+        List[ProhibitedTransitionSequence],
+        CompositeUniqueConstraint("connector_id", "segment_id"),
+    ] = Field(
         ...,
         min_length=1,
         description="Sequence of connectors defining the prohibited path",
@@ -243,47 +233,21 @@ class ProhibitedTransitionRule(GeometricRangeScopeContainer):
         None, description="Scoping conditions"
     )
 
-    @field_validator("sequence")
-    @classmethod
-    def validate_sequence_unique(cls, v):
-        """Ensure sequence entries are unique."""
-        # Create tuples of (connector_id, segment_id) for comparison
-        sequence_tuples = [(entry.connector_id, entry.segment_id) for entry in v]
-        if len(sequence_tuples) != len(set(sequence_tuples)):
-            raise ValueError("Sequence entries must be unique")
-        return v
-
 
 class RoadFlagRule(GeometricRangeScopeContainer):
     """Road-specific flag rule with geometric scoping only."""
 
-    values: List[RoadFlagType] = Field(
+    values: Annotated[List[RoadFlagType], UniqueItemsConstraint()] = Field(
         ..., min_length=1, description="Road flag values"
     )
-
-    @field_validator("values")
-    @classmethod
-    def validate_values_unique(cls, v):
-        """Ensure flag values are unique."""
-        if len(v) != len(set(v)):
-            raise ValueError("Road flag values must be unique")
-        return v
 
 
 class RailFlagRule(GeometricRangeScopeContainer):
     """Rail-specific flag rule with geometric scoping only."""
 
-    values: List[RailFlagType] = Field(
+    values: Annotated[List[RailFlagType], UniqueItemsConstraint()] = Field(
         ..., min_length=1, description="Rail flag values"
     )
-
-    @field_validator("values")
-    @classmethod
-    def validate_values_unique(cls, v):
-        """Ensure flag values are unique."""
-        if len(v) != len(set(v)):
-            raise ValueError("Rail flag values must be unique")
-        return v
 
 
 class WidthRule(GeometricRangeScopeContainer):

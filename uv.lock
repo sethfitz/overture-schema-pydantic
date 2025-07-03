@@ -238,6 +238,7 @@ dependencies = [
     { name = "overture-schema-transportation-common" },
     { name = "overture-schema-transportation-rules" },
     { name = "overture-schema-transportation-theme" },
+    { name = "overture-schema-validation" },
     { name = "overture-schema-water-type" },
     { name = "pydantic", extra = ["email"] },
     { name = "typing-extensions" },
@@ -295,6 +296,7 @@ requires-dist = [
     { name = "overture-schema-transportation-common", editable = "packages/overture-schema-transportation-common" },
     { name = "overture-schema-transportation-rules", editable = "packages/overture-schema-transportation-rules" },
     { name = "overture-schema-transportation-theme", editable = "packages/overture-schema-transportation-theme" },
+    { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "overture-schema-water-type", editable = "packages/overture-schema-water-type" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=6.0" },
@@ -446,12 +448,14 @@ version = "0.1.0"
 source = { editable = "packages/overture-schema-buildings-common" }
 dependencies = [
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
 
@@ -498,12 +502,14 @@ name = "overture-schema-core"
 version = "0.1.0"
 source = { editable = "packages/overture-schema-core" }
 dependencies = [
+    { name = "overture-schema-validation" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "typing-extensions" },
 ]
@@ -532,6 +538,7 @@ source = { editable = "packages/overture-schema-division-boundary-type" }
 dependencies = [
     { name = "overture-schema-core" },
     { name = "overture-schema-divisions-common" },
+    { name = "overture-schema-validation" },
     { name = "pydantic" },
 ]
 
@@ -539,6 +546,7 @@ dependencies = [
 requires-dist = [
     { name = "overture-schema-core" },
     { name = "overture-schema-divisions-common" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
 
@@ -549,6 +557,7 @@ source = { editable = "packages/overture-schema-division-type" }
 dependencies = [
     { name = "overture-schema-core" },
     { name = "overture-schema-divisions-common" },
+    { name = "overture-schema-validation" },
     { name = "pydantic" },
 ]
 
@@ -557,6 +566,7 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
     { name = "overture-schema-divisions-common" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "ruff", marker = "extra == 'dev'" },
@@ -569,12 +579,14 @@ version = "0.1.0"
 source = { editable = "packages/overture-schema-divisions-common" }
 dependencies = [
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
 
@@ -641,6 +653,7 @@ version = "0.1.0"
 source = { editable = "packages/overture-schema-place-type" }
 dependencies = [
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", extra = ["email"] },
 ]
 
@@ -648,6 +661,7 @@ dependencies = [
 requires-dist = [
     { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pydantic", extras = ["email"] },
     { name = "pytest", marker = "extra == 'dev'" },
@@ -680,6 +694,7 @@ dependencies = [
     { name = "overture-schema-core" },
     { name = "overture-schema-transportation-common" },
     { name = "overture-schema-transportation-rules" },
+    { name = "overture-schema-validation" },
     { name = "pydantic" },
 ]
 
@@ -688,6 +703,7 @@ requires-dist = [
     { name = "overture-schema-core" },
     { name = "overture-schema-transportation-common" },
     { name = "overture-schema-transportation-rules" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
 
@@ -712,12 +728,14 @@ version = "0.1.0"
 source = { editable = "packages/overture-schema-transportation-rules" }
 dependencies = [
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "overture-schema-core" },
+    { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
 
@@ -740,6 +758,20 @@ requires-dist = [
     { name = "overture-schema-segment-type" },
     { name = "overture-schema-transportation-common" },
     { name = "pydantic", specifier = ">=2.0" },
+]
+
+[[package]]
+name = "overture-schema-validation"
+source = { editable = "packages/overture-schema-validation" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "typing-extensions" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "typing-extensions", specifier = ">=4.0.0" },
 ]
 
 [[package]]

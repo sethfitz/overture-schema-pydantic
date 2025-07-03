@@ -11,6 +11,7 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.validation import HexColor, theme_literal
 
 
 class BuildingSubtype(str, Enum):
@@ -215,6 +216,9 @@ class ConfidenceLevel(str, Enum):
 class BaseBuildingProperties(OvertureFeatureProperties):
     """Base properties shared by all building types."""
 
+    # Override theme with constraint-based validation
+    theme: theme_literal("buildings") = Field("buildings", description="Feature theme")
+
     # Required properties
     subtype: Optional[BuildingSubtype] = Field(None, description="Building subtype")
 
@@ -269,22 +273,8 @@ class BaseBuildingProperties(OvertureFeatureProperties):
     )
 
     # Optional color properties (hexadecimal strings)
-    facade_color: Optional[str] = Field(None, description="Facade color (hex)")
-    roof_color: Optional[str] = Field(None, description="Roof color (hex)")
-
-    @field_validator("theme")
-    @classmethod
-    def validate_theme(cls, v):
-        if v != "buildings":
-            raise ValueError("Building theme must be 'buildings'")
-        return v
-
-    @field_validator("facade_color", "roof_color")
-    @classmethod
-    def validate_hex_color(cls, v):
-        if v is not None and not v.startswith("#"):
-            raise ValueError("Color must be in hexadecimal format (e.g., #FFFFFF)")
-        return v
+    facade_color: Optional[HexColor] = Field(None, description="Facade color (hex)")
+    roof_color: Optional[HexColor] = Field(None, description="Roof color (hex)")
 
 
 __all__ = [

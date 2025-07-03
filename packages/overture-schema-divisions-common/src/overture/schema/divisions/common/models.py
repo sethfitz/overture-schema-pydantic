@@ -2,9 +2,11 @@
 
 import re
 from enum import Enum
-from typing import List, Optional
+from typing import Annotated, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
+
+from overture.schema.validation import CountryCode, UniqueItemsConstraint
 
 
 class PlaceType(str, Enum):
@@ -59,23 +61,9 @@ class Perspectives(BaseModel):
     """Political perspectives container."""
 
     mode: PerspectiveMode = Field(..., description="Perspective validation mode")
-    countries: List[str] = Field(
+    countries: Annotated[List[CountryCode], UniqueItemsConstraint()] = Field(
         ..., min_length=1, description="ISO 3166-1 alpha-2 country codes"
     )
-
-    @field_validator("countries")
-    @classmethod
-    def validate_country_codes(cls, v):
-        """Validate ISO 3166-1 alpha-2 country codes."""
-        pattern = re.compile(r"^[A-Z]{2}$")
-        for country in v:
-            if not pattern.match(country):
-                raise ValueError(f"Invalid country code format: {country}")
-
-        if len(v) != len(set(v)):
-            raise ValueError("Country codes must be unique")
-
-        return v
 
 
 class HierarchyItem(BaseModel):

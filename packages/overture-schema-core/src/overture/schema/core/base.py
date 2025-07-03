@@ -1,11 +1,15 @@
 """Base schema classes for Overture Maps features."""
 
-import re
 from abc import ABC
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from overture.schema.validation import (
+    ExtensionPrefixConstraint,
+    MinItemsConstraint,
+)
+from overture.schema.validation.types import ISO8601DateTime, JSONPointer
 from .validation_rules import validate_with_rules
 
 # Registry for valid themes and feature types (extensible)
@@ -74,35 +78,15 @@ def validate_theme_type_compatibility(theme: str, feature_type: str) -> bool:
 class SourcePropertyItem(BaseModel):
     """Source information for a specific property."""
 
-    property: str = Field(..., description="JSON Pointer to the property")
+    property: JSONPointer = Field(..., description="JSON Pointer to the property")
     dataset: str = Field(..., description="Source dataset identifier")
     record_id: Optional[str] = Field(None, description="Specific record within dataset")
-    update_time: Optional[str] = Field(
+    update_time: Optional[ISO8601DateTime] = Field(
         None, description="When this property was last updated"
     )
     confidence: Optional[float] = Field(
         None, ge=0, le=1, description="Confidence value for ML-derived data"
     )
-
-    @field_validator("update_time")
-    @classmethod
-    def validate_datetime_format(cls, v):
-        """Validate that update_time follows ISO 8601 datetime format."""
-        if v is None:
-            return v
-
-        # ISO 8601 datetime pattern (simplified)
-        # Allows YYYY-MM-DDTHH:MM:SS with optional timezone offset
-        iso_pattern = (
-            r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$"
-        )
-
-        if not re.match(iso_pattern, v):
-            raise ValueError(
-                f"update_time '{v}' is not a valid ISO 8601 datetime format"
-            )
-
-        return v
 
 
 class CartographyContainer(BaseModel):
@@ -128,11 +112,8 @@ class ExtensibleBaseModel(BaseModel):
     @model_validator(mode="after")
     def validate_extensions(self):
         """Validate that any extra fields use ext_* prefix."""
-        # In Pydantic v2, extra fields are stored in __pydantic_extra__
-        if hasattr(self, "__pydantic_extra__") and self.__pydantic_extra__:
-            for field_name in self.__pydantic_extra__.keys():
-                if not field_name.startswith("ext_"):
-                    raise ValueError("Unrecognized properties must use 'ext_' prefix")
+        constraint = ExtensionPrefixConstraint()
+        constraint.validate(self, None)
         return self
 
 
@@ -142,37 +123,28 @@ class OvertureFeatureProperties(ExtensibleBaseModel):
     theme: str = Field(..., description="Top-level Overture theme")
     type: str = Field(..., description="Specific feature type within theme")
     version: int = Field(..., ge=0, description="Feature version number")
-    sources: Optional[List[SourcePropertyItem]] = Field(
-        None, min_length=1, description="Source information"
+    sources: Optional[Annotated[List[SourcePropertyItem], MinItemsConstraint(1)]] = (
+        Field(None, description="Source information")
     )
     cartography: Optional[CartographyContainer] = Field(
         None, description="Cartographic display hints"
     )
 
-    @field_validator("theme")
-    @classmethod
-    def validate_theme_registered(cls, v):
-        if not validate_theme(v):
+    @model_validator(mode="after")
+    def validate_theme_registered(self):
+        if not validate_theme(self.theme):
             raise ValueError(
-                f"Unknown theme: {v}. Register theme using register_theme()"
+                f"Unknown theme: {self.theme}. Register theme using register_theme()"
             )
-        return v
+        return self
 
-    @field_validator("type")
-    @classmethod
-    def validate_type_registered(cls, v):
-        if not validate_feature_type(v):
+    @model_validator(mode="after")
+    def validate_type_registered(self):
+        if not validate_feature_type(self.type):
             raise ValueError(
-                f"Unknown feature type: {v}. Register type using register_feature_type()"
+                f"Unknown feature type: {self.type}. Register type using register_feature_type()"
             )
-        return v
-
-    @field_validator("sources")
-    @classmethod
-    def validate_sources_not_empty(cls, v):
-        if not v:
-            raise ValueError("sources must contain at least one item")
-        return v
+        return self
 
     @model_validator(mode="after")
     def validate_theme_type_consistency(self):

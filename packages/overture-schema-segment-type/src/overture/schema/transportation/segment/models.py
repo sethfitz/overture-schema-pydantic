@@ -1,8 +1,15 @@
 """Segment feature models for Overture Maps transportation theme."""
 
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
+
+from overture.schema.validation import (
+    CompositeUniqueConstraint,
+    ConditionalRequiredConstraint,
+    theme_literal,
+    type_literal,
+)
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -79,8 +86,20 @@ class RailFlags(BaseModel):
     )
 
 
-class SegmentProperties(OvertureFeatureProperties):
+class SegmentProperties(
+    Annotated[
+        OvertureFeatureProperties,
+        ConditionalRequiredConstraint("subtype", SegmentSubtype.ROAD, ["class_"]),
+        ConditionalRequiredConstraint("subtype", SegmentSubtype.RAIL, ["class_"]),
+    ]
+):
     """Properties specific to segment features."""
+
+    # Override theme and type with constraint-based validation
+    theme: theme_literal("transportation") = Field(
+        "transportation", description="Feature theme"
+    )
+    type: type_literal("segment") = Field("segment", description="Feature type")
 
     # Required properties
     subtype: SegmentSubtype = Field(..., description="Transportation segment subtype")
@@ -97,9 +116,11 @@ class SegmentProperties(OvertureFeatureProperties):
     level: Optional[int] = Field(None, description="Z-order level")
 
     # Connector references
-    connectors: Optional[List[ConnectorReference]] = Field(
-        None, description="Connector references"
-    )
+    connectors: Optional[
+        Annotated[
+            List[ConnectorReference], CompositeUniqueConstraint("connector_id", "at")
+        ]
+    ] = Field(None, description="Connector references")
 
     # Route references (strict typed with linear referencing)
     routes: Optional[List[StrictRouteReference]] = Field(
@@ -148,39 +169,21 @@ class SegmentProperties(OvertureFeatureProperties):
         None, description="Turn restrictions"
     )
 
-    @field_validator("theme")
-    @classmethod
-    def validate_theme(cls, v):
-        if v != "transportation":
-            raise ValueError("Segment theme must be 'transportation'")
-        return v
-
-    @field_validator("type")
-    @classmethod
-    def validate_type(cls, v):
-        if v != "segment":
-            raise ValueError("Segment type must be 'segment'")
-        return v
-
     @field_validator("class_")
     @classmethod
     def validate_class_with_subtype(cls, v, info):
-        """Class is required for segments and must match subtype."""
-        if hasattr(info, "data"):
+        """Validate class against appropriate enum based on subtype."""
+        if v is not None and hasattr(info, "data"):
             subtype = info.data.get("subtype")
-            if subtype in [SegmentSubtype.ROAD, SegmentSubtype.RAIL]:
-                if v is None:
-                    raise ValueError("Road and rail segments must have class property")
-
-                # Validate against appropriate enum
-                if subtype == SegmentSubtype.ROAD:
-                    valid_classes = [e.value for e in RoadClass]
-                    if v not in valid_classes:
-                        raise ValueError(f"Invalid road class: {v}")
-                elif subtype == SegmentSubtype.RAIL:
-                    valid_classes = [e.value for e in RailClass]
-                    if v not in valid_classes:
-                        raise ValueError(f"Invalid rail class: {v}")
+            # Validate against appropriate enum
+            if subtype == SegmentSubtype.ROAD:
+                valid_classes = [e.value for e in RoadClass]
+                if v not in valid_classes:
+                    raise ValueError(f"Invalid road class: {v}")
+            elif subtype == SegmentSubtype.RAIL:
+                valid_classes = [e.value for e in RailClass]
+                if v not in valid_classes:
+                    raise ValueError(f"Invalid rail class: {v}")
         return v
 
     @field_validator("road_flags")
@@ -205,23 +208,6 @@ class SegmentProperties(OvertureFeatureProperties):
                 raise ValueError(
                     f"rail_flags property not allowed for subtype '{subtype}', only for 'rail'"
                 )
-        return v
-
-    @field_validator("connectors")
-    @classmethod
-    def validate_connectors_unique(cls, v):
-        """Connectors must not have duplicates."""
-        if v is not None:
-            # Check for duplicate connector references
-            seen = set()
-            for i, connector in enumerate(v):
-                # Create a unique key from connector_id and at position
-                key = (connector.connector_id, connector.at)
-                if key in seen:
-                    raise ValueError(
-                        f"Duplicate connector reference found: connector_id='{connector.connector_id}', at={connector.at}"
-                    )
-                seen.add(key)
         return v
 
 
