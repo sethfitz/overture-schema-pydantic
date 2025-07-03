@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "overture-schema-core"
+version = "0.1.0"
+description = "Core schemas for Overture Maps"
+dependencies = [
+    "pydantic>=2.0",
+    "typing-extensions",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/overture"]

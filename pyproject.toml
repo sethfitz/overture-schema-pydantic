@@ -1,0 +1,146 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "overture-schema"
+dynamic = ["version"]
+description = "Pydantic schemas for Overture Maps data structures"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Overture Maps Contributors" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "overture-schema-connector-type",
+    "overture-schema-core",
+    "overture-schema-segment-type",
+    "overture-schema-transportation-common",
+    "overture-schema-transportation-rules",
+    "overture-schema-transportation-theme",
+    "overture-schema-building-type",
+    "overture-schema-buildings-common",
+    "overture-schema-buildings-theme",
+    "overture-schema-building-part-type",
+    "overture-schema-place-type",
+    "overture-schema-places-theme",
+    "overture-schema-division-type",
+    "overture-schema-division-area-type",
+    "overture-schema-division-boundary-type",
+    "overture-schema-divisions-common",
+    "overture-schema-divisions-theme",
+    "overture-schema-base-common",
+    "overture-schema-base-theme",
+    "overture-schema-bathymetry-type",
+    "overture-schema-infrastructure-type",
+    "overture-schema-land-type",
+    "overture-schema-water-type",
+    "overture-schema-address-type",
+    "overture-schema-addresses-theme",
+    "pydantic[email]>=2.0",
+    "typing-extensions",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "pyyaml",
+    "deepdiff",
+]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "pyyaml",
+    "deepdiff",
+    "ruff",
+    "mypy",
+]
+
+[tool.hatch.version]
+path = "packages/overture-schema-core/src/overture/schema/core/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["packages/overture-schema-core/src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.uv.sources]
+overture-schema-core = { path = "packages/overture-schema-core", editable = true }
+overture-schema-transportation-rules = { path = "packages/overture-schema-transportation-rules", editable = true }
+overture-schema-transportation-common = { path = "packages/overture-schema-transportation-common", editable = true }
+overture-schema-segment-type = { path = "packages/overture-schema-segment-type", editable = true }
+overture-schema-connector-type = { path = "packages/overture-schema-connector-type", editable = true }
+overture-schema-transportation-theme = { path = "packages/overture-schema-transportation-theme", editable = true }
+overture-schema-building-type = { path = "packages/overture-schema-building-type", editable = true }
+overture-schema-buildings-common = { path = "packages/overture-schema-buildings-common", editable = true }
+overture-schema-buildings-theme = { path = "packages/overture-schema-buildings-theme", editable = true }
+overture-schema-building-part-type = { path = "packages/overture-schema-building-part-type", editable = true }
+overture-schema-place-type = { path = "packages/overture-schema-place-type", editable = true }
+overture-schema-places-theme = { path = "packages/overture-schema-places-theme", editable = true }
+overture-schema-division-type = { path = "packages/overture-schema-division-type", editable = true }
+overture-schema-division-area-type = { path = "packages/overture-schema-division-area-type", editable = true }
+overture-schema-division-boundary-type = { path = "packages/overture-schema-division-boundary-type", editable = true }
+overture-schema-divisions-common = { path = "packages/overture-schema-divisions-common", editable = true }
+overture-schema-divisions-theme = { path = "packages/overture-schema-divisions-theme", editable = true }
+overture-schema-base-common = { path = "packages/overture-schema-base-common", editable = true }
+overture-schema-base-theme = { path = "packages/overture-schema-base-theme", editable = true }
+overture-schema-bathymetry-type = { path = "packages/overture-schema-bathymetry-type", editable = true }
+overture-schema-infrastructure-type = { path = "packages/overture-schema-infrastructure-type", editable = true }
+overture-schema-land-type = { path = "packages/overture-schema-land-type", editable = true }
+overture-schema-water-type = { path = "packages/overture-schema-water-type", editable = true }
+overture-schema-address-type = { path = "packages/overture-schema-address-type", editable = true }
+overture-schema-addresses-theme = { path = "packages/overture-schema-addresses-theme", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pyyaml>=6.0.2",
+    "deepdiff>=6.0.0",
+]

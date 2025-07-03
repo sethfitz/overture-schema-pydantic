@@ -1,0 +1,23 @@
+[project]
+name = "overture-schema-building-part-type"
+version = "0.1.0"
+description = "Pydantic schemas for Overture Maps building_part type"
+authors = [
+    { name = "Overture Maps Foundation" },
+]
+dependencies = [
+    "pydantic>=2.0",
+    "overture-schema-core",
+    "overture-schema-buildings-common",
+]
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/overturemaps/pydantic-schema"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/overture"]
