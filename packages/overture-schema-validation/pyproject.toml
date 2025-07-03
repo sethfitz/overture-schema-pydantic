@@ -42,6 +42,8 @@ packages = ["src/overture"]
 [tool.ruff]
 target-version = "py310"
 line-length = 88
+
+[tool.ruff.lint]
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -56,6 +58,4 @@ ignore = [
     "B008",  # do not perform function calls in argument defaults
     "C901",  # too complex
 ]
-
-[tool.ruff.per-file-ignores]
-"__init__.py" = ["F401"]
+per-file-ignores = {"__init__.py" = ["F401"]}
