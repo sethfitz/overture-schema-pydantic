@@ -1,55 +1,56 @@
 """Comprehensive tests for constraint-based validation in overture-schema-validation package."""
 
+from typing import Annotated
+
 import pytest
-from typing import Annotated, List, Optional, Dict, Any
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ValidationError
 
 from overture.schema.validation import (
-    # String constraints
-    PatternConstraint,
-    LanguageTagConstraint,
-    CountryCodeConstraint,
-    RegionCodeConstraint,
-    ISO8601DateTimeConstraint,
-    JSONPointerConstraint,
-    WhitespaceConstraint,
+    AtLeastOneOfConstraint,
+    CategoryPattern,
     CategoryPatternConstraint,
-    WikidataConstraint,
-    PhoneNumberConstraint,
-    HexColorConstraint,
-    NoWhitespaceConstraint,
-    # Collection constraints  
-    UniqueItemsConstraint,
-    MinItemsConstraint,
-    MaxItemsConstraint,
     CompositeUniqueConstraint,
-    # Numeric constraints
-    ConfidenceScoreConstraint,
-    ZoomLevelConstraint,
-    NonNegativeConstraint,
-    # Specialized constraints
-    LinearReferenceRangeConstraint,
-    ExtensionPrefixConstraint,
-    LiteralValueConstraint,
     # Conditional constraints
     ConditionalRequiredConstraint,
-    MutuallyExclusiveConstraint,
-    AtLeastOneOfConstraint,
+    ConfidenceScore,
+    # Numeric constraints
+    ConfidenceScoreConstraint,
+    CountryCode,
+    CountryCodeConstraint,
+    ExtensionPrefixConstraint,
+    HexColor,
+    HexColorConstraint,
+    ISO8601DateTime,
+    ISO8601DateTimeConstraint,
+    JSONPointer,
+    JSONPointerConstraint,
     # Constrained types
     LanguageTag,
-    CountryCode,
-    RegionCode,
-    ISO8601DateTime,
-    JSONPointer,
+    LanguageTagConstraint,
     LinearReferenceRange,
-    ConfidenceScore,
-    ZoomLevel,
+    # Specialized constraints
+    LinearReferenceRangeConstraint,
+    LiteralValueConstraint,
+    MaxItemsConstraint,
+    MinItemsConstraint,
+    MutuallyExclusiveConstraint,
+    NonNegativeConstraint,
     NonNegativeFloat,
     NonNegativeInt,
-    CategoryPattern,
-    WikidataId,
+    NoWhitespaceConstraint,
+    # String constraints
+    PatternConstraint,
     PhoneNumber,
-    HexColor,
+    PhoneNumberConstraint,
+    RegionCode,
+    RegionCodeConstraint,
+    # Collection constraints
+    UniqueItemsConstraint,
+    WhitespaceConstraint,
+    WikidataConstraint,
+    WikidataId,
+    ZoomLevel,
+    ZoomLevelConstraint,
 )
 
 
@@ -59,51 +60,53 @@ class TestStringConstraints:
     def test_pattern_constraint_valid(self):
         """Test PatternConstraint with valid values."""
         constraint = PatternConstraint(r"^[A-Z]{2}$", "Must be 2 uppercase letters")
-        
+
         class TestModel(BaseModel):
             code: Annotated[str, constraint]
-        
+
         # Valid values
         model = TestModel(code="US")
         assert model.code == "US"
-        
+
         model = TestModel(code="GB")
         assert model.code == "GB"
 
     def test_pattern_constraint_invalid(self):
         """Test PatternConstraint with invalid values."""
         constraint = PatternConstraint(r"^[A-Z]{2}$", "Must be 2 uppercase letters")
-        
+
         class TestModel(BaseModel):
             code: Annotated[str, constraint]
-        
+
         # Invalid values
         with pytest.raises(ValidationError) as exc_info:
             TestModel(code="usa")
         assert "Must be 2 uppercase letters" in str(exc_info.value)
-        
+
         with pytest.raises(ValidationError):
             TestModel(code="123")
 
     def test_language_tag_constraint_valid(self):
         """Test LanguageTagConstraint with valid language tags."""
+
         class TestModel(BaseModel):
             language: Annotated[str, LanguageTagConstraint()]
-        
+
         # Valid language tags
         valid_tags = ["en", "en-US", "en-GB", "zh-CN", "fr-CA", "es-MX"]
-        
+
         for tag in valid_tags:
             model = TestModel(language=tag)
             assert model.language == tag
 
     def test_language_tag_constraint_invalid(self):
         """Test LanguageTagConstraint with invalid language tags."""
+
         class TestModel(BaseModel):
             language: Annotated[str, LanguageTagConstraint()]
-        
+
         invalid_tags = ["invalid-tag-format", "123", "en_US", "toolongcode"]
-        
+
         for tag in invalid_tags:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(language=tag)
@@ -111,22 +114,24 @@ class TestStringConstraints:
 
     def test_country_code_constraint_valid(self):
         """Test CountryCodeConstraint with valid ISO 3166-1 alpha-2 codes."""
+
         class TestModel(BaseModel):
             country: Annotated[str, CountryCodeConstraint()]
-        
+
         valid_codes = ["US", "GB", "CA", "FR", "DE", "JP", "CN", "BR"]
-        
+
         for code in valid_codes:
             model = TestModel(country=code)
             assert model.country == code
 
     def test_country_code_constraint_invalid(self):
-        """Test CountryCodeConstraint with invalid country codes.""" 
+        """Test CountryCodeConstraint with invalid country codes."""
+
         class TestModel(BaseModel):
             country: Annotated[str, CountryCodeConstraint()]
-        
+
         invalid_codes = ["USA", "123", "invalid", "gb", "us"]
-        
+
         for code in invalid_codes:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(country=code)
@@ -134,22 +139,24 @@ class TestStringConstraints:
 
     def test_region_code_constraint_valid(self):
         """Test RegionCodeConstraint with valid ISO 3166-2 codes."""
+
         class TestModel(BaseModel):
             region: Annotated[str, RegionCodeConstraint()]
-        
+
         valid_codes = ["US-CA", "GB-ENG", "CA-ON", "FR-75", "DE-BY"]
-        
+
         for code in valid_codes:
             model = TestModel(region=code)
             assert model.region == code
 
     def test_region_code_constraint_invalid(self):
         """Test RegionCodeConstraint with invalid region codes."""
+
         class TestModel(BaseModel):
             region: Annotated[str, RegionCodeConstraint()]
-        
+
         invalid_codes = ["US", "123-45", "invalid-region", "us-ca"]
-        
+
         for code in invalid_codes:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(region=code)
@@ -157,33 +164,35 @@ class TestStringConstraints:
 
     def test_iso8601_datetime_constraint_valid(self):
         """Test ISO8601DateTimeConstraint with valid datetime strings."""
+
         class TestModel(BaseModel):
             timestamp: Annotated[str, ISO8601DateTimeConstraint()]
-        
+
         valid_datetimes = [
             "2023-10-15T10:30:00Z",
             "2023-12-25T00:00:00+00:00",
             "2024-01-01T12:00:00-05:00",
             "2023-06-15T14:30:00.123Z",
         ]
-        
+
         for dt in valid_datetimes:
             model = TestModel(timestamp=dt)
             assert model.timestamp == dt
 
     def test_iso8601_datetime_constraint_invalid(self):
         """Test ISO8601DateTimeConstraint with invalid datetime strings."""
+
         class TestModel(BaseModel):
             timestamp: Annotated[str, ISO8601DateTimeConstraint()]
-        
+
         invalid_datetimes = [
             "not-a-timestamp",
             "2023-13-01T10:30:00Z",  # Invalid month
             "2023-10-32T10:30:00Z",  # Invalid day
-            "2023-10-15 10:30:00",   # Missing T separator
+            "2023-10-15 10:30:00",  # Missing T separator
             "2023/10/15T10:30:00Z",  # Wrong date separator
         ]
-        
+
         for dt in invalid_datetimes:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(timestamp=dt)
@@ -191,9 +200,10 @@ class TestStringConstraints:
 
     def test_json_pointer_constraint_valid(self):
         """Test JSONPointerConstraint with valid JSON pointers."""
+
         class TestModel(BaseModel):
             pointer: Annotated[str, JSONPointerConstraint()]
-        
+
         valid_pointers = [
             "",
             "/foo",
@@ -203,21 +213,22 @@ class TestStringConstraints:
             "/~0",  # Represents ~
             "/~1",  # Represents /
         ]
-        
+
         for ptr in valid_pointers:
             model = TestModel(pointer=ptr)
             assert model.pointer == ptr
 
     def test_json_pointer_constraint_invalid(self):
         """Test JSONPointerConstraint with invalid JSON pointers."""
+
         class TestModel(BaseModel):
             pointer: Annotated[str, JSONPointerConstraint()]
-        
+
         invalid_pointers = [
-            "foo",      # Must start with /
+            "foo",  # Must start with /
             "foo/bar",  # Must start with /
         ]
-        
+
         for ptr in invalid_pointers:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(pointer=ptr)
@@ -225,33 +236,35 @@ class TestStringConstraints:
 
     def test_whitespace_constraint_valid(self):
         """Test WhitespaceConstraint with valid strings (no leading/trailing whitespace)."""
+
         class TestModel(BaseModel):
             text: Annotated[str, WhitespaceConstraint()]
-        
+
         valid_strings = [
             "hello",
             "hello world",
             "text with internal spaces",
             "",  # Empty string is valid
         ]
-        
+
         for text in valid_strings:
             model = TestModel(text=text)
             assert model.text == text
 
     def test_whitespace_constraint_invalid(self):
         """Test WhitespaceConstraint with invalid strings (leading/trailing whitespace)."""
+
         class TestModel(BaseModel):
             text: Annotated[str, WhitespaceConstraint()]
-        
+
         invalid_strings = [
-            " hello",        # Leading space
-            "hello ",        # Trailing space
-            "\thello",       # Leading tab
-            "hello\n",       # Trailing newline
-            " hello world ", # Both leading and trailing
+            " hello",  # Leading space
+            "hello ",  # Trailing space
+            "\thello",  # Leading tab
+            "hello\n",  # Trailing newline
+            " hello world ",  # Both leading and trailing
         ]
-        
+
         for text in invalid_strings:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(text=text)
@@ -259,33 +272,35 @@ class TestStringConstraints:
 
     def test_category_pattern_constraint_valid(self):
         """Test CategoryPatternConstraint with valid snake_case patterns."""
+
         class TestModel(BaseModel):
             category: Annotated[str, CategoryPatternConstraint()]
-        
+
         valid_categories = [
             "restaurant",
-            "gas_station", 
+            "gas_station",
             "shopping_mall",
             "coffee_shop",
             "bank_atm",
         ]
-        
+
         for cat in valid_categories:
             model = TestModel(category=cat)
             assert model.category == cat
 
     def test_category_pattern_constraint_invalid(self):
         """Test CategoryPatternConstraint with invalid category patterns."""
+
         class TestModel(BaseModel):
             category: Annotated[str, CategoryPatternConstraint()]
-        
+
         invalid_categories = [
-            "Restaurant",     # Capital letter
-            "gas-station",    # Hyphen instead of underscore
+            "Restaurant",  # Capital letter
+            "gas-station",  # Hyphen instead of underscore
             "shopping mall",  # Space instead of underscore
-            "category!",      # Special character
+            "category!",  # Special character
         ]
-        
+
         for cat in invalid_categories:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(category=cat)
@@ -293,28 +308,30 @@ class TestStringConstraints:
 
     def test_wikidata_constraint_valid(self):
         """Test WikidataConstraint with valid Wikidata identifiers."""
+
         class TestModel(BaseModel):
             wikidata_id: Annotated[str, WikidataConstraint()]
-        
+
         valid_ids = ["Q1", "Q123", "Q999999", "Q1234567890"]
-        
+
         for wid in valid_ids:
             model = TestModel(wikidata_id=wid)
             assert model.wikidata_id == wid
 
     def test_wikidata_constraint_invalid(self):
         """Test WikidataConstraint with invalid Wikidata identifiers."""
+
         class TestModel(BaseModel):
             wikidata_id: Annotated[str, WikidataConstraint()]
-        
+
         invalid_ids = [
-            "q123",       # Lowercase q
-            "P123",       # Property instead of item
-            "Q",          # Missing number
-            "123",        # Missing Q prefix
-            "Q12abc",     # Non-numeric suffix
+            "q123",  # Lowercase q
+            "P123",  # Property instead of item
+            "Q",  # Missing number
+            "123",  # Missing Q prefix
+            "Q12abc",  # Non-numeric suffix
         ]
-        
+
         for wid in invalid_ids:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(wikidata_id=wid)
@@ -322,32 +339,34 @@ class TestStringConstraints:
 
     def test_phone_number_constraint_valid(self):
         """Test PhoneNumberConstraint with valid international phone numbers."""
+
         class TestModel(BaseModel):
             phone: Annotated[str, PhoneNumberConstraint()]
-        
+
         valid_phones = [
             "+1-555-123-4567",
-            "+44-20-7946-0958", 
+            "+44-20-7946-0958",
             "+33-1-42-86-83-26",
             "+81-3-1234-5678",
             "+86-10-8888-8888",
         ]
-        
+
         for phone in valid_phones:
             model = TestModel(phone=phone)
             assert model.phone == phone
 
     def test_phone_number_constraint_invalid(self):
         """Test PhoneNumberConstraint with invalid phone numbers."""
+
         class TestModel(BaseModel):
             phone: Annotated[str, PhoneNumberConstraint()]
-        
+
         invalid_phones = [
-            "555-123-4567",      # Missing country code
-            "1-555-123-4567",    # Missing + 
-            "not-a-phone",       # Not a phone number
+            "555-123-4567",  # Missing country code
+            "1-555-123-4567",  # Missing +
+            "not-a-phone",  # Not a phone number
         ]
-        
+
         for phone in invalid_phones:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(phone=phone)
@@ -355,36 +374,38 @@ class TestStringConstraints:
 
     def test_hex_color_constraint_valid(self):
         """Test HexColorConstraint with valid hex colors."""
+
         class TestModel(BaseModel):
             color: Annotated[str, HexColorConstraint()]
-        
+
         valid_colors = [
             "#FFFFFF",
-            "#000000", 
+            "#000000",
             "#FF0000",
             "#00FF00",
             "#0000FF",
             "#ABCDEF",
             "#123456",
         ]
-        
+
         for color in valid_colors:
             model = TestModel(color=color)
             assert model.color == color
 
     def test_hex_color_constraint_invalid(self):
         """Test HexColorConstraint with invalid hex colors."""
+
         class TestModel(BaseModel):
             color: Annotated[str, HexColorConstraint()]
-        
+
         invalid_colors = [
-            "FFFFFF",     # Missing #
-            "#FFF",       # Too short
-            "#FFFFFFF",   # Too long
-            "#GGGGGG",    # Invalid hex characters
-            "red",        # Not hex
+            "FFFFFF",  # Missing #
+            "#FFF",  # Too short
+            "#FFFFFFF",  # Too long
+            "#GGGGGG",  # Invalid hex characters
+            "red",  # Not hex
         ]
-        
+
         for color in invalid_colors:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(color=color)
@@ -393,9 +414,10 @@ class TestStringConstraints:
 
     def test_no_whitespace_constraint_valid(self):
         """Test NoWhitespaceConstraint with valid strings (no whitespace)."""
+
         class TestModel(BaseModel):
             identifier: Annotated[str, NoWhitespaceConstraint()]
-        
+
         valid_identifiers = [
             "hello",
             "identifier123",
@@ -403,16 +425,17 @@ class TestStringConstraints:
             "kebab-case-id",
             "camelCaseId",
         ]
-        
+
         for ident in valid_identifiers:
             model = TestModel(identifier=ident)
             assert model.identifier == ident
 
     def test_no_whitespace_constraint_invalid(self):
         """Test NoWhitespaceConstraint with invalid strings (containing whitespace)."""
+
         class TestModel(BaseModel):
             identifier: Annotated[str, NoWhitespaceConstraint()]
-        
+
         invalid_identifiers = [
             "hello world",
             "id with spaces",
@@ -420,7 +443,7 @@ class TestStringConstraints:
             "new\nline",
             "carriage\rreturn",
         ]
-        
+
         for ident in invalid_identifiers:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(identifier=ident)
@@ -433,31 +456,33 @@ class TestCollectionConstraints:
 
     def test_unique_items_constraint_valid(self):
         """Test UniqueItemsConstraint with unique items."""
+
         class TestModel(BaseModel):
-            tags: Annotated[List[str], UniqueItemsConstraint()]
-        
+            tags: Annotated[list[str], UniqueItemsConstraint()]
+
         valid_lists = [
             [],
             ["a"],
             ["a", "b", "c"],
             ["unique", "items", "only"],
         ]
-        
+
         for items in valid_lists:
             model = TestModel(tags=items)
             assert model.tags == items
 
     def test_unique_items_constraint_invalid(self):
         """Test UniqueItemsConstraint with duplicate items."""
+
         class TestModel(BaseModel):
-            tags: Annotated[List[str], UniqueItemsConstraint()]
-        
+            tags: Annotated[list[str], UniqueItemsConstraint()]
+
         invalid_lists = [
             ["a", "a"],
-            ["a", "b", "a"], 
+            ["a", "b", "a"],
             ["duplicate", "values", "duplicate"],
         ]
-        
+
         for items in invalid_lists:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(tags=items)
@@ -465,29 +490,31 @@ class TestCollectionConstraints:
 
     def test_min_items_constraint_valid(self):
         """Test MinItemsConstraint with valid item counts."""
+
         class TestModel(BaseModel):
-            items: Annotated[List[str], MinItemsConstraint(2)]
-        
+            items: Annotated[list[str], MinItemsConstraint(2)]
+
         valid_lists = [
             ["a", "b"],
             ["a", "b", "c"],
             ["a", "b", "c", "d", "e"],
         ]
-        
+
         for items in valid_lists:
             model = TestModel(items=items)
             assert model.items == items
 
     def test_min_items_constraint_invalid(self):
         """Test MinItemsConstraint with too few items."""
+
         class TestModel(BaseModel):
-            items: Annotated[List[str], MinItemsConstraint(2)]
-        
+            items: Annotated[list[str], MinItemsConstraint(2)]
+
         invalid_lists = [
             [],
             ["a"],
         ]
-        
+
         for items in invalid_lists:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(items=items)
@@ -495,30 +522,32 @@ class TestCollectionConstraints:
 
     def test_max_items_constraint_valid(self):
         """Test MaxItemsConstraint with valid item counts."""
+
         class TestModel(BaseModel):
-            items: Annotated[List[str], MaxItemsConstraint(3)]
-        
+            items: Annotated[list[str], MaxItemsConstraint(3)]
+
         valid_lists = [
             [],
             ["a"],
             ["a", "b"],
             ["a", "b", "c"],
         ]
-        
+
         for items in valid_lists:
             model = TestModel(items=items)
             assert model.items == items
 
     def test_max_items_constraint_invalid(self):
         """Test MaxItemsConstraint with too many items."""
+
         class TestModel(BaseModel):
-            items: Annotated[List[str], MaxItemsConstraint(3)]
-        
+            items: Annotated[list[str], MaxItemsConstraint(3)]
+
         invalid_lists = [
             ["a", "b", "c", "d"],
             ["a", "b", "c", "d", "e"],
         ]
-        
+
         for items in invalid_lists:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(items=items)
@@ -526,13 +555,51 @@ class TestCollectionConstraints:
 
     def test_composite_unique_constraint_valid(self):
         """Test CompositeUniqueConstraint with unique composite keys."""
-        # Skip this test for now - CompositeUniqueConstraint may not be fully implemented
-        pytest.skip("CompositeUniqueConstraint implementation needs verification")
+
+        class Item(BaseModel):
+            category: str
+            name: str
+            value: int
+
+        class TestModel(BaseModel):
+            items: Annotated[list[Item], CompositeUniqueConstraint("category", "name")]
+
+        valid_items = [
+            [],
+            [Item(category="food", name="apple", value=1)],
+            [
+                Item(category="food", name="apple", value=1),
+                Item(category="food", name="banana", value=2),  # Different name
+                Item(category="drink", name="apple", value=3),  # Different category
+            ],
+        ]
+
+        for items in valid_items:
+            model = TestModel(items=items)
+            assert model.items == items
 
     def test_composite_unique_constraint_invalid(self):
         """Test CompositeUniqueConstraint with duplicate composite keys."""
-        # Skip this test for now - CompositeUniqueConstraint may not be fully implemented
-        pytest.skip("CompositeUniqueConstraint implementation needs verification")
+
+        class Item(BaseModel):
+            category: str
+            name: str
+            value: int
+
+        class TestModel(BaseModel):
+            items: Annotated[list[Item], CompositeUniqueConstraint("category", "name")]
+
+        # Items with same category and name (duplicate composite key)
+        duplicate_items = [
+            Item(category="food", name="apple", value=1),
+            Item(
+                category="food", name="apple", value=2
+            ),  # Same category+name, different value
+        ]
+
+        with pytest.raises(ValidationError) as exc_info:
+            TestModel(items=duplicate_items)
+        assert "Items must be unique based on (category, name)" in str(exc_info.value)
 
 
 class TestNumericConstraints:
@@ -540,22 +607,24 @@ class TestNumericConstraints:
 
     def test_confidence_score_constraint_valid(self):
         """Test ConfidenceScoreConstraint with valid scores (0.0 to 1.0)."""
+
         class TestModel(BaseModel):
             confidence: Annotated[float, ConfidenceScoreConstraint()]
-        
+
         valid_scores = [0.0, 0.1, 0.5, 0.9, 1.0, 0.123456]
-        
+
         for score in valid_scores:
             model = TestModel(confidence=score)
             assert model.confidence == score
 
     def test_confidence_score_constraint_invalid(self):
         """Test ConfidenceScoreConstraint with invalid scores."""
+
         class TestModel(BaseModel):
             confidence: Annotated[float, ConfidenceScoreConstraint()]
-        
+
         invalid_scores = [-0.1, 1.1, 2.0, -1.0, 10.0]
-        
+
         for score in invalid_scores:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(confidence=score)
@@ -563,22 +632,24 @@ class TestNumericConstraints:
 
     def test_zoom_level_constraint_valid(self):
         """Test ZoomLevelConstraint with valid zoom levels (0 to 23)."""
+
         class TestModel(BaseModel):
             zoom: Annotated[int, ZoomLevelConstraint()]
-        
+
         valid_zooms = [0, 1, 10, 15, 20, 23]
-        
+
         for zoom in valid_zooms:
             model = TestModel(zoom=zoom)
             assert model.zoom == zoom
 
     def test_zoom_level_constraint_invalid(self):
         """Test ZoomLevelConstraint with invalid zoom levels."""
+
         class TestModel(BaseModel):
             zoom: Annotated[int, ZoomLevelConstraint()]
-        
+
         invalid_zooms = [-1, 24, 25, 100, -10]
-        
+
         for zoom in invalid_zooms:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(zoom=zoom)
@@ -586,22 +657,24 @@ class TestNumericConstraints:
 
     def test_non_negative_constraint_valid(self):
         """Test NonNegativeConstraint with valid non-negative numbers."""
+
         class TestModel(BaseModel):
             value: Annotated[float, NonNegativeConstraint()]
-        
+
         valid_values = [0.0, 0.1, 1.0, 100.0, 999.99]
-        
+
         for val in valid_values:
             model = TestModel(value=val)
             assert model.value == val
 
     def test_non_negative_constraint_invalid(self):
         """Test NonNegativeConstraint with invalid negative numbers."""
+
         class TestModel(BaseModel):
             value: Annotated[float, NonNegativeConstraint()]
-        
+
         invalid_values = [-0.1, -1.0, -100.0, -999.99]
-        
+
         for val in invalid_values:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(value=val)
@@ -613,66 +686,117 @@ class TestSpecializedConstraints:
 
     def test_linear_reference_range_constraint_valid(self):
         """Test LinearReferenceRangeConstraint with valid ranges."""
+
         class TestModel(BaseModel):
-            range_val: Annotated[List[float], LinearReferenceRangeConstraint()]
-        
+            range_val: Annotated[list[float], LinearReferenceRangeConstraint()]
+
         valid_ranges = [
             [0.0, 1.0],
             [0.1, 0.9],
             [0.0, 0.5],
             [0.25, 0.75],
         ]
-        
+
         for range_val in valid_ranges:
             model = TestModel(range_val=range_val)
             assert model.range_val == range_val
 
     def test_linear_reference_range_constraint_invalid(self):
         """Test LinearReferenceRangeConstraint with invalid ranges."""
+
         class TestModel(BaseModel):
-            range_val: Annotated[List[float], LinearReferenceRangeConstraint()]
-        
+            range_val: Annotated[list[float], LinearReferenceRangeConstraint()]
+
         invalid_ranges = [
-            [0.9, 0.1],    # start > end
-            [-0.1, 0.5],   # start < 0
-            [0.5, 1.1],    # end > 1
-            [0.5, 0.5],    # start == end
-            [0.0],         # Wrong length
+            [0.9, 0.1],  # start > end
+            [-0.1, 0.5],  # start < 0
+            [0.5, 1.1],  # end > 1
+            [0.5, 0.5],  # start == end
+            [0.0],  # Wrong length
             [0.0, 0.5, 1.0],  # Wrong length
         ]
-        
+
         for range_val in invalid_ranges:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(range_val=range_val)
-            error_msg = str(exc_info.value)
             # Check that validation fails with appropriate error
             assert len(exc_info.value.errors()) > 0
 
     def test_extension_prefix_constraint_valid(self):
         """Test ExtensionPrefixConstraint with valid extension prefixes."""
-        # ExtensionPrefixConstraint works on BaseModel, not individual fields
-        pytest.skip("ExtensionPrefixConstraint is applied to BaseModel classes, not individual fields")
+
+        # Apply constraint using the proper Annotated approach
+        class TestModel(BaseModel):
+            model_config = {"extra": "allow"}
+            name: str
+
+        # Create a constrained version of the model
+        ConstrainedTestModel = Annotated[
+            TestModel, ExtensionPrefixConstraint({"ext_", "custom_"})
+        ]
+
+        # Use TypeAdapter to create models with constraint validation
+        def create_constrained_model(**kwargs):
+            from pydantic import TypeAdapter
+
+            adapter = TypeAdapter(ConstrainedTestModel)
+            return adapter.validate_python(kwargs)
+
+        # Valid: no extra fields
+        model = create_constrained_model(name="test")
+        assert model.name == "test"
+
+        # Valid: extra fields with allowed prefixes
+        model = create_constrained_model(
+            name="test", ext_field="value", custom_data="data"
+        )
+        assert model.name == "test"
 
     def test_extension_prefix_constraint_invalid(self):
         """Test ExtensionPrefixConstraint with invalid prefixes."""
-        # ExtensionPrefixConstraint works on BaseModel, not individual fields
-        pytest.skip("ExtensionPrefixConstraint is applied to BaseModel classes, not individual fields")
+
+        # Apply constraint using the proper Annotated approach
+        class TestModel(BaseModel):
+            model_config = {"extra": "allow"}
+            name: str
+
+        # Create a constrained version of the model
+        ConstrainedTestModel = Annotated[
+            TestModel, ExtensionPrefixConstraint({"ext_", "custom_"})
+        ]
+
+        # Use TypeAdapter to create models with constraint validation
+        def create_constrained_model(**kwargs):
+            from pydantic import TypeAdapter
+
+            adapter = TypeAdapter(ConstrainedTestModel)
+            return adapter.validate_python(kwargs)
+
+        # Invalid: extra field without allowed prefix
+        with pytest.raises(ValidationError) as exc_info:
+            create_constrained_model(name="test", invalid_field="value")
+        assert (
+            "Unrecognized field 'invalid_field' must use one of these prefixes"
+            in str(exc_info.value)
+        )
 
     def test_literal_value_constraint_valid(self):
         """Test LiteralValueConstraint with valid literal values."""
+
         class TestModel(BaseModel):
             theme: Annotated[str, LiteralValueConstraint("places")]
-        
+
         model = TestModel(theme="places")
         assert model.theme == "places"
 
     def test_literal_value_constraint_invalid(self):
         """Test LiteralValueConstraint with invalid literal values."""
+
         class TestModel(BaseModel):
             theme: Annotated[str, LiteralValueConstraint("places")]
-        
+
         invalid_values = ["buildings", "transportation", "divisions", "base"]
-        
+
         for value in invalid_values:
             with pytest.raises(ValidationError) as exc_info:
                 TestModel(theme=value)
@@ -684,23 +808,188 @@ class TestConditionalConstraints:
 
     def test_conditional_required_constraint_valid(self):
         """Test ConditionalRequiredConstraint with valid conditional requirements."""
-        # Skip - ConditionalRequiredConstraint needs proper implementation verification
-        pytest.skip("ConditionalRequiredConstraint implementation needs verification")
+
+        # Apply constraint directly to the model class
+        class TestModel(BaseModel):
+            type: str
+            required_field: str | None = None
+
+        # Create a factory function that applies the constraint manually
+        def create_constrained_model(**kwargs):
+            # First create a regular model instance
+            model = TestModel(**kwargs)
+            # Then apply the constraint validation manually
+            constraint = ConditionalRequiredConstraint(
+                "type", "special", ["required_field"]
+            )
+
+            class MockInfo:
+                def __init__(self):
+                    self.context = {}
+
+            constraint.validate(model, MockInfo())
+            return model
+
+        # When type != "special", required_field can be None
+        model = create_constrained_model(type="normal", required_field=None)
+        assert model.type == "normal" and model.required_field is None
+
+        # When type == "special", required_field must be provided
+        model = create_constrained_model(type="special", required_field="value")
+        assert model.type == "special" and model.required_field == "value"
 
     def test_conditional_required_constraint_invalid(self):
         """Test ConditionalRequiredConstraint with missing required field."""
-        # Skip - ConditionalRequiredConstraint needs proper implementation verification
-        pytest.skip("ConditionalRequiredConstraint implementation needs verification")
+
+        # Apply constraint directly to the model class
+        class TestModel(BaseModel):
+            type: str
+            required_field: str | None = None
+
+        # Create a factory function that applies the constraint manually
+        def create_constrained_model(**kwargs):
+            # First create a regular model instance
+            model = TestModel(**kwargs)
+            # Then apply the constraint validation manually
+            constraint = ConditionalRequiredConstraint(
+                "type", "special", ["required_field"]
+            )
+
+            class MockInfo:
+                def __init__(self):
+                    self.context = {}
+
+            constraint.validate(model, MockInfo())
+            return model
+
+        # When type == "special", required_field is required
+        with pytest.raises(ValidationError) as exc_info:
+            create_constrained_model(type="special", required_field=None)
+        assert "Field 'required_field' is required when 'type' is 'special'" in str(
+            exc_info.value
+        )
 
     def test_mutually_exclusive_constraint_valid(self):
         """Test MutuallyExclusiveConstraint with valid exclusive fields."""
-        # Skip - these constraints need model-level validation, not field-level
-        pytest.skip("MutuallyExclusiveConstraint needs model-level validation implementation")
+
+        # Apply constraint directly to the model class
+        class TestModel(BaseModel):
+            field_a: bool | None = None
+            field_b: bool | None = None
+
+        # Create a factory function that applies the constraint manually
+        def create_constrained_model(**kwargs):
+            # First create a regular model instance
+            model = TestModel(**kwargs)
+            # Then apply the constraint validation manually
+            constraint = MutuallyExclusiveConstraint("field_a", "field_b")
+
+            class MockInfo:
+                def __init__(self):
+                    self.context = {}
+
+            constraint.validate(model, MockInfo())
+            return model
+
+        # Only one field set to True
+        model = create_constrained_model(field_a=True, field_b=False)
+        assert model.field_a is True and model.field_b is False
+
+        # Neither field set to True
+        model = create_constrained_model(field_a=False, field_b=False)
+        assert model.field_a is False and model.field_b is False
+
+        # Only field_b set to True
+        model = create_constrained_model(field_a=False, field_b=True)
+        assert model.field_a is False and model.field_b is True
+
+    def test_mutually_exclusive_constraint_invalid(self):
+        """Test MutuallyExclusiveConstraint with invalid field combinations."""
+
+        # Apply constraint directly to the model class
+        class TestModel(BaseModel):
+            field_a: bool | None = None
+            field_b: bool | None = None
+
+        # Create a factory function that applies the constraint manually
+        def create_constrained_model(**kwargs):
+            # First create a regular model instance
+            model = TestModel(**kwargs)
+            # Then apply the constraint validation manually
+            constraint = MutuallyExclusiveConstraint("field_a", "field_b")
+
+            class MockInfo:
+                def __init__(self):
+                    self.context = {}
+
+            constraint.validate(model, MockInfo())
+            return model
+
+        # Both fields set to True (invalid)
+        with pytest.raises(ValidationError) as exc_info:
+            create_constrained_model(field_a=True, field_b=True)
+        assert "are mutually exclusive and cannot all be true" in str(exc_info.value)
 
     def test_at_least_one_of_constraint_valid(self):
         """Test AtLeastOneOfConstraint with valid field combinations."""
-        # Skip - these constraints need model-level validation, not field-level
-        pytest.skip("AtLeastOneOfConstraint needs model-level validation implementation")
+
+        # Apply constraint directly to the model class
+        class TestModel(BaseModel):
+            field_a: str | None = None
+            field_b: str | None = None
+            field_c: str | None = None
+
+        # Create a factory function that applies the constraint manually
+        def create_constrained_model(**kwargs):
+            # First create a regular model instance
+            model = TestModel(**kwargs)
+            # Then apply the constraint validation manually
+            constraint = AtLeastOneOfConstraint("field_a", "field_b", "field_c")
+
+            class MockInfo:
+                def __init__(self):
+                    self.context = {}
+
+            constraint.validate(model, MockInfo())
+            return model
+
+        # At least one field set
+        model = create_constrained_model(field_a="value", field_b=None, field_c=None)
+        assert model.field_a == "value"
+
+        # Multiple fields set
+        model = create_constrained_model(
+            field_a="value1", field_b="value2", field_c=None
+        )
+        assert model.field_a == "value1" and model.field_b == "value2"
+
+    def test_at_least_one_of_constraint_invalid(self):
+        """Test AtLeastOneOfConstraint with invalid field combinations."""
+
+        # Apply constraint directly to the model class
+        class TestModel(BaseModel):
+            field_a: str | None = None
+            field_b: str | None = None
+            field_c: str | None = None
+
+        # Create a factory function that applies the constraint manually
+        def create_constrained_model(**kwargs):
+            # First create a regular model instance
+            model = TestModel(**kwargs)
+            # Then apply the constraint validation manually
+            constraint = AtLeastOneOfConstraint("field_a", "field_b", "field_c")
+
+            class MockInfo:
+                def __init__(self):
+                    self.context = {}
+
+            constraint.validate(model, MockInfo())
+            return model
+
+        # No fields set (invalid)
+        with pytest.raises(ValidationError) as exc_info:
+            create_constrained_model(field_a=None, field_b=None, field_c=None)
+        assert "At least one of these fields must be present" in str(exc_info.value)
 
 
 class TestConstrainedTypes:
@@ -708,9 +997,10 @@ class TestConstrainedTypes:
 
     def test_constrained_types_valid(self):
         """Test that constrained types work correctly with valid values."""
+
         class TestModel(BaseModel):
             language: LanguageTag
-            country: CountryCode  
+            country: CountryCode
             region: RegionCode
             timestamp: ISO8601DateTime
             pointer: JSONPointer
@@ -723,7 +1013,7 @@ class TestConstrainedTypes:
             wikidata: WikidataId
             phone: PhoneNumber
             color: HexColor
-        
+
         model = TestModel(
             language="en-US",
             country="US",
@@ -738,9 +1028,9 @@ class TestConstrainedTypes:
             category="restaurant",
             wikidata="Q123456",
             phone="+1-555-123-4567",
-            color="#FF0000"
+            color="#FF0000",
         )
-        
+
         assert model.language == "en-US"
         assert model.country == "US"
         assert model.region == "US-CA"
@@ -749,14 +1039,15 @@ class TestConstrainedTypes:
 
     def test_constrained_types_invalid(self):
         """Test that constrained types reject invalid values."""
+
         class TestModel(BaseModel):
             language: LanguageTag
             country: CountryCode
-        
+
         # Test invalid language tag
         with pytest.raises(ValidationError):
             TestModel(language="invalid-tag-format", country="US")
-        
+
         # Test invalid country code
         with pytest.raises(ValidationError):
             TestModel(language="en-US", country="invalid")
@@ -767,32 +1058,34 @@ class TestJSONSchemaGeneration:
 
     def test_string_constraints_json_schema(self):
         """Test that string constraints generate proper JSON schema."""
+
         class TestModel(BaseModel):
             language: Annotated[str, LanguageTagConstraint()]
             country: Annotated[str, CountryCodeConstraint()]
             color: Annotated[str, HexColorConstraint()]
-        
+
         schema = TestModel.model_json_schema()
         props = schema["properties"]
-        
+
         # Check that patterns are included
         assert "pattern" in props["language"]
-        assert "pattern" in props["country"] 
+        assert "pattern" in props["country"]
         assert "pattern" in props["color"]
-        
+
         # Check descriptions
         assert "IETF BCP-47 language tag" in props["language"].get("description", "")
 
     def test_collection_constraints_json_schema(self):
         """Test that collection constraints generate proper JSON schema."""
+
         class TestModel(BaseModel):
-            unique_items: Annotated[List[str], UniqueItemsConstraint()]
-            min_items: Annotated[List[str], MinItemsConstraint(2)]
-            max_items: Annotated[List[str], MaxItemsConstraint(5)]
-        
+            unique_items: Annotated[list[str], UniqueItemsConstraint()]
+            min_items: Annotated[list[str], MinItemsConstraint(2)]
+            max_items: Annotated[list[str], MaxItemsConstraint(5)]
+
         schema = TestModel.model_json_schema()
         props = schema["properties"]
-        
+
         # Check collection constraints
         assert props["unique_items"].get("uniqueItems") is True
         assert props["min_items"].get("minItems") == 2
@@ -800,14 +1093,15 @@ class TestJSONSchemaGeneration:
 
     def test_numeric_constraints_json_schema(self):
         """Test that numeric constraints generate proper JSON schema."""
+
         class TestModel(BaseModel):
             confidence: Annotated[float, ConfidenceScoreConstraint()]
             zoom: Annotated[int, ZoomLevelConstraint()]
             non_negative: Annotated[float, NonNegativeConstraint()]
-        
+
         schema = TestModel.model_json_schema()
         props = schema["properties"]
-        
+
         # Check numeric bounds
         assert props["confidence"].get("minimum") == 0.0
         assert props["confidence"].get("maximum") == 1.0
@@ -821,45 +1115,45 @@ class TestErrorHandling:
 
     def test_validation_error_context(self):
         """Test that validation errors include proper context and location info."""
+
         class TestModel(BaseModel):
             country: Annotated[str, CountryCodeConstraint()]
-        
+
         with pytest.raises(ValidationError) as exc_info:
             TestModel(country="invalid")
-        
+
         error = exc_info.value
         assert error.error_count() == 1
-        
+
         error_detail = error.errors()[0]
         assert error_detail["type"] == "value_error"
         assert error_detail["input"] == "invalid"
-        assert "Invalid ISO 3166-1 alpha-2 country code" in str(error_detail["ctx"]["error"])
+        assert "Invalid ISO 3166-1 alpha-2 country code" in str(
+            error_detail["ctx"]["error"]
+        )
 
     def test_nested_validation_errors(self):
         """Test validation errors in nested structures."""
+
         class NestedModel(BaseModel):
             country: Annotated[str, CountryCodeConstraint()]
-        
+
         class TestModel(BaseModel):
             nested: NestedModel
-            items: List[NestedModel]
-        
+            items: list[NestedModel]
+
         # Test nested object error
         with pytest.raises(ValidationError) as exc_info:
-            TestModel(
-                nested=NestedModel(country="invalid"),
-                items=[]
-            )
-        
+            TestModel(nested=NestedModel(country="invalid"), items=[])
+
         error = exc_info.value
         assert error.error_count() >= 1
-        
+
         # Test nested array error
         with pytest.raises(ValidationError) as exc_info:
             TestModel(
-                nested=NestedModel(country="US"),
-                items=[NestedModel(country="invalid")]
+                nested=NestedModel(country="US"), items=[NestedModel(country="invalid")]
             )
-        
+
         error = exc_info.value
         assert error.error_count() >= 1

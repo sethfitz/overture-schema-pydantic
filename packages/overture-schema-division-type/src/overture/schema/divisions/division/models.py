@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any, Dict, List, Optional
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, field_validator
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -16,6 +16,7 @@ from overture.schema.core.common import (
 from overture.schema.validation import (
     CountryCode,
     NoWhitespaceString,
+    ParentDivisionConstraint,
     RegionCode,
     theme_literal,
     type_literal,
@@ -30,7 +31,9 @@ from overture.schema.divisions.common.models import (
 )
 
 
-class DivisionProperties(OvertureFeatureProperties):
+class DivisionProperties(
+    Annotated[OvertureFeatureProperties, ParentDivisionConstraint(PlaceType.COUNTRY)]
+):
     """Properties specific to division features."""
 
     # Override theme and type with constraint-based validation
@@ -105,21 +108,6 @@ class DivisionProperties(OvertureFeatureProperties):
                 raise ValueError("Division IDs must be unique within hierarchy")
 
         return v
-
-    @model_validator(mode="after")
-    def validate_parent_division_id_required(self):
-        """Validate parent division based on subtype."""
-        subtype = self.subtype
-        parent_division_id = self.parent_division_id
-
-        if subtype == PlaceType.COUNTRY and parent_division_id is not None:
-            raise ValueError("Countries must not have parent_division_id")
-        elif subtype != PlaceType.COUNTRY and parent_division_id is None:
-            raise ValueError(
-                f"parent_division_id is required for sub-country divisions (subtype: {subtype})"
-            )
-
-        return self
 
     @field_validator("capital_of_divisions")
     @classmethod

@@ -65,6 +65,12 @@ from .constraints import (
     ConditionalRequiredConstraint,
     MutuallyExclusiveConstraint,
     AtLeastOneOfConstraint,
+    # Registry constraints
+    ThemeRegistryConstraint,
+    TypeRegistryConstraint,
+    ThemeTypeCompatibilityConstraint,
+    CountryRequiredConstraint,
+    ParentDivisionConstraint,
 )
 
 from .types import (
@@ -125,6 +131,12 @@ __all__ = [
     "ConditionalRequiredConstraint",
     "MutuallyExclusiveConstraint",
     "AtLeastOneOfConstraint",
+    # Registry constraints
+    "ThemeRegistryConstraint",
+    "TypeRegistryConstraint",
+    "ThemeTypeCompatibilityConstraint",
+    "CountryRequiredConstraint",
+    "ParentDivisionConstraint",
     # Constrained types
     "LanguageTag",
     "CountryCode",

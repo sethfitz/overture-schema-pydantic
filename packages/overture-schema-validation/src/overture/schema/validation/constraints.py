@@ -496,7 +496,12 @@ class ExtensionPrefixConstraint(BaseConstraint):
                 f"but it was applied to {source.__name__}"
             )
         schema = handler(source)
-        return core_schema.with_info_after_validator_function(self.validate, schema)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
 
 
 class UniqueItemsConstraint(CollectionConstraint):
@@ -998,7 +1003,12 @@ class ConditionalRequiredConstraint(BaseConstraint):
                 f"but it was applied to {source.__name__}"
             )
         schema = handler(source)
-        return core_schema.with_info_after_validator_function(self.validate, schema)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
 
 
 class MutuallyExclusiveConstraint(BaseConstraint):
@@ -1053,7 +1063,12 @@ class MutuallyExclusiveConstraint(BaseConstraint):
                 f"but it was applied to {source.__name__}"
             )
         schema = handler(source)
-        return core_schema.with_info_after_validator_function(self.validate, schema)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
 
 
 class AtLeastOneOfConstraint(BaseConstraint):
@@ -1108,4 +1123,295 @@ class AtLeastOneOfConstraint(BaseConstraint):
                 f"but it was applied to {source.__name__}"
             )
         schema = handler(source)
-        return core_schema.with_info_after_validator_function(self.validate, schema)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
+
+
+class ThemeRegistryConstraint(BaseConstraint):
+    """Constraint to validate that theme is registered in the global registry."""
+
+    def __init__(self, registry_check_func):
+        """Initialize with a function to check theme registration."""
+        self.registry_check_func = registry_check_func
+
+    def validate(self, value: BaseModel, info: ValidationInfo) -> None:
+        """Validate that the theme field is registered."""
+        if not isinstance(value, BaseModel):
+            return
+
+        if hasattr(value, "theme"):
+            theme = getattr(value, "theme")
+            if not self.registry_check_func(theme):
+                context = info.context or {}
+                loc = context.get("loc_prefix", ()) + ("theme",)
+                raise ValidationError.from_exception_data(
+                    title=self.__class__.__name__,
+                    line_errors=[
+                        InitErrorDetails(
+                            type="value_error",
+                            loc=loc,
+                            input=value,
+                            ctx={
+                                "error": f"Unknown theme: {theme}. Register theme using register_theme()"
+                            },
+                        )
+                    ],
+                )
+
+    def __get_pydantic_core_schema__(
+        self, source: type[Any], handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        if not issubclass(source, BaseModel):
+            raise TypeError(
+                f"{type(self).__name__} can only be applied to BaseModel subclasses; "
+                f"but it was applied to {source.__name__}"
+            )
+        schema = handler(source)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
+
+
+class TypeRegistryConstraint(BaseConstraint):
+    """Constraint to validate that feature type is registered in the global registry."""
+
+    def __init__(self, registry_check_func):
+        """Initialize with a function to check type registration."""
+        self.registry_check_func = registry_check_func
+
+    def validate(self, value: BaseModel, info: ValidationInfo) -> None:
+        """Validate that the type field is registered."""
+        if not isinstance(value, BaseModel):
+            return
+
+        if hasattr(value, "type"):
+            feature_type = getattr(value, "type")
+            if not self.registry_check_func(feature_type):
+                context = info.context or {}
+                loc = context.get("loc_prefix", ()) + ("type",)
+                raise ValidationError.from_exception_data(
+                    title=self.__class__.__name__,
+                    line_errors=[
+                        InitErrorDetails(
+                            type="value_error",
+                            loc=loc,
+                            input=value,
+                            ctx={
+                                "error": f"Unknown feature type: {feature_type}. Register type using register_feature_type()"
+                            },
+                        )
+                    ],
+                )
+
+    def __get_pydantic_core_schema__(
+        self, source: type[Any], handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        if not issubclass(source, BaseModel):
+            raise TypeError(
+                f"{type(self).__name__} can only be applied to BaseModel subclasses; "
+                f"but it was applied to {source.__name__}"
+            )
+        schema = handler(source)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
+
+
+class ThemeTypeCompatibilityConstraint(BaseConstraint):
+    """Constraint to validate that theme and type combination is compatible."""
+
+    def __init__(self, compatibility_check_func):
+        """Initialize with a function to check theme-type compatibility."""
+        self.compatibility_check_func = compatibility_check_func
+
+    def validate(self, value: BaseModel, info: ValidationInfo) -> None:
+        """Validate that theme and type are compatible."""
+        if not isinstance(value, BaseModel):
+            return
+
+        if hasattr(value, "theme") and hasattr(value, "type"):
+            theme = getattr(value, "theme")
+            feature_type = getattr(value, "type")
+
+            if not self.compatibility_check_func(theme, feature_type):
+                context = info.context or {}
+                loc = context.get("loc_prefix", ()) + ("type",)
+                raise ValidationError.from_exception_data(
+                    title=self.__class__.__name__,
+                    line_errors=[
+                        InitErrorDetails(
+                            type="value_error",
+                            loc=loc,
+                            input=value,
+                            ctx={
+                                "error": f"Invalid theme-type combination: theme='{theme}', type='{feature_type}'. "
+                                f"Type '{feature_type}' is not valid for theme '{theme}'"
+                            },
+                        )
+                    ],
+                )
+
+    def __get_pydantic_core_schema__(
+        self, source: type[Any], handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        if not issubclass(source, BaseModel):
+            raise TypeError(
+                f"{type(self).__name__} can only be applied to BaseModel subclasses; "
+                f"but it was applied to {source.__name__}"
+            )
+        schema = handler(source)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
+
+
+class CountryRequiredConstraint(BaseConstraint):
+    """Constraint requiring country field for specific subtypes."""
+
+    def __init__(
+        self, excluded_subtype, subtype_field="subtype", country_field="country"
+    ):
+        """Initialize constraint.
+
+        Args:
+            excluded_subtype: Subtype value that doesn't require country
+            subtype_field: Name of the subtype field
+            country_field: Name of the country field
+        """
+        self.excluded_subtype = excluded_subtype
+        self.subtype_field = subtype_field
+        self.country_field = country_field
+
+    def validate(self, value: BaseModel, info: ValidationInfo) -> None:
+        """Validate that country is present unless subtype is excluded."""
+        if not isinstance(value, BaseModel):
+            return
+
+        if hasattr(value, self.subtype_field) and hasattr(value, self.country_field):
+            subtype = getattr(value, self.subtype_field)
+            country = getattr(value, self.country_field)
+
+            if country is None and subtype != self.excluded_subtype:
+                context = info.context or {}
+                loc = context.get("loc_prefix", ()) + (self.country_field,)
+                raise ValidationError.from_exception_data(
+                    title=self.__class__.__name__,
+                    line_errors=[
+                        InitErrorDetails(
+                            type="value_error",
+                            loc=loc,
+                            input=value,
+                            ctx={
+                                "error": f"Field '{self.country_field}' is required when '{self.subtype_field}' is not '{self.excluded_subtype}'"
+                            },
+                        )
+                    ],
+                )
+
+    def __get_pydantic_core_schema__(
+        self, source: type[Any], handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        if not issubclass(source, BaseModel):
+            raise TypeError(
+                f"{type(self).__name__} can only be applied to BaseModel subclasses; "
+                f"but it was applied to {source.__name__}"
+            )
+        schema = handler(source)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)
+
+
+class ParentDivisionConstraint(BaseConstraint):
+    """Constraint for parent division ID logic based on subtype."""
+
+    def __init__(
+        self,
+        country_subtype_value,
+        subtype_field="subtype",
+        parent_field="parent_division_id",
+    ):
+        """Initialize constraint.
+
+        Args:
+            country_subtype_value: Subtype value representing country (should not have parent)
+            subtype_field: Name of the subtype field
+            parent_field: Name of the parent division ID field
+        """
+        self.country_subtype_value = country_subtype_value
+        self.subtype_field = subtype_field
+        self.parent_field = parent_field
+
+    def validate(self, value: BaseModel, info: ValidationInfo) -> None:
+        """Validate parent division ID based on subtype."""
+        if not isinstance(value, BaseModel):
+            return
+
+        if hasattr(value, self.subtype_field) and hasattr(value, self.parent_field):
+            subtype = getattr(value, self.subtype_field)
+            parent_division_id = getattr(value, self.parent_field)
+
+            if subtype == self.country_subtype_value and parent_division_id is not None:
+                context = info.context or {}
+                loc = context.get("loc_prefix", ()) + (self.parent_field,)
+                raise ValidationError.from_exception_data(
+                    title=self.__class__.__name__,
+                    line_errors=[
+                        InitErrorDetails(
+                            type="value_error",
+                            loc=loc,
+                            input=value,
+                            ctx={
+                                "error": f"Countries must not have {self.parent_field}"
+                            },
+                        )
+                    ],
+                )
+            elif subtype != self.country_subtype_value and parent_division_id is None:
+                context = info.context or {}
+                loc = context.get("loc_prefix", ()) + (self.parent_field,)
+                raise ValidationError.from_exception_data(
+                    title=self.__class__.__name__,
+                    line_errors=[
+                        InitErrorDetails(
+                            type="value_error",
+                            loc=loc,
+                            input=value,
+                            ctx={
+                                "error": f"{self.parent_field} is required for sub-country divisions (subtype: {subtype})"
+                            },
+                        )
+                    ],
+                )
+
+    def __get_pydantic_core_schema__(
+        self, source: type[Any], handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        if not issubclass(source, BaseModel):
+            raise TypeError(
+                f"{type(self).__name__} can only be applied to BaseModel subclasses; "
+                f"but it was applied to {source.__name__}"
+            )
+        schema = handler(source)
+
+        def validator_wrapper(value: Any, info: ValidationInfo) -> Any:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(validator_wrapper, schema)

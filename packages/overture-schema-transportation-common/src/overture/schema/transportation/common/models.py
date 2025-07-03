@@ -1,15 +1,16 @@
 """Common transportation theme structures and enums."""
 
 from enum import Enum
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 from overture.schema.core.common import (
     GeometricRangeScopeContainer,
     ScopingConditions,
     Speed,
 )
+from overture.schema.validation import AtLeastOneOfConstraint
 
 
 class SegmentSubtype(str, Enum):
@@ -73,20 +74,17 @@ class RouteReference(str):
 # Advanced Transportation Properties
 
 
-class SpeedLimitRule(GeometricRangeScopeContainer):
+class SpeedLimitRule(
+    Annotated[
+        GeometricRangeScopeContainer, AtLeastOneOfConstraint("min_speed", "max_speed")
+    ]
+):
     """Speed limit rule with scoping."""
 
     min_speed: Optional[Speed] = Field(None, description="Minimum speed")
     max_speed: Optional[Speed] = Field(None, description="Maximum speed")
     is_max_speed_variable: bool = Field(False, description="Variable max speed")
     when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
-
-    @model_validator(mode="after")
-    def validate_at_least_one_speed(self):
-        """At least one of min_speed or max_speed must be provided."""
-        if self.min_speed is None and self.max_speed is None:
-            raise ValueError("At least one of min_speed or max_speed must be provided")
-        return self
 
 
 class AccessRestriction(GeometricRangeScopeContainer):

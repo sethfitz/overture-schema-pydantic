@@ -3,11 +3,14 @@
 from abc import ABC
 from typing import Annotated, Any, Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from overture.schema.validation import (
     ExtensionPrefixConstraint,
     MinItemsConstraint,
+    ThemeRegistryConstraint,
+    TypeRegistryConstraint,
+    ThemeTypeCompatibilityConstraint,
 )
 from overture.schema.validation.types import ISO8601DateTime, JSONPointer
 from .validation_rules import validate_with_rules
@@ -104,20 +107,20 @@ class CartographyContainer(BaseModel):
     sort_key: Optional[int] = Field(None, description="Drawing order (lower = on top)")
 
 
-class ExtensibleBaseModel(BaseModel):
+class ExtensibleBaseModel(Annotated[BaseModel, ExtensionPrefixConstraint()]):
     """Base model that allows ext_* prefixed fields only."""
 
     model_config = ConfigDict(extra="allow")  # Allow extra fields for validation
 
-    @model_validator(mode="after")
-    def validate_extensions(self):
-        """Validate that any extra fields use ext_* prefix."""
-        constraint = ExtensionPrefixConstraint()
-        constraint.validate(self, None)
-        return self
 
-
-class OvertureFeatureProperties(ExtensibleBaseModel):
+class OvertureFeatureProperties(
+    Annotated[
+        ExtensibleBaseModel,
+        ThemeRegistryConstraint(validate_theme),
+        TypeRegistryConstraint(validate_feature_type),
+        ThemeTypeCompatibilityConstraint(validate_theme_type_compatibility),
+    ]
+):
     """Base properties for all Overture features."""
 
     theme: str = Field(..., description="Top-level Overture theme")
@@ -129,32 +132,6 @@ class OvertureFeatureProperties(ExtensibleBaseModel):
     cartography: Optional[CartographyContainer] = Field(
         None, description="Cartographic display hints"
     )
-
-    @model_validator(mode="after")
-    def validate_theme_registered(self):
-        if not validate_theme(self.theme):
-            raise ValueError(
-                f"Unknown theme: {self.theme}. Register theme using register_theme()"
-            )
-        return self
-
-    @model_validator(mode="after")
-    def validate_type_registered(self):
-        if not validate_feature_type(self.type):
-            raise ValueError(
-                f"Unknown feature type: {self.type}. Register type using register_feature_type()"
-            )
-        return self
-
-    @model_validator(mode="after")
-    def validate_theme_type_consistency(self):
-        """Validate that theme and type are compatible."""
-        if not validate_theme_type_compatibility(self.theme, self.type):
-            raise ValueError(
-                f"Invalid theme-type combination: theme='{self.theme}', type='{self.type}'. "
-                f"Type '{self.type}' is not valid for theme '{self.theme}'"
-            )
-        return self
 
 
 class OvertureFeature(BaseModel, ABC):

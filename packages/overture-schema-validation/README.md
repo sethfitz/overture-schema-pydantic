@@ -57,6 +57,7 @@ Validate string formats against common patterns:
 
 | Constraint | Purpose | Example |
 |------------|---------|---------|
+| `PatternConstraint` | Generic regex pattern matching | Custom patterns with error messages |
 | `LanguageTagConstraint` | IETF BCP-47 language tags | `"en-US"`, `"fr-CA"` |
 | `CountryCodeConstraint` | ISO 3166-1 alpha-2 country codes | `"US"`, `"CA"`, `"GB"` |
 | `RegionCodeConstraint` | ISO 3166-2 subdivision codes | `"US-CA"`, `"CA-ON"` |
@@ -66,6 +67,8 @@ Validate string formats against common patterns:
 | `PhoneNumberConstraint` | International phone numbers | `"+1-555-123-4567"` |
 | `HexColorConstraint` | Hexadecimal color codes | `"#FF0000"`, `"#00FF00"` |
 | `JSONPointerConstraint` | RFC 6901 JSON Pointers | `"/properties/name"` |
+| `WhitespaceConstraint` | No leading/trailing whitespace | Trims input validation |
+| `NoWhitespaceConstraint` | No whitespace characters allowed | `"identifier123"`, `"snake_case"` |
 
 ### Collection Constraints
 
@@ -135,23 +138,87 @@ class SegmentProperties(
     class_: Optional[str] = Field(None, description="Segment class")
 ```
 
+### Registry Constraints
+
+Validate against global registries and enforce schema consistency:
+
+| Constraint | Purpose |
+|------------|---------|
+| `ThemeRegistryConstraint` | Validates theme field against registered themes |
+| `TypeRegistryConstraint` | Validates feature type field against registered types |
+| `ThemeTypeCompatibilityConstraint` | Ensures theme-type combinations are valid |
+| `CountryRequiredConstraint` | Requires country field for non-country subtypes |
+| `ParentDivisionConstraint` | Validates parent division logic (countries have no parent) |
+
+**Example - Registry Validation:**
+
+```python
+from overture.schema.validation import (
+    ThemeRegistryConstraint,
+    TypeRegistryConstraint, 
+    ThemeTypeCompatibilityConstraint
+)
+from overture.schema.core.base import (
+    validate_theme,
+    validate_feature_type,
+    validate_theme_type_compatibility
+)
+
+class OvertureFeatureProperties(
+    Annotated[
+        BaseModel,
+        ThemeRegistryConstraint(validate_theme),
+        TypeRegistryConstraint(validate_feature_type),
+        ThemeTypeCompatibilityConstraint(validate_theme_type_compatibility),
+    ]
+):
+    theme: str = Field(..., description="Overture theme")
+    type: str = Field(..., description="Feature type")
+```
+
 ## Ready-to-Use Types
 
 Pre-configured type aliases for common use cases:
 
 ```python
 from overture.schema.validation import (
+    # String types
     LanguageTag,          # Annotated[str, LanguageTagConstraint()]
     CountryCode,          # Annotated[str, CountryCodeConstraint()]
-    ConfidenceScore,      # Annotated[float, ConfidenceScoreConstraint()]
+    RegionCode,           # Annotated[str, RegionCodeConstraint()]
+    ISO8601DateTime,      # Annotated[str, ISO8601DateTimeConstraint()]
+    JSONPointer,          # Annotated[str, JSONPointerConstraint()]
+    TrimmedString,        # Annotated[str, WhitespaceConstraint()]
     CategoryPattern,      # Annotated[str, CategoryPatternConstraint()]
-    # ... and many more
+    WikidataId,           # Annotated[str, WikidataConstraint()]
+    PhoneNumber,          # Annotated[str, PhoneNumberConstraint()]
+    HexColor,             # Annotated[str, HexColorConstraint()]
+    NoWhitespaceString,   # Annotated[str, NoWhitespaceConstraint()]
+    
+    # Numeric types
+    ConfidenceScore,      # Annotated[float, ConfidenceScoreConstraint()]
+    ZoomLevel,            # Annotated[int, ZoomLevelConstraint()]
+    NonNegativeFloat,     # Annotated[float, NonNegativeConstraint()]
+    NonNegativeInt,       # Annotated[int, NonNegativeConstraint()]
+    
+    # Collection types
+    LinearReferenceRange, # Annotated[List[float], LinearReferenceRangeConstraint()]
+    
+    # Utility functions
+    theme_literal,        # Creates theme literal constraint
+    type_literal,         # Creates type literal constraint
 )
 
 class MyModel(BaseModel):
-    language: LanguageTag = Field(..., description="Language")
-    country: CountryCode = Field(..., description="Country")
-    confidence: ConfidenceScore = Field(..., description="Confidence")
+    language: LanguageTag = Field(..., description="IETF BCP-47 language tag")
+    country: CountryCode = Field(..., description="ISO 3166-1 alpha-2 country code")
+    region: RegionCode = Field(None, description="ISO 3166-2 region code")
+    confidence: ConfidenceScore = Field(..., description="ML confidence score")
+    zoom: ZoomLevel = Field(..., description="Map zoom level")
+    wikidata: WikidataId = Field(None, description="Wikidata identifier")
+    phone: PhoneNumber = Field(None, description="International phone number")
+    color: HexColor = Field("#FFFFFF", description="Hex color code")
+    range: LinearReferenceRange = Field(..., description="Linear reference range")
 ```
 
 ## Advanced Usage
@@ -199,6 +266,200 @@ class BoundaryProperties(
     is_territorial: Optional[bool] = None
 ```
 
+### Migrating from Traditional Validators
+
+#### Replacing @field_validator
+
+Instead of using Pydantic's `@field_validator` decorator, use constraint annotations:
+
+**Before (using @field_validator):**
+
+```python
+class PlaceProperties(BaseModel):
+    country: str = Field(..., description="Country code")
+    language: str = Field(..., description="Language tag")
+    categories: List[str] = Field(..., description="Categories")
+    wikidata_id: Optional[str] = Field(None, description="Wikidata ID")
+    
+    @field_validator("country")
+    @classmethod
+    def validate_country_code(cls, v):
+        if not re.match(r"^[A-Z]{2}$", v):
+            raise ValueError("Invalid ISO 3166-1 alpha-2 country code")
+        return v
+    
+    @field_validator("language")
+    @classmethod
+    def validate_language_tag(cls, v):
+        if not re.match(r"^[a-z]{2,3}(-[A-Za-z]{2,8})*$", v):
+            raise ValueError("Invalid IETF BCP-47 language tag")
+        return v
+        
+    @field_validator("categories")
+    @classmethod  
+    def validate_unique_categories(cls, v):
+        if len(v) != len(set(v)):
+            raise ValueError("Categories must be unique")
+        return v
+        
+    @field_validator("wikidata_id")
+    @classmethod
+    def validate_wikidata_format(cls, v):
+        if v is not None and not re.match(r"^Q\d+$", v):
+            raise ValueError("Invalid Wikidata identifier format")
+        return v
+```
+
+**After (using constraints):**
+
+```python
+class PlaceProperties(BaseModel):
+    country: Annotated[str, CountryCodeConstraint()] = Field(
+        ..., description="Country code"
+    )
+    language: Annotated[str, LanguageTagConstraint()] = Field(
+        ..., description="Language tag"
+    )
+    categories: Annotated[List[str], UniqueItemsConstraint()] = Field(
+        ..., description="Categories"
+    )
+    wikidata_id: Optional[Annotated[str, WikidataConstraint()]] = Field(
+        None, description="Wikidata ID"
+    )
+```
+
+#### Replacing @model_validator
+
+Instead of using Pydantic's `@model_validator` decorator, use constraint-based validation:
+
+**Before (using @model_validator):**
+
+```python
+class SpeedLimitRule(BaseModel):
+    max_speed: Optional[Speed] = None
+    min_speed: Optional[Speed] = None
+    
+    @model_validator(mode="after")
+    def validate_speed_required(self):
+        if not self.max_speed and not self.min_speed:
+            raise ValueError("Either max_speed or min_speed is required")
+        return self
+```
+
+**After (using constraints):**
+
+```python
+class SpeedLimitRule(
+    Annotated[BaseModel, AtLeastOneOfConstraint("max_speed", "min_speed")]
+):
+    max_speed: Optional[Speed] = None
+    min_speed: Optional[Speed] = None
+```
+
+#### Common Migration Patterns
+
+**Pattern 1: Range Validation**
+
+```python
+# Before
+@field_validator("confidence")
+@classmethod
+def validate_confidence_range(cls, v):
+    if not 0.0 <= v <= 1.0:
+        raise ValueError("Confidence must be between 0.0 and 1.0")
+    return v
+
+# After  
+confidence: Annotated[float, ConfidenceScoreConstraint()]
+```
+
+**Pattern 2: Multiple Field Constraints**  
+
+```python
+# Before
+@field_validator("tags")
+@classmethod
+def validate_tags(cls, v):
+    if len(v) != len(set(v)):
+        raise ValueError("Tags must be unique")
+    if len(v) < 1:
+        raise ValueError("At least one tag required")
+    return v
+
+# After
+tags: Annotated[
+    List[str], 
+    UniqueItemsConstraint(),
+    MinItemsConstraint(1)
+]
+```
+
+**Pattern 3: Custom Pattern Validation**
+
+```python
+# Before
+@field_validator("postal_code") 
+@classmethod
+def validate_postal_code(cls, v):
+    if not re.match(r"^\d{5}(-\d{4})?$", v):
+        raise ValueError("Invalid ZIP code format")
+    return v
+
+# After
+postal_code: Annotated[
+    str, 
+    PatternConstraint(r"^\d{5}(-\d{4})?$", "Invalid ZIP code format")
+]
+```
+
+**Pattern 4: Complex Model Validation**
+
+```python
+# Before
+class DivisionBoundary(BaseModel):
+    subtype: PlaceType
+    country: Optional[str] = None
+    is_land: Optional[bool] = None  
+    is_territorial: Optional[bool] = None
+    
+    @model_validator(mode="after")
+    def validate_country_required(self):
+        if self.country is None and self.subtype != PlaceType.COUNTRY:
+            raise ValueError("Country required for non-country boundaries")
+        return self
+        
+    @model_validator(mode="after") 
+    def validate_territorial_flags(self):
+        if self.is_land is True and self.is_territorial is True:
+            raise ValueError("is_land and is_territorial are mutually exclusive")
+        return self
+
+# After
+class DivisionBoundary(
+    Annotated[
+        BaseModel,
+        CountryRequiredConstraint(PlaceType.COUNTRY),
+        MutuallyExclusiveConstraint("is_land", "is_territorial"),
+    ]
+):
+    subtype: PlaceType
+    country: Optional[str] = None
+    is_land: Optional[bool] = None
+    is_territorial: Optional[bool] = None
+```
+
+#### Migration Benefits
+
+This constraint-based approach provides:
+
+- **Less boilerplate**: No need to write repetitive validator methods
+- **Better composition**: Multiple constraints can be easily combined
+- **Reusability**: Same constraint logic can be applied to different models  
+- **Type safety**: Better integration with static type checkers
+- **Performance**: Constraints are compiled into Pydantic's core schema
+- **Consistency**: Standardized error messages across all validations
+- **JSON Schema**: Automatic enhancement of generated JSON schemas
+
 ## Error Messages
 
 Constraints provide detailed, consistent error messages:
@@ -241,16 +502,49 @@ model_schema = MyModel.model_json_schema()
 
 ## Integration with Overture Schema
 
-This validation package is designed to work seamlessly with Overture Maps schema packages:
+This validation package is designed to work seamlessly with Overture Maps schema packages and has replaced all `@model_validator` usage throughout the codebase:
 
 ```python
 # In your schema models
-from overture.schema.validation import CountryCode, LanguageTag
+from typing import Annotated
+from overture.schema.validation import (
+    CountryCode, 
+    LanguageTag,
+    ThemeRegistryConstraint,
+    TypeRegistryConstraint,
+    ParentDivisionConstraint
+)
 
-class OvertureFeatureProperties(BaseModel):
+# Base properties with registry validation
+class OvertureFeatureProperties(
+    Annotated[
+        BaseModel,
+        ThemeRegistryConstraint(validate_theme),
+        TypeRegistryConstraint(validate_feature_type),
+    ]
+):
+    theme: str = Field(..., description="Overture theme")
+    type: str = Field(..., description="Feature type")
     country: Optional[CountryCode] = None
     names: Dict[LanguageTag, str] = Field(default_factory=dict)
+
+# Division-specific validation
+class DivisionProperties(
+    Annotated[OvertureFeatureProperties, ParentDivisionConstraint(PlaceType.COUNTRY)]
+):
+    subtype: PlaceType = Field(..., description="Administrative level")
+    parent_division_id: Optional[str] = Field(None, description="Parent division ID")
 ```
+
+### Real-World Usage in Overture Schema
+
+The constraint system is actively used throughout Overture Maps schema definitions:
+
+- **Core models**: Base feature properties use registry constraints
+- **Division models**: Parent-child relationship validation
+- **Transportation**: Speed limit and rule validation  
+- **Boundary models**: Mutual exclusion and conditional requirements
+- **Extension validation**: Consistent `ext_*` prefix enforcement
 
 ## Development
 
