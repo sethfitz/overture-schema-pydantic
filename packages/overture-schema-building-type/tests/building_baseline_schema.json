@@ -1,0 +1,999 @@
+{
+  "$defs": {
+    "AddressContainer": {
+      "additionalProperties": true,
+      "description": "Address container with flexible admin levels.",
+      "properties": {
+        "address_levels": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/AddressLevel"
+              },
+              "maxItems": 5,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Address levels (1-5)",
+          "title": "Address Levels"
+        },
+        "country": {
+          "anyOf": [
+            {
+              "description": "ISO 3166-1 alpha-2 country code",
+              "pattern": "^[A-Z]{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ISO 3166-1 alpha-2 country code",
+          "title": "Country"
+        },
+        "freeform": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Freeform address string",
+          "title": "Freeform"
+        },
+        "locality": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Locality name",
+          "title": "Locality"
+        },
+        "postal_city": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Postal city if different",
+          "title": "Postal City"
+        },
+        "postcode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Postal code",
+          "title": "Postcode"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "description": "ISO 3166-2 subdivision code",
+              "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ISO 3166-2 subdivision code",
+          "title": "Region"
+        }
+      },
+      "title": "AddressContainer",
+      "type": "object"
+    },
+    "AddressLevel": {
+      "description": "Address level with optional value.",
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Address level value",
+          "title": "Value"
+        }
+      },
+      "title": "AddressLevel",
+      "type": "object"
+    },
+    "AdvancedSourceItem": {
+      "description": "Advanced source information with linear referencing support.",
+      "properties": {
+        "between": {
+          "anyOf": [
+            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
+              "items": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear referencing range",
+          "title": "Between"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "title": "Confidence"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id"
+        },
+        "update_time": {
+          "anyOf": [
+            {
+              "description": "ISO 8601 datetime",
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When this property was last updated (ISO 8601)",
+          "title": "Update Time"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "AdvancedSourceItem",
+      "type": "object"
+    },
+    "BuildingClass": {
+      "description": "Building class classification (84 total values).",
+      "enum": [
+        "agricultural",
+        "allotment_house",
+        "apartments",
+        "barn",
+        "beach_hut",
+        "boathouse",
+        "bridge_structure",
+        "bungalow",
+        "bunker",
+        "cabin",
+        "caravan",
+        "cathedral",
+        "chapel",
+        "church",
+        "civic",
+        "college",
+        "commercial",
+        "conservatory",
+        "cowshed",
+        "detached",
+        "detached_house",
+        "dormitory",
+        "farm",
+        "farm_auxiliary",
+        "fire_station",
+        "garage",
+        "garages",
+        "government",
+        "grandstand",
+        "greenhouse",
+        "hangar",
+        "hospital",
+        "hotel",
+        "house",
+        "houseboat",
+        "hut",
+        "industrial",
+        "kindergarten",
+        "kiosk",
+        "library",
+        "manufacture",
+        "mobile_home",
+        "mosque",
+        "office",
+        "offices",
+        "parking",
+        "pavilion",
+        "prison",
+        "public",
+        "religious",
+        "residential",
+        "retail",
+        "roof",
+        "ruins",
+        "school",
+        "semi",
+        "semidetached_house",
+        "service",
+        "shed",
+        "shrine",
+        "silo",
+        "slurry_tank",
+        "sports_centre",
+        "sports_hall",
+        "stable",
+        "stadium",
+        "static_caravan",
+        "stilt_house",
+        "storage_tank",
+        "sty",
+        "supermarket",
+        "synagogue",
+        "temple",
+        "terrace",
+        "toilets",
+        "train_station",
+        "transformer_tower",
+        "transportation",
+        "trullo",
+        "university",
+        "warehouse",
+        "wayside_shrine"
+      ],
+      "title": "BuildingClass",
+      "type": "string"
+    },
+    "BuildingProperties": {
+      "additionalProperties": true,
+      "description": "Properties specific to building features.",
+      "properties": {
+        "address": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AddressContainer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Address information"
+        },
+        "cartography": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CartographyContainer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Cartographic display hints"
+        },
+        "class": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BuildingClass"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Building class"
+        },
+        "facade_color": {
+          "anyOf": [
+            {
+              "description": "Hexadecimal color code in format #RRGGBB",
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Facade color (hex)",
+          "title": "Facade Color"
+        },
+        "facade_material": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FacadeMaterial"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Facade material"
+        },
+        "has_parts": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Building has parts",
+          "title": "Has Parts"
+        },
+        "height": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Height of the building in meters",
+          "title": "Height"
+        },
+        "is_underground": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Entire building is below ground",
+          "title": "Is Underground"
+        },
+        "level": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Z-order level",
+          "title": "Level"
+        },
+        "min_floor": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Start floor if building is floating",
+          "title": "Min Floor"
+        },
+        "min_height": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Building bottom height in meters",
+          "title": "Min Height"
+        },
+        "names": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NamesContainer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Multilingual names"
+        },
+        "num_floors": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Number of above-ground floors",
+          "title": "Num Floors"
+        },
+        "num_floors_underground": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Number of below-ground floors",
+          "title": "Num Floors Underground"
+        },
+        "roof_color": {
+          "anyOf": [
+            {
+              "description": "Hexadecimal color code in format #RRGGBB",
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Roof color (hex)",
+          "title": "Roof Color"
+        },
+        "roof_direction": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 360,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Roof bearing in degrees",
+          "title": "Roof Direction"
+        },
+        "roof_height": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Roof height in meters",
+          "title": "Roof Height"
+        },
+        "roof_material": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoofMaterial"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Roof material"
+        },
+        "roof_orientation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoofOrientation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Roof orientation"
+        },
+        "roof_shape": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoofShape"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Roof shape"
+        },
+        "sources": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/AdvancedSourceItem"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Advanced source information",
+          "title": "Sources"
+        },
+        "subtype": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BuildingSubtype"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Building subtype"
+        },
+        "theme": {
+          "const": "buildings",
+          "default": "buildings",
+          "description": "Feature theme",
+          "title": "Theme",
+          "type": "string"
+        },
+        "type": {
+          "description": "Specific feature type within theme",
+          "title": "Type",
+          "type": "string"
+        },
+        "version": {
+          "description": "Feature version number",
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type",
+        "version"
+      ],
+      "title": "BuildingProperties",
+      "type": "object"
+    },
+    "BuildingSubtype": {
+      "description": "Building subtype classification.",
+      "enum": [
+        "agricultural",
+        "civic",
+        "commercial",
+        "education",
+        "entertainment",
+        "industrial",
+        "medical",
+        "military",
+        "outbuilding",
+        "religious",
+        "residential",
+        "service",
+        "transportation"
+      ],
+      "title": "BuildingSubtype",
+      "type": "string"
+    },
+    "CartographyContainer": {
+      "description": "Cartographic hints for optimal map display.",
+      "properties": {
+        "max_zoom": {
+          "anyOf": [
+            {
+              "maximum": 23,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum recommended zoom level",
+          "title": "Max Zoom"
+        },
+        "min_zoom": {
+          "anyOf": [
+            {
+              "maximum": 23,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Minimum recommended zoom level",
+          "title": "Min Zoom"
+        },
+        "prominence": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Feature significance/importance",
+          "title": "Prominence"
+        },
+        "sort_key": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Drawing order (lower = on top)",
+          "title": "Sort Key"
+        }
+      },
+      "title": "CartographyContainer",
+      "type": "object"
+    },
+    "FacadeMaterial": {
+      "description": "Building facade material classification.",
+      "enum": [
+        "brick",
+        "cement_block",
+        "clay",
+        "concrete",
+        "glass",
+        "metal",
+        "plaster",
+        "plastic",
+        "stone",
+        "timber_framing",
+        "wood"
+      ],
+      "title": "FacadeMaterial",
+      "type": "string"
+    },
+    "NamePerspectives": {
+      "description": "Political perspectives for names.",
+      "properties": {
+        "countries": {
+          "description": "ISO 3166-1 alpha-2 country codes",
+          "items": {
+            "description": "ISO 3166-1 alpha-2 country code",
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Countries",
+          "type": "array"
+        },
+        "mode": {
+          "$ref": "#/$defs/PerspectiveMode",
+          "description": "Perspective mode"
+        }
+      },
+      "required": [
+        "mode",
+        "countries"
+      ],
+      "title": "NamePerspectives",
+      "type": "object"
+    },
+    "NameRule": {
+      "description": "Name rule with variant and language specification.",
+      "properties": {
+        "between": {
+          "anyOf": [
+            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
+              "items": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear referencing range",
+          "title": "Between"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "description": "IETF BCP-47 language tag",
+              "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "IETF BCP-47 language tag",
+          "title": "Language"
+        },
+        "perspectives": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NamePerspectives"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Political perspectives"
+        },
+        "side": {
+          "anyOf": [
+            {
+              "enum": [
+                "left",
+                "right"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Side specification",
+          "title": "Side"
+        },
+        "value": {
+          "description": "Name value",
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/NameVariant",
+          "description": "Name variant type"
+        }
+      },
+      "required": [
+        "variant",
+        "value"
+      ],
+      "title": "NameRule",
+      "type": "object"
+    },
+    "NameVariant": {
+      "description": "Name variant types.",
+      "enum": [
+        "common",
+        "official",
+        "alternate",
+        "short"
+      ],
+      "title": "NameVariant",
+      "type": "string"
+    },
+    "NamesContainer": {
+      "additionalProperties": true,
+      "description": "Multilingual names container.",
+      "properties": {
+        "common": {
+          "anyOf": [
+            {
+              "patternProperties": {
+                "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$": {
+                  "type": "string"
+                }
+              },
+              "propertyNames": {
+                "description": "IETF BCP-47 language tag"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Common names by language",
+          "title": "Common"
+        },
+        "primary": {
+          "description": "Primary name",
+          "minLength": 1,
+          "title": "Primary",
+          "type": "string"
+        },
+        "rules": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/NameRule"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Name rules",
+          "title": "Rules"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "title": "NamesContainer",
+      "type": "object"
+    },
+    "PerspectiveMode": {
+      "description": "Perspective mode for disputed names.",
+      "enum": [
+        "accepted_by",
+        "disputed_by"
+      ],
+      "title": "PerspectiveMode",
+      "type": "string"
+    },
+    "RoofMaterial": {
+      "description": "Building roof material classification.",
+      "enum": [
+        "concrete",
+        "copper",
+        "eternit",
+        "glass",
+        "grass",
+        "gravel",
+        "metal",
+        "plastic",
+        "roof_tiles",
+        "slate",
+        "solar_panels",
+        "thatch",
+        "tar_paper",
+        "wood"
+      ],
+      "title": "RoofMaterial",
+      "type": "string"
+    },
+    "RoofOrientation": {
+      "description": "Building roof orientation classification.",
+      "enum": [
+        "across",
+        "along"
+      ],
+      "title": "RoofOrientation",
+      "type": "string"
+    },
+    "RoofShape": {
+      "description": "Building roof shape classification.",
+      "enum": [
+        "dome",
+        "flat",
+        "gabled",
+        "gambrel",
+        "half_hipped",
+        "hipped",
+        "mansard",
+        "onion",
+        "pyramidal",
+        "round",
+        "saltbox",
+        "sawtooth",
+        "skillion",
+        "spherical"
+      ],
+      "title": "RoofShape",
+      "type": "string"
+    }
+  },
+  "description": "Building feature model.",
+  "properties": {
+    "geometry": {
+      "additionalProperties": true,
+      "description": "GeoJSON geometry",
+      "title": "Geometry",
+      "type": "object"
+    },
+    "id": {
+      "description": "Feature identifier",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "properties": {
+      "$ref": "#/$defs/BuildingProperties",
+      "description": "Building feature properties"
+    },
+    "type": {
+      "default": "Feature",
+      "description": "GeoJSON type",
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "geometry",
+    "properties"
+  ],
+  "title": "BuildingFeature",
+  "type": "object"
+}

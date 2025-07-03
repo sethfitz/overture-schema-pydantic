@@ -1,0 +1,740 @@
+{
+  "$defs": {
+    "AdvancedSourceItem": {
+      "description": "Advanced source information with linear referencing support.",
+      "properties": {
+        "between": {
+          "anyOf": [
+            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
+              "items": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear referencing range",
+          "title": "Between"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "title": "Confidence"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id"
+        },
+        "update_time": {
+          "anyOf": [
+            {
+              "description": "ISO 8601 datetime",
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When this property was last updated (ISO 8601)",
+          "title": "Update Time"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "AdvancedSourceItem",
+      "type": "object"
+    },
+    "CartographyContainer": {
+      "description": "Cartographic hints for optimal map display.",
+      "properties": {
+        "max_zoom": {
+          "anyOf": [
+            {
+              "maximum": 23,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum recommended zoom level",
+          "title": "Max Zoom"
+        },
+        "min_zoom": {
+          "anyOf": [
+            {
+              "maximum": 23,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Minimum recommended zoom level",
+          "title": "Min Zoom"
+        },
+        "prominence": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Feature significance/importance",
+          "title": "Prominence"
+        },
+        "sort_key": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Drawing order (lower = on top)",
+          "title": "Sort Key"
+        }
+      },
+      "title": "CartographyContainer",
+      "type": "object"
+    },
+    "DivisionClass": {
+      "description": "Division-specific class designations.",
+      "enum": [
+        "megacity",
+        "city",
+        "town",
+        "village",
+        "hamlet"
+      ],
+      "title": "DivisionClass",
+      "type": "string"
+    },
+    "DivisionProperties": {
+      "additionalProperties": true,
+      "description": "Properties specific to division features.",
+      "properties": {
+        "capital_division_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "description": "String without whitespace characters",
+                "pattern": "^\\S+$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Capital division identifiers",
+          "title": "Capital Division Ids"
+        },
+        "capital_of_divisions": {
+          "anyOf": [
+            {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Divisions this is capital of",
+          "title": "Capital Of Divisions"
+        },
+        "cartography": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CartographyContainer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Cartographic display hints"
+        },
+        "class": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DivisionClass"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Division class designation"
+        },
+        "country": {
+          "description": "ISO 3166-1 alpha-2 country code",
+          "pattern": "^[A-Z]{2}$",
+          "title": "Country",
+          "type": "string"
+        },
+        "hierarchies": {
+          "description": "Administrative hierarchy chains",
+          "items": {
+            "items": {
+              "$ref": "#/$defs/HierarchyItem"
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Hierarchies",
+          "type": "array"
+        },
+        "local_type": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Localized subtype name",
+          "title": "Local Type"
+        },
+        "names": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NamesContainer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Multilingual names"
+        },
+        "norms": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Norms"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Local norms"
+        },
+        "parent_division_id": {
+          "anyOf": [
+            {
+              "description": "String without whitespace characters",
+              "minLength": 1,
+              "pattern": "^\\S+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Parent division identifier",
+          "title": "Parent Division Id"
+        },
+        "perspectives": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Perspectives"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Political perspectives"
+        },
+        "population": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Population count",
+          "title": "Population"
+        },
+        "prominence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Prominence score (0.0-1.0)",
+          "title": "Prominence"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "description": "ISO 3166-2 subdivision code",
+              "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ISO 3166-2 region code",
+          "title": "Region"
+        },
+        "sources": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/AdvancedSourceItem"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Advanced source information",
+          "title": "Sources"
+        },
+        "subtype": {
+          "$ref": "#/$defs/PlaceType",
+          "description": "Administrative level"
+        },
+        "theme": {
+          "const": "divisions",
+          "default": "divisions",
+          "description": "Feature theme",
+          "title": "Theme",
+          "type": "string"
+        },
+        "type": {
+          "const": "division",
+          "default": "division",
+          "description": "Feature type",
+          "title": "Type",
+          "type": "string"
+        },
+        "version": {
+          "description": "Feature version number",
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "subtype",
+        "hierarchies",
+        "country"
+      ],
+      "title": "DivisionProperties",
+      "type": "object"
+    },
+    "HierarchyItem": {
+      "description": "Single item in administrative hierarchy.",
+      "properties": {
+        "division_id": {
+          "description": "Division identifier",
+          "title": "Division Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Division name",
+          "title": "Name",
+          "type": "string"
+        },
+        "subtype": {
+          "$ref": "#/$defs/PlaceType",
+          "description": "Administrative level"
+        }
+      },
+      "required": [
+        "division_id",
+        "subtype",
+        "name"
+      ],
+      "title": "HierarchyItem",
+      "type": "object"
+    },
+    "NamePerspectives": {
+      "description": "Political perspectives for names.",
+      "properties": {
+        "countries": {
+          "description": "ISO 3166-1 alpha-2 country codes",
+          "items": {
+            "description": "ISO 3166-1 alpha-2 country code",
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Countries",
+          "type": "array"
+        },
+        "mode": {
+          "$ref": "#/$defs/overture__schema__core__common__PerspectiveMode",
+          "description": "Perspective mode"
+        }
+      },
+      "required": [
+        "mode",
+        "countries"
+      ],
+      "title": "NamePerspectives",
+      "type": "object"
+    },
+    "NameRule": {
+      "description": "Name rule with variant and language specification.",
+      "properties": {
+        "between": {
+          "anyOf": [
+            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
+              "items": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear referencing range",
+          "title": "Between"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "description": "IETF BCP-47 language tag",
+              "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "IETF BCP-47 language tag",
+          "title": "Language"
+        },
+        "perspectives": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NamePerspectives"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Political perspectives"
+        },
+        "side": {
+          "anyOf": [
+            {
+              "enum": [
+                "left",
+                "right"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Side specification",
+          "title": "Side"
+        },
+        "value": {
+          "description": "Name value",
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/NameVariant",
+          "description": "Name variant type"
+        }
+      },
+      "required": [
+        "variant",
+        "value"
+      ],
+      "title": "NameRule",
+      "type": "object"
+    },
+    "NameVariant": {
+      "description": "Name variant types.",
+      "enum": [
+        "common",
+        "official",
+        "alternate",
+        "short"
+      ],
+      "title": "NameVariant",
+      "type": "string"
+    },
+    "NamesContainer": {
+      "additionalProperties": true,
+      "description": "Multilingual names container.",
+      "properties": {
+        "common": {
+          "anyOf": [
+            {
+              "patternProperties": {
+                "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$": {
+                  "type": "string"
+                }
+              },
+              "propertyNames": {
+                "description": "IETF BCP-47 language tag"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Common names by language",
+          "title": "Common"
+        },
+        "primary": {
+          "description": "Primary name",
+          "minLength": 1,
+          "title": "Primary",
+          "type": "string"
+        },
+        "rules": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/NameRule"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Name rules",
+          "title": "Rules"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "title": "NamesContainer",
+      "type": "object"
+    },
+    "Norms": {
+      "description": "Local norms and standards.",
+      "properties": {
+        "driving_side": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Side"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Driving side (inheritable from parent)"
+        }
+      },
+      "title": "Norms",
+      "type": "object"
+    },
+    "Perspectives": {
+      "description": "Political perspectives container.",
+      "properties": {
+        "countries": {
+          "description": "ISO 3166-1 alpha-2 country codes",
+          "items": {
+            "description": "ISO 3166-1 alpha-2 country code",
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Countries",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mode": {
+          "$ref": "#/$defs/overture__schema__divisions__common__models__PerspectiveMode",
+          "description": "Perspective validation mode"
+        }
+      },
+      "required": [
+        "mode",
+        "countries"
+      ],
+      "title": "Perspectives",
+      "type": "object"
+    },
+    "PlaceType": {
+      "description": "Administrative hierarchy levels for divisions.",
+      "enum": [
+        "country",
+        "dependency",
+        "macroregion",
+        "region",
+        "macrocounty",
+        "county",
+        "localadmin",
+        "locality",
+        "borough",
+        "macrohood",
+        "neighborhood",
+        "microhood"
+      ],
+      "title": "PlaceType",
+      "type": "string"
+    },
+    "Side": {
+      "description": "Driving side for norms.",
+      "enum": [
+        "left",
+        "right"
+      ],
+      "title": "Side",
+      "type": "string"
+    },
+    "overture__schema__core__common__PerspectiveMode": {
+      "description": "Perspective mode for disputed names.",
+      "enum": [
+        "accepted_by",
+        "disputed_by"
+      ],
+      "title": "PerspectiveMode",
+      "type": "string"
+    },
+    "overture__schema__divisions__common__models__PerspectiveMode": {
+      "description": "Political perspective validation modes.",
+      "enum": [
+        "accepted_by",
+        "disputed_by"
+      ],
+      "title": "PerspectiveMode",
+      "type": "string"
+    }
+  },
+  "description": "Division feature model.",
+  "properties": {
+    "geometry": {
+      "additionalProperties": true,
+      "description": "GeoJSON geometry",
+      "title": "Geometry",
+      "type": "object"
+    },
+    "id": {
+      "description": "Feature identifier",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "properties": {
+      "$ref": "#/$defs/DivisionProperties",
+      "description": "Division feature properties"
+    },
+    "type": {
+      "default": "Feature",
+      "description": "GeoJSON type",
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "geometry",
+    "properties"
+  ],
+  "title": "Division",
+  "type": "object"
+}
