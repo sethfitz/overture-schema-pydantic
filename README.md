@@ -4,12 +4,15 @@ Pydantic schemas for Overture Maps data structures.
 
 ## Project Structure
 
-This project uses a multi-package workspace architecture with theme-based namespaces and type-specific packages:
+This project uses a multi-package workspace architecture with theme-based
+namespaces and type-specific packages:
 
-```
+```text
 packages/
-├── overture-schema/                   # Main entrypoint package (aggregates all types)
-├── overture-schema-core/              # Base classes and common structures
+├── overture-schema/                   # Main entrypoint package
+│                                      # (aggregates all types)
+├── overture-schema-core/              # Base classes and common
+│                                      # structures
 ├── overture-schema-segment-type/      # Transportation segments
 ├── overture-schema-connector-type/    # Transportation connectors
 ├── overture-schema-building-type/     # Building features
@@ -17,7 +20,9 @@ packages/
 └── ...                               # Other type-specific packages
 ```
 
-The `overture-schema` package serves as the main entrypoint and aggregates all type-specific packages. For extensions, depend on specific packages directly:
+The `overture-schema` package serves as the main entrypoint and aggregates
+all type-specific packages. For extensions, depend on specific packages
+directly:
 
 ```python
 # Main usage - includes all types
@@ -54,11 +59,19 @@ from typing import Literal
 class EVCharger(OvertureFeature):
     """Electric vehicle charging station with specialized attributes"""
     type: Literal["ev_charger"] = "ev_charger"
-    connector_types: list[str] = Field(description="Available connector types (CCS, CHAdeMO, etc.)")
-    max_power_kw: float = Field(description="Maximum charging power in kilowatts")
-    network_operator: str | None = Field(default=None, description="Charging network operator")
+    connector_types: list[str] = Field(
+        description="Available connector types (CCS, CHAdeMO, etc.)"
+    )
+    max_power_kw: float = Field(
+        description="Maximum charging power in kilowatts"
+    )
+    network_operator: str | None = Field(
+        default=None, description="Charging network operator"
+    )
     pricing_model: str | None = Field(default=None, description="Pricing structure")
-    payment_methods: list[str] = Field(default_factory=list, description="Accepted payment methods")
+    payment_methods: list[str] = Field(
+        default_factory=list, description="Accepted payment methods"
+    )
 ```
 
 ### Linear Referencing Extensions
@@ -73,35 +86,59 @@ from datetime import time
 class TimeSpan(BaseModel):
     """Time-based restriction following CurbLR specification"""
     days_of_week: list[str] = Field(description="Days when restriction applies")
-    time_of_day_start: time | None = Field(default=None, description="Start time")
+    time_of_day_start: time | None = Field(
+        default=None, description="Start time"
+    )
     time_of_day_end: time | None = Field(default=None, description="End time")
-    designated_period: str | None = Field(default=None, description="Named time period (school_days, snow_emergency)")
+    designated_period: str | None = Field(
+        default=None,
+        description="Named time period (school_days, snow_emergency)"
+    )
 
 class PaymentTerms(BaseModel):
     """Payment requirements for curb usage"""
     rate: float | None = Field(default=None, description="Cost per unit time")
-    rate_unit: str | None = Field(default=None, description="Unit of time for rate (hour, day)")
-    methods: list[str] = Field(default_factory=list, description="Accepted payment methods")
+    rate_unit: str | None = Field(
+        default=None, description="Unit of time for rate (hour, day)"
+    )
+    methods: list[str] = Field(
+        default_factory=list, description="Accepted payment methods"
+    )
 
 class CurbRestriction(LinearReferencedEvent):
     """Curb usage restrictions following CurbLR specification"""
     type: Literal["curb_restriction"] = "curb_restriction"
-    rule: str = Field(description="Type of regulation (no_parking, loading_zone, etc.)")
-    user_classes: list[str] = Field(default_factory=list, description="Vehicle types or user groups")
-    time_spans: list[TimeSpan] = Field(default_factory=list, description="When restriction applies")
-    payment: PaymentTerms | None = Field(default=None, description="Payment requirements")
-    priority: int = Field(default=1, description="Priority for overlapping regulations")
-    max_stay_minutes: int | None = Field(default=None, description="Maximum stay duration")
+    rule: str = Field(
+        description="Type of regulation (no_parking, loading_zone, etc.)"
+    )
+    user_classes: list[str] = Field(
+        default_factory=list, description="Vehicle types or user groups"
+    )
+    time_spans: list[TimeSpan] = Field(
+        default_factory=list, description="When restriction applies"
+    )
+    payment: PaymentTerms | None = Field(
+        default=None, description="Payment requirements"
+    )
+    priority: int = Field(
+        default=1, description="Priority for overlapping regulations"
+    )
+    max_stay_minutes: int | None = Field(
+        default=None, description="Maximum stay duration"
+    )
 ```
 
 ## Tooling: Hatch + uv
 
-This project uses [Hatch](https://hatch.pypa.io/) for project management and [uv](https://github.com/astral-sh/uv) for fast dependency resolution.
+This project uses [Hatch](https://hatch.pypa.io/) for project management and
+[uv](https://github.com/astral-sh/uv) for fast dependency resolution.
 
 ### Why Hatch?
 
 - **Multi-package workspaces**: Manages multiple related packages in one repository
-- **Modern build standards**: Built around [PEP 517](https://peps.python.org/pep-0517/) (build system interface) and [PEP 518](https://peps.python.org/pep-0518/) (build system requirements)
+- **Modern build standards**: Built around
+  [PEP 517](https://peps.python.org/pep-0517/) (build system interface) and
+  [PEP 518](https://peps.python.org/pep-0518/) (build system requirements)
 - **Environment management**: Built-in test matrix and environment handling
 - **Publishing workflow**: Streamlined process for publishing multiple packages
 
@@ -143,19 +180,108 @@ uv run mypy packages/
 uv run python -m build packages/overture-schema-core
 ```
 
+## Model Registration System
+
+The library uses a global model registry for validation and JSON schema
+generation. This system allows modular packages while enabling centralized
+validation.
+
+### How Registration Works
+
+1. **Import-time registration**: Models register themselves when their
+   modules are imported
+2. **Global registry**: A central registry maps `(theme, type)` tuples to
+   Pydantic model classes
+3. **Explicit collection**: Tests and schema generation explicitly import
+   all model modules
+
+### Registration Pattern
+
+Each model package follows this pattern:
+
+```python
+# packages/overture-schema-building-type/src/overture/schema/buildings/
+# building/models.py
+from overture.schema.core.base import OvertureFeature, register_model
+
+class BuildingFeature(OvertureFeature):
+    type: Literal["building"] = "building"
+    # ... model definition ...
+
+# Register when module is imported
+register_model("buildings", "building", BuildingFeature)
+```
+
+### Model Collection
+
+For validation and schema generation, import all model packages to trigger
+registration:
+
+```python
+# Trigger registration by importing all model packages
+import overture.schema.buildings.building.models
+import overture.schema.places.place.models
+import overture.schema.transportation.segment.models
+# ... other model imports
+
+from overture.schema.core.base import _FEATURE_MODELS, get_registered_model
+
+# Access registered models
+model_class = get_registered_model("buildings", "building")
+if model_class:
+    validated = model_class.model_validate(feature_data)
+```
+
+### Schema Generation
+
+Generate JSON schemas for all registered models:
+
+```python
+from overture.schema.core.base import _FEATURE_MODELS
+
+def generate_json_schemas():
+    schemas = {}
+    for (theme, feature_type), model_class in _FEATURE_MODELS.items():
+        json_schema = model_class.model_json_schema()
+        if theme not in schemas:
+            schemas[theme] = {}
+        schemas[theme][feature_type] = json_schema
+    return schemas
+```
+
+### Extension Registration
+
+When creating extensions, follow the same registration pattern:
+
+```python
+from overture.schema.core.base import register_model
+from overture.schema.places.place import Place
+
+class EVCharger(Place):
+    type: Literal["ev_charger"] = "ev_charger"
+    connector_types: list[str]
+    max_power_kw: float
+
+# Register your extension
+register_model("places", "ev_charger", EVCharger)
+```
+
 ## Multi-Package Workflow
 
 The workspace configuration in `pyproject.toml` enables seamless development:
 
 ```toml
 [tool.uv.sources]
-overture-schema-core = { path = "packages/overture-schema-core", editable = true }
-overture-schema-segment-type = { path = "packages/overture-schema-segment-type", editable = true }
+overture-schema-core = { path = "packages/overture-schema-core",
+                        editable = true }
+overture-schema-segment-type = { path = "packages/overture-schema-segment-type",
+                                editable = true }
 # ... other packages
 ```
 
 This provides:
 
 - **Local development**: Changes to one package immediately available to others
-- **Dependency management**: Automatic resolution of inter-package dependencies  
+- **Dependency management**: Automatic resolution of inter-package
+  dependencies  
 - **Unified testing**: Run tests across all packages while respecting dependencies
