@@ -6,7 +6,7 @@ This document describes the iterative process for improving our Pydantic schema 
 
 The feedback loop helps identify and fix discrepancies between our Pydantic-generated JSON Schema and the expected validation behavior by testing against known examples and counterexamples.
 
-**Important distinction:** This process focuses on the **generated JSON Schema output** (`overture-schema.json`), not direct Pydantic model validation. Field validation and model-level configuration issues are typically caught earlier when testing Pydantic models directly against examples. This feedback loop specifically targets cases where the Pydantic models work correctly but their JSON Schema generation doesn't capture all the intended validation rules.
+**Key insight:** The major breakthrough was discovering that the monolithic schema approach doesn't work because it lacks conditional routing logic (`if/then/else` based on `theme` and `type`). The solution is **per-theme-type schema generation** that matches how examples are organized.
 
 ## Prerequisites
 
@@ -16,171 +16,223 @@ The feedback loop helps identify and fix discrepancies between our Pydantic-gene
 
 ## Feedback Loop Steps
 
-### 1. Generate Schema Snapshot
+### 0. Start Clean - Pydantic Model Validation
 
-Generate the current JSON Schema from your Pydantic models:
-
-```bash
-uv run python -m packages.overture-schema.src.overture.schema > overture-schema.json
-```
-
-This captures the current state of all Pydantic models' JSON Schema output in a single file.
-
-### 2. Run Validation Tests
-
-Execute the test suite against examples and counterexamples:
+**CRITICAL:** Always verify Pydantic models work correctly before testing JSON Schema generation.
 
 ```bash
-PATH="$PATH:$HOME/go/bin" /opt/homebrew/bin/bash ./test.sh
+# Run constraint validation tests
+uv run pytest packages/overture-schema-validation/test_constraints.py -v
+
+# Run baseline tests (may have cache issues - clear if needed)
+find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+uv run pytest packages/overture-schema-address-type/tests/ -v
 ```
 
-**Test modes available:**
-
-- `./test.sh` - Run all tests (schema, examples, counterexamples)
-- `./test.sh -m examples` - Test only positive examples (should pass)
-- `./test.sh -m counterexamples` - Test only negative examples (should fail)
-- `./test.sh "pattern"` - Test files matching regex pattern
-
-### 3. Inspect Failures
-
-**Example failures (should pass but failed):**
-
-- Indicates the Pydantic schema is too strict
-- Look for missing optional fields, overly restrictive validation, or type mismatches
-- Check the detailed error output for specific validation failures
-
-**Counterexample failures (should fail but passed):**
-
-- Indicates the Pydantic schema is too permissive
-- Look for missing required fields, missing validation constraints, or missing type restrictions
-- These are often the most critical to fix as they represent security/data quality issues
-
-**Detailed error inspection:**
+**Test your specific models directly:**
 
 ```bash
-# Get detailed validation output for specific failing files
-PATH="$PATH:$HOME/go/bin" /opt/homebrew/bin/bash -c "jv --output detailed overture-schema.json reference/counterexamples/path/to/failing-file.yaml"
+uv run python -c "
+import sys
+sys.path.append('packages/overture-schema-address-type/src')
+from overture.schema.addresses.address.models import AddressFeature
+
+# Test the failing counterexample data
+test_data = {
+    'id': 'test:1', 'type': 'Feature',
+    'geometry': {'type': 'Point', 'coordinates': [-71, 42]},
+    'properties': {
+        'theme': 'addresses', 'type': 'address', 'version': 0,
+        'country': 'US', 'address_levels': []  # Should fail
+    }
+}
+
+try:
+    AddressFeature(**test_data)
+    print('❌ PYDANTIC VALIDATION PASSED - This indicates a model issue')
+except Exception as e:
+    print('✅ PYDANTIC VALIDATION FAILED (correctly):', str(e))
+"
 ```
 
-### 4. Update Pydantic Models
-
-Focus on customizing JSON Schema generation using Pydantic's schema customization features:
-
-**Common fixes:**
-
-a) **Custom field validation:**
+**If Pydantic validation fails to catch issues, fix the models first using constraint-based validation:**
 
 ```python
-from pydantic import Field, field_validator
-from typing_extensions import Annotated
+from typing import Annotated, List
+from overture.schema.validation import MinItemsConstraint, WhitespaceConstraint
 
-class MyModel(BaseModel):
-    field: Annotated[str, Field(min_length=1)]  # Prevent empty strings
-    
-    @field_validator('field')
-    def validate_field(cls, v):
-        # Custom validation logic
-        return v
+# Use constraints instead of basic Field parameters
+address_levels: Annotated[List[AddressLevel], MinItemsConstraint(1), MaxItemsConstraint(5)]
+street: Optional[Annotated[str, WhitespaceConstraint()]]
 ```
 
-b) **JSON Schema customization:**
+### 1. Generate Per-Theme-Type Schemas
+
+**NEW APPROACH:** Generate individual schema files for each theme-type combination instead of one monolithic schema.
+
+```bash
+# List all available theme-type combinations
+uv run python -m packages.overture-schema.src.overture.schema --list-types
+
+# Generate specific schema for testing
+uv run python -m packages.overture-schema.src.overture.schema --theme addresses --type address > overture-schema-addresses-address.json
+
+# Or generate all schemas at once
+uv run python -m packages.overture-schema.src.overture.schema --output-dir schemas/
+```
+
+**Why this works:** Each example/counterexample has a known `theme` and `type`, so we can validate against the specific schema for that combination, avoiding the need for complex conditional routing.
+
+### 2. Test Against Specific Schemas
+
+**OLD (didn't work):**
+
+```bash
+# This approach failed because of missing routing logic
+PATH="$PATH:$HOME/go/bin" jv overture-schema.json reference/counterexamples/addresses/bad-address-empty-levels.yaml
+```
+
+**NEW (works correctly):**
+
+```bash
+# Test against specific theme-type schema
+PATH="$PATH:$HOME/go/bin" jv --output detailed overture-schema-addresses-address.json reference/counterexamples/addresses/bad-address-empty-levels.yaml
+```
+
+### 3. Validate Results
+
+**Expected behavior for counterexamples:**
+
+```bash
+# Should FAIL with specific error messages
+PATH="$PATH:$HOME/go/bin" jv overture-schema-addresses-address.json reference/counterexamples/addresses/bad-address-empty-levels.yaml
+# Expected: "minItems: got 0, want 1"
+
+PATH="$PATH:$HOME/go/bin" jv overture-schema-addresses-address.json reference/counterexamples/addresses/bad-address-too-many-levels.yaml  
+# Expected: "maxItems: got 6, want 5"
+```
+
+**Expected behavior for examples:**
+
+```bash
+# Should PASS without errors
+PATH="$PATH:$HOME/go/bin" jv overture-schema-addresses-address.json reference/examples/addresses/address.yaml
+```
+
+### 4. Diagnose Schema Generation Issues
+
+**Common problems discovered:**
+
+a) **Constraint not generating JSON Schema properly:**
+
+```bash
+# Check if constraint appears in generated schema
+jq '.["$defs"].AddressProperties.properties.street' overture-schema-addresses-address.json
+```
+
+If missing expected patterns/constraints, the issue is in constraint implementation:
+
+- `MinItemsConstraint()` → should generate `"minItems": N`
+- `WhitespaceConstraint()` → should generate `"pattern": "^(\\S.*)?\S$"`
+- `CountryCodeConstraint()` → should generate `"pattern": "^[A-Z]{2}$"`
+
+b) **Missing required fields:**
+
+```bash
+# Check required array
+jq '.["$defs"].AddressProperties.required' overture-schema-addresses-address.json
+```
+
+c) **Type routing issues:**
+
+```bash  
+# Check theme/type constraints
+jq '.["$defs"].AddressProperties.properties.theme' overture-schema-addresses-address.json
+# Should show: {"const": "addresses", ...}
+```
+
+### 5. Fix Issues Systematically
+
+**Priority order:**
+
+1. **High Priority - Missing JSON Schema generation in constraints**
+   - Fix constraint classes to properly implement `__get_json_schema__()` methods
+   - Test: Generate schema and verify constraint appears
+
+2. **Medium Priority - Field-level validation issues**  
+   - Add missing constraints to model fields
+   - Use `Annotated[Type, Constraint()]` syntax
+
+3. **Low Priority - Model structure issues**
+   - Adjust required fields, optional handling
+
+**Example fixes:**
 
 ```python
-from pydantic import BaseModel
-from pydantic.json_schema import GenerateJsonSchema, JsonSchemaValue
-from typing import Any
-
-class MyModel(BaseModel):
-    @classmethod
-    def __get_pydantic_json_schema__(
-        cls, core_schema: Any, handler: Any
-    ) -> JsonSchemaValue:
-        json_schema = handler(core_schema)
-        # Customize the generated JSON Schema
-        json_schema['additionalProperties'] = False  # Strict property checking
+# Fix constraint that doesn't generate JSON Schema
+class WhitespaceConstraint(BaseConstraint):
+    def __get_json_schema__(self, source_type, handler):
+        json_schema = handler(source_type) 
+        json_schema['pattern'] = r'^(\S.*)?\S$'  # Add pattern constraint
         return json_schema
 ```
 
-c) **Model-level configuration:**
+### 6. Update Test Infrastructure (Future)
 
-```python
-from pydantic import BaseModel, ConfigDict
+**Current approach:** Manual testing per theme-type
+**Future improvement:** Update `test.sh` to automatically:
 
-class MyModel(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',  # Reject extra fields
-        str_strip_whitespace=True,  # Auto-strip strings
-        validate_assignment=True,  # Validate on assignment
-    )
-```
+1. Detect theme/type from example file path
+2. Generate appropriate schema file
+3. Validate against correct schema
+4. Report results by theme-type
 
-**Target specific issues:**
-
-- **Too permissive**: Add field constraints, required fields, enum restrictions
-- **Too strict**: Make fields optional, allow additional properties, relax type constraints
-- **Missing validation**: Add custom validators, field constraints, or model validators
-
-### 5. Repeat the Loop
-
-After making changes:
-
-1. Regenerate schema: `uv run python -m packages.overture-schema.src.overture.schema > overture-schema.json`
-2. Re-run tests: `PATH="$PATH:$HOME/go/bin" /opt/homebrew/bin/bash ./test.sh`
-3. Compare results to previous run
-4. Continue until all tests pass
-
-## Tracking Progress
-
-**Monitor test results:**
+Example logic:
 
 ```bash
-# Count passing/failing tests
-PATH="$PATH:$HOME/go/bin" /opt/homebrew/bin/bash ./test.sh 2>&1 | grep -c "OK"
-PATH="$PATH:$HOME/go/bin" /opt/homebrew/bin/bash ./test.sh 2>&1 | grep -c "FAILED"
+# Extract theme/type from path: reference/examples/addresses/address.yaml
+theme="addresses"
+type="address" 
+schema_file="overture-schema-${theme}-${type}.json"
+
+# Generate if needed, then validate
+uv run python -m packages.overture-schema.src.overture.schema --theme "$theme" --type "$type" > "$schema_file"
+jv "$schema_file" "$example_file"
 ```
 
-**Focus areas by priority:**
+## Root Cause Analysis Framework
 
-1. **Counterexamples passing** (highest priority - security/data quality)
-2. **Examples failing** (medium priority - usability)
-3. **Schema validation** (basic prerequisite)
+**When counterexamples pass (should fail):**
 
-## Debugging Tips
+1. ✅ **Test Pydantic model directly** - Does it catch the issue?
+   - **No**: Fix the Pydantic model (add constraints)  
+   - **Yes**: Continue to step 2
 
-**Understanding validation failures:**
+2. ✅ **Check JSON Schema generation** - Are constraints present?
+   - **No**: Fix constraint JSON Schema generation
+   - **Yes**: Continue to step 3
 
-- Use `jv --output detailed` for comprehensive error messages
-- Check the specific line/property causing validation failures
-- Compare against the source of truth: hand-written JSON Schema in
-  `../schema/schema/` (YAML files)
-- Note: Our generated JSON Schema doesn't need to match exactly, but should
-  validate the same data correctly
-
-**Common Pydantic schema issues:**
-
-- Missing `Field(...)` constraints
-- Incorrect use of `Optional` vs required fields
-- Union types not properly constrained
-- Missing custom validators for complex business rules
-- Incorrect `additionalProperties` handling
-
-**Testing specific patterns:**
-
-```bash
-# Test only transportation-related files
-./test.sh "transportation"
-
-# Test only a specific counterexample category
-./test.sh -m counterexamples "addresses"
-```
+3. ✅ **Check validation approach** - Using per-theme-type schema?
+   - **No**: Generate specific schema and test against it
+   - **Yes**: Complex schema structure issue
 
 ## Success Criteria
 
 The feedback loop is complete when:
 
-- ✅ Schema validation passes (`overture-schema.json` is valid)
-- ✅ All examples pass validation (positive test cases)
-- ✅ All counterexamples fail validation (negative test cases)
-- ✅ Generated JSON Schema semantically matches reference behavior
+- ✅ **Pydantic models validate correctly** (test directly with Python)
+- ✅ **JSON Schema generation works** (constraints appear in schema)  
+- ✅ **Per-theme-type validation works** (counterexamples fail, examples pass)
+- ✅ **All theme-type combinations tested** (systematic coverage)
 
-This iterative process ensures the Pydantic implementation accurately reflects the intended validation rules of the Overture Maps schema.
+## Key Learnings
+
+1. **Architecture matters:** Monolithic schema approach with conditional routing is complex and error-prone. Per-theme-type schemas are simpler and more reliable.
+
+2. **Test Pydantic first:** Many "JSON Schema" issues are actually Pydantic model issues. Always verify models work before testing schema generation.
+
+3. **Constraint implementation gaps:** Some constraints work in Pydantic but don't generate proper JSON Schema. Each constraint needs both validation logic AND JSON Schema generation.
+
+4. **File organization alignment:** The per-theme-type approach naturally aligns with how examples and counterexamples are organized, making testing more intuitive.
+
+This revised approach has proven much more effective than the original monolithic schema strategy.

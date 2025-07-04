@@ -24,6 +24,7 @@ OPTIONS:
                    this argument maybe specified more than once, e.g.
                    \`-m schema -m examples\`. if this argument is omitted,
                    all validation modes are run.
+  -v, --verbose   show detailed information including theme:type detection
 
 EXAMPLES:
   $self --help
@@ -55,6 +56,9 @@ function parse_args() {
         ;;
       --mode=*)
         add_mode "${arg/#*=/}"
+        ;;
+      -v|--verbose)
+        VERBOSE=1
         ;;
       -h|--help)
         usage
@@ -93,7 +97,101 @@ function add_mode() {
   modes["$mode"]=yes
 }
 
+# Default schema file (for backward compatibility)
 schema_file=overture-schema.json
+
+function extract_theme_type() {
+  local instance_file="$1"
+  local theme=""
+  local type=""
+  
+  # Extract theme and type from file path
+  # Examples:
+  # reference/examples/addresses/address.yaml -> theme=addresses, type=address
+  # reference/counterexamples/transportation/segment/bad-class.yaml -> theme=transportation, type=segment
+  # reference/examples/buildings/building-polygon.yaml -> theme=buildings, type=building
+  
+  if [[ "$instance_file" =~ reference/(examples|counterexamples)/([^/]+)/([^/]+) ]]; then
+    theme="${BASH_REMATCH[2]}"
+    local path_component="${BASH_REMATCH[3]}"
+    
+    # Handle different path patterns
+    case "$theme" in
+      addresses)
+        type="address"
+        ;;
+      base)
+        # base/bathymetry-example.yaml -> type=bathymetry
+        # base/infrastructure/infrastructure-example.yaml -> type=infrastructure
+        if [[ "$instance_file" =~ reference/(examples|counterexamples)/base/([^/]+) ]]; then
+          local base_component="${BASH_REMATCH[2]}"
+          # Extract type from filename pattern
+          if [[ "$base_component" =~ ^([^-]+) ]]; then
+            type="${BASH_REMATCH[1]}"
+          elif [[ "$instance_file" =~ reference/(examples|counterexamples)/base/([^/]+)/([^/]+) ]]; then
+            # Handle subdirectory case: base/bathymetry/bad-depth.yaml
+            type="${BASH_REMATCH[2]}"
+          fi
+        fi
+        ;;
+      buildings)
+        # Most buildings are type=building, but building_part is separate
+        if [[ "$instance_file" =~ building-part ]]; then
+          type="building_part"
+        else
+          type="building"
+        fi
+        ;;
+      divisions)
+        # divisions/division/, divisions/division_area/, divisions/division_boundary/
+        if [[ "$instance_file" =~ reference/(examples|counterexamples)/divisions/([^/]+) ]]; then
+          type="${BASH_REMATCH[2]}"
+        fi
+        ;;
+      places)
+        type="place"
+        ;;
+      transportation)
+        # transportation/segment/, transportation/connector/
+        if [[ "$instance_file" =~ reference/(examples|counterexamples)/transportation/([^/]+) ]]; then
+          type="${BASH_REMATCH[2]}"
+        fi
+        ;;
+    esac
+  fi
+  
+  # Output theme:type (or empty if not detected)
+  if [[ -n "$theme" && -n "$type" ]]; then
+    echo "${theme}:${type}"
+  fi
+}
+
+function get_schema_file() {
+  local instance_file="$1"
+  local theme_type
+  theme_type=$(extract_theme_type "$instance_file")
+  
+  if [[ -n "$theme_type" ]]; then
+    local theme="${theme_type%:*}"
+    local type="${theme_type#*:}"
+    local specific_schema="overture-schema-${theme}-${type}.json"
+    
+    # Generate schema if it doesn't exist
+    if [[ ! -f "$specific_schema" ]]; then
+      >&2 printf "Generating schema for %s:%s...\n" "$theme" "$type"
+      if ! uv run python -m packages.overture-schema.src.overture.schema --theme "$theme" --type "$type" > "$specific_schema" 2>/dev/null; then
+        >&2 printf "Failed to generate schema for %s:%s, falling back to default\n" "$theme" "$type"
+        echo "$schema_file"
+        return
+      fi
+    fi
+    
+    echo "$specific_schema"
+  else
+    # Fall back to default schema
+    echo "$schema_file"
+  fi
+}
 
 function match() {
   if [ "${#patterns}" == 0 ]; then
@@ -112,8 +210,14 @@ function match() {
 function verify() {
   local mode="$1"
   local instance_file="${2:-}"
+  
+  # Determine which schema file to use
+  local current_schema_file="$schema_file"
+  if [ -n "$instance_file" ]; then
+    current_schema_file=$(get_schema_file "$instance_file")
+  fi
 
-  local -a jv_args=(--assert-format --assert-content "$schema_file")
+  local -a jv_args=(--assert-format --assert-content "$current_schema_file")
   if [ -n "$instance_file" ]; then
     jv_args+=("$instance_file")
   fi
@@ -168,12 +272,29 @@ function examples() {
     elif ! match "$instance_file"; then
       continue
     fi
-    printf "%s..." "$instance_file"
+    
+    # Show which schema is being used (in debug mode or if VERBOSE is set)
+    local schema_info=""
+    if [[ "${VERBOSE:-}" == "1" ]]; then
+      local theme_type
+      theme_type=$(extract_theme_type "$instance_file")
+      if [[ -n "$theme_type" ]]; then
+        schema_info=" [${theme_type}]"
+      fi
+    fi
+    
+    printf "%s%s..." "$instance_file" "$schema_info"
     if verify quiet "$instance_file"; then
       echo OK
     else
       echo FAILED
       printf "\nexample instance '%s' is EXPECTED to pass validation but ACTUALLY it failed.\n" "$instance_file"
+      
+      # Show which schema was used
+      local used_schema
+      used_schema=$(get_schema_file "$instance_file")
+      printf "Schema used: %s\n" "$used_schema"
+      
       verify detailed "$instance_file"
     fi
   done
@@ -191,11 +312,28 @@ function counterexamples() {
     if ! match "$instance_file"; then
       continue
     fi
-    printf "%s..." "$instance_file"
+    
+    # Show which schema is being used (in debug mode or if VERBOSE is set)
+    local schema_info=""
+    if [[ "${VERBOSE:-}" == "1" ]]; then
+      local theme_type
+      theme_type=$(extract_theme_type "$instance_file")
+      if [[ -n "$theme_type" ]]; then
+        schema_info=" [${theme_type}]"
+      fi
+    fi
+    
+    printf "%s%s..." "$instance_file" "$schema_info"
     declare -a expected_errors
     if verify quiet "$instance_file"; then
       echo FAILED
       printf "\ncounterexample instance '%s' is EXPECTED to fail validation but ACTUALLY it passed.\n" "$instance_file"
+      
+      # Show which schema was used
+      local used_schema
+      used_schema=$(get_schema_file "$instance_file")
+      printf "Schema used: %s\n" "$used_schema"
+      
     elif [ -z "$yq_installed" ] || ! expected_errors "$instance_file" | mapfile -t expected_errors || [ ${#expected_errors} == 0 ]; then
       echo OK
     else
@@ -213,6 +351,12 @@ function counterexamples() {
         printf "%s\n\n" "$expected_error"
         printf "%s\n" "---------------------- ACTUAL VALIDATION OUTPUT ----------------------"
         printf "%s\n" "${actual_errors[@]}"
+        
+        # Show which schema was used
+        local used_schema
+        used_schema=$(get_schema_file "$instance_file")
+        printf "%s\n" "------------------------"
+        printf "Schema used: %s\n" "$used_schema"
       done
       echo OK
     fi
