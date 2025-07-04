@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any, Dict, List, Optional
 
-from pydantic import Field, field_validator
+from pydantic import Field, model_validator
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -15,14 +15,16 @@ from overture.schema.core.common import (
 )
 from overture.schema.validation import (
     CountryCode,
+    GeometryTypeConstraint,
+    MinItemsConstraint,
     NoWhitespaceString,
-    ParentDivisionConstraint,
     RegionCode,
     theme_literal,
     type_literal,
     UniqueItemsConstraint,
 )
 from overture.schema.divisions.common.models import (
+    CapitalOfDivisionItem,
     DivisionClass,
     HierarchyItem,
     Norms,
@@ -31,9 +33,7 @@ from overture.schema.divisions.common.models import (
 )
 
 
-class DivisionProperties(
-    Annotated[OvertureFeatureProperties, ParentDivisionConstraint(PlaceType.COUNTRY)]
-):
+class DivisionProperties(OvertureFeatureProperties):
     """Properties specific to division features."""
 
     # Override theme and type with constraint-based validation
@@ -43,10 +43,15 @@ class DivisionProperties(
     # Required properties
     subtype: PlaceType = Field(..., description="Administrative level")
 
-    # Administrative hierarchy
-    hierarchies: List[List[HierarchyItem]] = Field(
-        ..., min_length=1, description="Administrative hierarchy chains"
-    )
+    # Administrative hierarchy - each hierarchy must have unique items and at least one item
+    hierarchies: Annotated[
+        List[
+            Annotated[
+                List[HierarchyItem], MinItemsConstraint(1), UniqueItemsConstraint()
+            ]
+        ],
+        MinItemsConstraint(1),
+    ] = Field(..., description="Administrative hierarchy chains")
 
     # Geographic context
     country: CountryCode = Field(..., description="ISO 3166-1 alpha-2 country code")
@@ -59,9 +64,11 @@ class DivisionProperties(
     capital_division_ids: Optional[
         Annotated[List[NoWhitespaceString], UniqueItemsConstraint()]
     ] = Field(None, min_length=1, description="Capital division identifiers")
-    capital_of_divisions: Optional[List[Dict[str, Any]]] = Field(
-        None, min_length=1, description="Divisions this is capital of"
-    )
+    capital_of_divisions: Optional[
+        Annotated[
+            List[CapitalOfDivisionItem], MinItemsConstraint(1), UniqueItemsConstraint()
+        ]
+    ] = Field(None, description="Divisions this is capital of")
 
     # Political and social context
     perspectives: Optional[Perspectives] = Field(
@@ -91,38 +98,6 @@ class DivisionProperties(
         None, min_length=1, description="Advanced source information"
     )
 
-    @field_validator("hierarchies")
-    @classmethod
-    def validate_hierarchies(cls, v):
-        """Validate hierarchy structure and consistency."""
-        if not v:
-            raise ValueError("Division must have at least one hierarchy")
-
-        for hierarchy in v:
-            if not hierarchy:
-                raise ValueError("Hierarchy cannot be empty")
-
-            # Validate hierarchy item uniqueness within each hierarchy
-            division_ids = [item.division_id for item in hierarchy]
-            if len(division_ids) != len(set(division_ids)):
-                raise ValueError("Division IDs must be unique within hierarchy")
-
-        return v
-
-    @field_validator("capital_of_divisions")
-    @classmethod
-    def validate_capital_of_divisions_unique(cls, v):
-        """Ensure capital of divisions are unique."""
-        if v is None:
-            return v
-
-        # Check uniqueness based on division_id
-        division_ids = [item.get("division_id") for item in v if isinstance(item, dict)]
-        if len(division_ids) != len(set(division_ids)):
-            raise ValueError("Capital of divisions must be unique")
-
-        return v
-
 
 class Division(OvertureFeature):
     """Division feature model."""
@@ -131,33 +106,25 @@ class Division(OvertureFeature):
         ..., description="Division feature properties"
     )
 
-    @field_validator("geometry")
-    @classmethod
-    def validate_geometry_type(cls, v):
-        """Divisions must have Point geometry."""
-        # Call parent validation first
-        super().validate_geometry_structure(v)
+    # Use constraint-based validation for Point geometry
+    geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["Point"])] = Field(
+        ..., description="Point geometry for division location"
+    )
 
-        geom_type = v.get("type")
-        if geom_type != "Point":
-            raise ValueError(f"Division geometry must be Point, got {geom_type}")
+    @model_validator(mode="after")
+    def validate_parent_division_logic(self):
+        """Validate parent division ID based on subtype."""
+        subtype = self.properties.subtype
+        parent_division_id = self.properties.parent_division_id
 
-        # Validate Point coordinates
-        if "coordinates" in v:
-            coords = v["coordinates"]
-            if not isinstance(coords, list) or len(coords) < 2:
-                raise ValueError(
-                    "Point coordinates must be an array with at least 2 elements"
-                )
+        if subtype == PlaceType.COUNTRY and parent_division_id is not None:
+            raise ValueError("Countries must not have parent_division_id")
+        elif subtype != PlaceType.COUNTRY and parent_division_id is None:
+            raise ValueError(
+                f"parent_division_id is required for sub-country divisions (subtype: {subtype})"
+            )
 
-            # Check that coordinates are numbers
-            for i, coord in enumerate(coords):
-                if not isinstance(coord, (int, float)):
-                    raise ValueError(
-                        f"Coordinate {i} must be a number, got {type(coord).__name__}"
-                    )
-
-        return v
+        return self
 
 
 # Register the model

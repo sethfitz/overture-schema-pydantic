@@ -71,6 +71,7 @@ from .constraints import (
     ThemeTypeCompatibilityConstraint,
     CountryRequiredConstraint,
     ParentDivisionConstraint,
+    GeometryTypeConstraint,
 )
 
 from .types import (
@@ -137,6 +138,7 @@ __all__ = [
     "ThemeTypeCompatibilityConstraint",
     "CountryRequiredConstraint",
     "ParentDivisionConstraint",
+    "GeometryTypeConstraint",
     # Constrained types
     "LanguageTag",
     "CountryCode",

@@ -52,6 +52,7 @@ dependencies = [
     "overture-schema-addresses-theme",
     "pydantic[email]>=2.0",
     "typing-extensions",
+    "shapely>=2.1.1",
 ]
 
 [project.optional-dependencies]

@@ -4,13 +4,30 @@ A comprehensive constraint-based validation library for Overture Maps Pydantic s
 
 ## Overview
 
-Instead of writing repetitive `@field_validator` methods, you can use constraint annotations to declare validation rules declaratively. This approach provides:
+This package provides constraint-based validation utilities for Overture Maps
+Pydantic schemas. While some constraints work reliably, there are important
+limitations to be aware of.
+
+### ✅ What Works Reliably
+
+- **Field-level constraints**: All single-field validation constraints work
+- **Collection constraints on fields**: List/array validation constraints work
+- **String pattern validation**: Regex and format constraints work
+- **Numeric range validation**: Min/max value constraints work
+
+### ❌ Known Limitations
+
+**Model-level constraints via `Annotated` do NOT work reliably.**
+
+Use `@model_validator` instead for cross-field validation.
+
+## Benefits of Working Constraints
 
 - **Cleaner code**: Less boilerplate validation logic
-- **Consistency**: Standardized validation patterns across all schemas
+- **Consistency**: Standardized validation patterns
 - **Reusability**: Constraints can be composed and reused
 - **Better errors**: Consistent, detailed validation error messages
-- **JSON Schema integration**: Constraints automatically enhance generated JSON schemas
+- **JSON Schema integration**: Constraints enhance generated JSON schemas
 
 ## Installation
 
@@ -140,40 +157,33 @@ class SegmentProperties(
 
 ### Registry Constraints
 
-Validate against global registries and enforce schema consistency:
+**⚠️ WARNING: Registry constraints via `Annotated` do NOT work.**
 
-| Constraint | Purpose |
-|------------|---------|
-| `ThemeRegistryConstraint` | Validates theme field against registered themes |
-| `TypeRegistryConstraint` | Validates feature type field against registered types |
-| `ThemeTypeCompatibilityConstraint` | Ensures theme-type combinations are valid |
-| `CountryRequiredConstraint` | Requires country field for non-country subtypes |
-| `ParentDivisionConstraint` | Validates parent division logic (countries have no parent) |
+The following registry constraints are **non-functional**:
 
-**Example - Registry Validation:**
+| Constraint | Status | Alternative |
+|------------|--------|-------------|
+| `ThemeRegistryConstraint` | ❌ Not working | Use `theme_literal()` |
+| `TypeRegistryConstraint` | ❌ Not working | Use `type_literal()` |
+| `ThemeTypeCompatibilityConstraint` | ❌ Not working | Use field validators |
+| `CountryRequiredConstraint` | ❌ Not working | Use `@model_validator` |
+| `ParentDivisionConstraint` | ❌ Not working | Use `@model_validator` |
+
+**Working Alternative - Field-Level Validation:**
 
 ```python
-from overture.schema.validation import (
-    ThemeRegistryConstraint,
-    TypeRegistryConstraint, 
-    ThemeTypeCompatibilityConstraint
-)
-from overture.schema.core.base import (
-    validate_theme,
-    validate_feature_type,
-    validate_theme_type_compatibility
-)
+from overture.schema.validation.types import theme_literal, type_literal
 
-class OvertureFeatureProperties(
-    Annotated[
-        BaseModel,
-        ThemeRegistryConstraint(validate_theme),
-        TypeRegistryConstraint(validate_feature_type),
-        ThemeTypeCompatibilityConstraint(validate_theme_type_compatibility),
-    ]
-):
-    theme: str = Field(..., description="Overture theme")
-    type: str = Field(..., description="Feature type")
+class DivisionProperties(BaseModel):
+    # These work because they're field-level constraints
+    theme: theme_literal("divisions") = Field("divisions")
+    type: type_literal("division") = Field("division")
+    
+    # For complex validation, use @model_validator
+    @model_validator(mode="after")
+    def validate_business_rules(self):
+        # Custom validation logic here
+        return self
 ```
 
 ## Ready-to-Use Types
@@ -253,17 +263,39 @@ osm_id: Annotated[str, OSMIdConstraint] = Field(..., description="OSM ID")
 
 ### Model-Level Validation
 
-Apply constraints to entire models for cross-field validation:
+**⚠️ IMPORTANT LIMITATION: Model-level constraints via `Annotated` do NOT work
+reliably in this Pydantic setup.**
+
+The following model-level constraints are **NOT functional** and should be
+avoided:
+
+- `MutuallyExclusiveConstraint`
+- `AtLeastOneOfConstraint`
+- `ConditionalRequiredConstraint`
+- `ThemeRegistryConstraint`
+- `TypeRegistryConstraint`
+- `ThemeTypeCompatibilityConstraint`
+- `ParentDivisionConstraint`
+- `CountryRequiredConstraint`
+- `ExtensionPrefixConstraint`
+
+Use `@model_validator` instead for cross-field validation:
 
 ```python
-class BoundaryProperties(
-    Annotated[
-        BaseModel,
-        MutuallyExclusiveConstraint("is_land", "is_territorial"),
-    ]
-):
+from pydantic import model_validator
+
+class BoundaryProperties(BaseModel):
     is_land: Optional[bool] = None
     is_territorial: Optional[bool] = None
+    
+    @model_validator(mode="after")
+    def validate_mutually_exclusive_flags(self):
+        """Validate that is_land and is_territorial are mutually exclusive."""
+        if self.is_land is True and self.is_territorial is True:
+            raise ValueError(
+                "is_land and is_territorial are mutually exclusive"
+            )
+        return self
 ```
 
 ### Migrating from Traditional Validators
@@ -502,38 +534,43 @@ model_schema = MyModel.model_json_schema()
 
 ## Integration with Overture Schema
 
-This validation package is designed to work seamlessly with Overture Maps schema packages and has replaced all `@model_validator` usage throughout the codebase:
+This validation package integrates with Overture Maps schema packages using
+a hybrid approach:
+
+- **Field-level constraints**: Used for single-field validation
+- **@model_validator**: Used for cross-field validation
 
 ```python
 # In your schema models
 from typing import Annotated
-from overture.schema.validation import (
-    CountryCode, 
-    LanguageTag,
-    ThemeRegistryConstraint,
-    TypeRegistryConstraint,
-    ParentDivisionConstraint
-)
+from pydantic import model_validator
+from overture.schema.validation import CountryCode, LanguageTag
+from overture.schema.validation.types import theme_literal, type_literal
 
-# Base properties with registry validation
-class OvertureFeatureProperties(
-    Annotated[
-        BaseModel,
-        ThemeRegistryConstraint(validate_theme),
-        TypeRegistryConstraint(validate_feature_type),
-    ]
-):
+# Base properties with field-level validation only
+class OvertureFeatureProperties(BaseModel):
     theme: str = Field(..., description="Overture theme")
     type: str = Field(..., description="Feature type")
     country: Optional[CountryCode] = None
     names: Dict[LanguageTag, str] = Field(default_factory=dict)
 
-# Division-specific validation
-class DivisionProperties(
-    Annotated[OvertureFeatureProperties, ParentDivisionConstraint(PlaceType.COUNTRY)]
-):
+# Division-specific validation with @model_validator
+class DivisionProperties(OvertureFeatureProperties):
+    # Field-level constraints work
+    theme: theme_literal("divisions") = Field("divisions")
+    type: type_literal("division") = Field("division")
+    
     subtype: PlaceType = Field(..., description="Administrative level")
-    parent_division_id: Optional[str] = Field(None, description="Parent division ID")
+    parent_division_id: Optional[str] = Field(None, description="Parent ID")
+    
+    # Model-level validation via decorator
+    @model_validator(mode="after")
+    def validate_parent_division_logic(self):
+        if self.subtype == PlaceType.COUNTRY and self.parent_division_id:
+            raise ValueError("Countries must not have parent_division_id")
+        elif self.subtype != PlaceType.COUNTRY and not self.parent_division_id:
+            raise ValueError("Non-countries must have parent_division_id")
+        return self
 ```
 
 ### Real-World Usage in Overture Schema

@@ -2,12 +2,11 @@
 
 from typing import Annotated, List, Optional
 
-from pydantic import Field, field_validator
+from pydantic import Field, model_validator
 
 from overture.schema.validation import (
     CountryCode,
-    CountryRequiredConstraint,
-    MutuallyExclusiveConstraint,
+    GeometryTypeConstraint,
     RegionCode,
     UniqueItemsConstraint,
     theme_literal,
@@ -29,13 +28,7 @@ from overture.schema.divisions.common.models import (
 )
 
 
-class DivisionBoundaryProperties(
-    Annotated[
-        OvertureFeatureProperties,
-        CountryRequiredConstraint(PlaceType.COUNTRY),
-        MutuallyExclusiveConstraint("is_land", "is_territorial"),
-    ]
-):
+class DivisionBoundaryProperties(OvertureFeatureProperties):
     """Properties specific to division boundary features."""
 
     # Override theme and type with constraint-based validation
@@ -81,47 +74,34 @@ class DivisionBoundaryProperties(
         None, min_length=1, description="Advanced source information"
     )
 
+    @model_validator(mode="after")
+    def validate_mutually_exclusive_flags(self):
+        """Validate that is_land and is_territorial are mutually exclusive."""
+        if self.is_land is True and self.is_territorial is True:
+            raise ValueError(
+                "Fields is_land, is_territorial are mutually exclusive and cannot both be true"
+            )
+        return self
 
-class DivisionBoundary(OvertureFeature):
+    @model_validator(mode="after")
+    def validate_country_required(self):
+        """Validate that country is required for non-country boundaries."""
+        if self.country is None and self.subtype != PlaceType.COUNTRY:
+            raise ValueError("country is required when subtype is not 'country'")
+        return self
+
+
+class DivisionBoundary(
+    Annotated[
+        OvertureFeature,
+        GeometryTypeConstraint(["LineString", "MultiLineString"]),
+    ]
+):
     """Division boundary feature model."""
 
     properties: DivisionBoundaryProperties = Field(
         ..., description="Division boundary feature properties"
     )
-
-    @field_validator("geometry")
-    @classmethod
-    def validate_geometry_type(cls, v):
-        """Division boundaries must have LineString or MultiLineString geometry."""
-        # Call parent validation first
-        super().validate_geometry_structure(v)
-
-        geom_type = v.get("type")
-        if geom_type not in ["LineString", "MultiLineString"]:
-            raise ValueError(
-                f"Division boundary geometry must be LineString or MultiLineString, got {geom_type}"
-            )
-
-        # Validate coordinates structure
-        if "coordinates" in v:
-            coords = v["coordinates"]
-            if not isinstance(coords, list):
-                raise ValueError("Coordinates must be an array")
-
-            # Basic numeric validation for nested coordinate arrays
-            def validate_coords_recursive(coord_array):
-                if isinstance(coord_array, list):
-                    for item in coord_array:
-                        if isinstance(item, list):
-                            validate_coords_recursive(item)
-                        elif not isinstance(item, (int, float)):
-                            raise ValueError(
-                                f"Coordinate must be a number, got {type(item).__name__}"
-                            )
-
-            validate_coords_recursive(coords)
-
-        return v
 
 
 # Register the model

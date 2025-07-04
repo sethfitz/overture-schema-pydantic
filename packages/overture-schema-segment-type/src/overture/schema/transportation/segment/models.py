@@ -1,12 +1,14 @@
 """Segment feature models for Overture Maps transportation theme."""
 
-from typing import Annotated, List, Literal, Optional
+from typing import Annotated, Dict, Any, List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
 from overture.schema.validation import (
     CompositeUniqueConstraint,
     ConditionalRequiredConstraint,
+    MinItemsConstraint,
+    GeometryTypeConstraint,
     theme_literal,
     type_literal,
 )
@@ -108,8 +110,8 @@ class SegmentProperties(
     names: Optional[NamesContainer] = Field(None, description="Multilingual names")
 
     # Override sources to use advanced source items
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
+    sources: Optional[Annotated[List[AdvancedSourceItem], MinItemsConstraint(1)]] = (
+        Field(None, description="Advanced source information")
     )
 
     # Optional basic properties
@@ -149,8 +151,8 @@ class SegmentProperties(
     level_rules: Optional[List[StrictLevelRule]] = Field(
         None, description="Level/elevation rules"
     )
-    width_rules: Optional[List[StrictWidthRule]] = Field(
-        None, min_length=1, description="Width rules"
+    width_rules: Optional[Annotated[List[StrictWidthRule], MinItemsConstraint(1)]] = (
+        Field(None, description="Width rules")
     )
 
     # Subtype-specific flags (strict typed)
@@ -215,18 +217,9 @@ class SegmentFeature(OvertureFeature):
     """Segment feature model."""
 
     properties: SegmentProperties = Field(..., description="Segment feature properties")
-
-    @field_validator("geometry")
-    @classmethod
-    def validate_geometry_type(cls, v):
-        """Segments must have LineString geometry."""
-        # Call parent validation first
-        super().validate_geometry_structure(v)
-
-        geom_type = v.get("type")
-        if geom_type != "LineString":
-            raise ValueError(f"Segment geometry must be LineString, got {geom_type}")
-        return v
+    geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["LineString"])] = Field(
+        ..., description="GeoJSON geometry (LineString)"
+    )
 
 
 # Register Pydantic models when module is imported

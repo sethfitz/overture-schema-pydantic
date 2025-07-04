@@ -3,9 +3,10 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import field_validator
+from pydantic import Field
 
 from overture.schema.core.base import OvertureFeatureProperties
+from overture.schema.validation import theme_literal
 
 
 class SurfaceMaterial(str, Enum):
@@ -51,15 +52,11 @@ class BaseGeometryType(str, Enum):
 class BaseThemeProperties(OvertureFeatureProperties):
     """Base properties for all base theme features."""
 
+    # Override theme with constraint-based validation
+    theme: theme_literal("base") = Field("base", description="Feature theme")
+
     # Common surface property that can be used by infrastructure and land
     surface: Optional[SurfaceMaterial] = None
-
-    @field_validator("theme")
-    @classmethod
-    def validate_theme_is_base(cls, v):
-        if v != "base":
-            raise ValueError("Base theme feature must have theme='base'")
-        return v
 
 
 def create_geometry_validator(valid_types: List[str]):

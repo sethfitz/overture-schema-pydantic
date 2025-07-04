@@ -3,10 +3,9 @@
 from enum import Enum
 from typing import Annotated, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from overture.schema.validation import (
-    AtLeastOneOfConstraint,
     CompositeUniqueConstraint,
     UniqueItemsConstraint,
 )
@@ -142,11 +141,7 @@ class DestinationWhenClause(HeadingScopeContainer):
 
 
 # Core rule models using mix-in composition
-class SpeedLimitRule(
-    Annotated[
-        GeometricRangeScopeContainer, AtLeastOneOfConstraint("max_speed", "min_speed")
-    ]
-):
+class SpeedLimitRule(GeometricRangeScopeContainer):
     """Speed limit rule with scoping via when clause."""
 
     max_speed: Optional[Speed] = Field(None, description="Maximum speed limit")
@@ -155,6 +150,13 @@ class SpeedLimitRule(
         None, description="Whether maximum speed is variable"
     )
     when: Optional[SpeedLimitWhenClause] = Field(None, description="Scoping conditions")
+
+    @model_validator(mode="after")
+    def validate_at_least_one_speed(self):
+        """Validate that at least one of max_speed or min_speed is present."""
+        if self.max_speed is None and self.min_speed is None:
+            raise ValueError("At least one of max_speed or min_speed must be present")
+        return self
 
 
 class AccessRestrictionRule(GeometricRangeScopeContainer):

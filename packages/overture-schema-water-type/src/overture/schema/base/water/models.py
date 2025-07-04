@@ -1,10 +1,15 @@
 """Water feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
-from pydantic import Field, field_validator
+from pydantic import Field
 
+from overture.schema.validation import (
+    GeometryTypeConstraint,
+    theme_literal,
+    type_literal,
+)
 from overture.schema.core.base import (
     OvertureFeature,
     OvertureFeatureProperties,
@@ -76,6 +81,10 @@ class WaterClass(str, Enum):
 class WaterProperties(OvertureFeatureProperties):
     """Properties specific to water features."""
 
+    # Override theme and type with constraint-based validation
+    theme: theme_literal("base") = Field("base", description="Feature theme")
+    type: type_literal("water") = Field("water", description="Feature type")
+
     # Required properties
     subtype: WaterSubtype = Field(..., description="Water subtype")
     class_: WaterClass = Field(..., alias="class", description="Water class")
@@ -100,40 +109,18 @@ class WaterProperties(OvertureFeatureProperties):
     # External identifiers
     wikidata: Optional[str] = Field(None, description="Wikidata identifier")
 
-    @field_validator("theme")
-    @classmethod
-    def validate_theme(cls, v):
-        if v != "base":
-            raise ValueError("Water theme must be 'base'")
-        return v
-
-    @field_validator("type")
-    @classmethod
-    def validate_type(cls, v):
-        if v != "water":
-            raise ValueError("Water type must be 'water'")
-        return v
-
 
 class WaterFeature(OvertureFeature):
     """Water feature model."""
 
     properties: WaterProperties = Field(..., description="Water feature properties")
-
-    @field_validator("geometry")
-    @classmethod
-    def validate_geometry_type(cls, v):
-        """Water supports Point, LineString, Polygon, MultiPolygon."""
-        # Call parent validation first
-        super().validate_geometry_structure(v)
-
-        geom_type = v.get("type")
-        valid_types = ["Point", "LineString", "Polygon", "MultiPolygon"]
-        if geom_type not in valid_types:
-            raise ValueError(
-                f"Water geometry must be one of {valid_types}, got {geom_type}"
-            )
-        return v
+    geometry: Annotated[
+        Dict[str, Any],
+        GeometryTypeConstraint(["Point", "LineString", "Polygon", "MultiPolygon"]),
+    ] = Field(
+        ...,
+        description="GeoJSON geometry (Point, LineString, Polygon, or MultiPolygon)",
+    )
 
 
 # Register Pydantic models when module is imported

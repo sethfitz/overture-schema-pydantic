@@ -1,5 +1,7 @@
 """Common type definitions using constraint-based validation."""
 
+from __future__ import annotations
+
 from typing import Annotated, Dict, List
 
 from .constraints import (

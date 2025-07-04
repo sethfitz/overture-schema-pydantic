@@ -73,6 +73,37 @@ class HierarchyItem(BaseModel):
     subtype: PlaceType = Field(..., description="Administrative level")
     name: str = Field(..., description="Division name")
 
+    def __hash__(self) -> int:
+        """Make HierarchyItem hashable for uniqueness constraints."""
+        return hash((self.division_id, self.subtype, self.name))
+
+    def __eq__(self, other) -> bool:
+        """Equality comparison for HierarchyItem."""
+        if not isinstance(other, HierarchyItem):
+            return False
+        return (
+            self.division_id == other.division_id
+            and self.subtype == other.subtype
+            and self.name == other.name
+        )
+
+
+class CapitalOfDivisionItem(BaseModel):
+    """Division that has this division as capital."""
+
+    division_id: str = Field(..., description="Division identifier")
+    subtype: PlaceType = Field(..., description="Administrative level")
+
+    def __hash__(self) -> int:
+        """Make CapitalOfDivisionItem hashable for uniqueness constraints."""
+        return hash((self.division_id, self.subtype))
+
+    def __eq__(self, other) -> bool:
+        """Equality comparison for CapitalOfDivisionItem."""
+        if not isinstance(other, CapitalOfDivisionItem):
+            return False
+        return self.division_id == other.division_id and self.subtype == other.subtype
+
 
 class Norms(BaseModel):
     """Local norms and standards."""

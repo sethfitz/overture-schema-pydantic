@@ -1,16 +1,15 @@
 """Base schema classes for Overture Maps features."""
 
+from __future__ import annotations
+
 from abc import ABC
 from typing import Annotated, Any, Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from overture.schema.validation import (
-    ExtensionPrefixConstraint,
     MinItemsConstraint,
-    ThemeRegistryConstraint,
-    TypeRegistryConstraint,
-    ThemeTypeCompatibilityConstraint,
+    LiteralValueConstraint,
 )
 from overture.schema.validation.types import ISO8601DateTime, JSONPointer
 from .validation_rules import validate_with_rules
@@ -107,20 +106,24 @@ class CartographyContainer(BaseModel):
     sort_key: Optional[int] = Field(None, description="Drawing order (lower = on top)")
 
 
-class ExtensibleBaseModel(Annotated[BaseModel, ExtensionPrefixConstraint()]):
+class ExtensibleBaseModel(BaseModel):
     """Base model that allows ext_* prefixed fields only."""
 
     model_config = ConfigDict(extra="allow")  # Allow extra fields for validation
 
+    @model_validator(mode="after")
+    def validate_extension_prefixes(self):
+        """Validate that extra fields use allowed prefixes."""
+        if hasattr(self, "__pydantic_extra__") and self.__pydantic_extra__:
+            for field_name in self.__pydantic_extra__.keys():
+                if not field_name.startswith("ext_"):
+                    raise ValueError(
+                        f"Unrecognized field '{field_name}' must use ext_ prefix"
+                    )
+        return self
 
-class OvertureFeatureProperties(
-    Annotated[
-        ExtensibleBaseModel,
-        ThemeRegistryConstraint(validate_theme),
-        TypeRegistryConstraint(validate_feature_type),
-        ThemeTypeCompatibilityConstraint(validate_theme_type_compatibility),
-    ]
-):
+
+class OvertureFeatureProperties(ExtensibleBaseModel):
     """Base properties for all Overture features."""
 
     theme: str = Field(..., description="Top-level Overture theme")
@@ -138,20 +141,15 @@ class OvertureFeature(BaseModel, ABC):
     """Base class for all Overture features (GeoJSON Feature structure)."""
 
     id: str = Field(..., min_length=1, description="Feature identifier")
-    type: str = Field("Feature", description="GeoJSON type")
+    type: Annotated[str, LiteralValueConstraint("Feature", "type")] = Field(
+        "Feature", description="GeoJSON type"
+    )
     geometry: Dict[str, Any] = Field(..., description="GeoJSON geometry")
     properties: OvertureFeatureProperties = Field(..., description="Feature properties")
 
-    @field_validator("type")
-    @classmethod
-    def validate_geojson_type(cls, v):
-        if v != "Feature":
-            raise ValueError("type must be 'Feature'")
-        return v
-
-    @field_validator("geometry")
     @classmethod
     def validate_geometry_structure(cls, v):
+        """Basic geometry structure validation."""
         if not isinstance(v, dict):
             raise ValueError("geometry must be an object")
         if "type" not in v:

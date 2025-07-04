@@ -1,9 +1,9 @@
 """Infrastructure feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
-from pydantic import Field, field_validator
+from pydantic import Field
 
 from overture.schema.base.common import SurfaceMaterial
 from overture.schema.core.base import (
@@ -14,6 +14,11 @@ from overture.schema.core.base import (
 from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
+)
+from overture.schema.validation import (
+    GeometryTypeConstraint,
+    theme_literal,
+    type_literal,
 )
 
 
@@ -83,7 +88,13 @@ class InfrastructureClass(str, Enum):
 class InfrastructureProperties(OvertureFeatureProperties):
     """Properties specific to infrastructure features."""
 
-    # Required properties
+    # Required properties with constraint-based validation
+    theme: Annotated[str, theme_literal("base")] = Field(
+        ..., description="Feature theme"
+    )
+    type: Annotated[str, type_literal("infrastructure")] = Field(
+        ..., description="Feature type"
+    )
     subtype: InfrastructureSubtype = Field(..., description="Infrastructure subtype")
 
     # Optional properties
@@ -106,20 +117,6 @@ class InfrastructureProperties(OvertureFeatureProperties):
         None, description="Source tags from data providers"
     )
 
-    @field_validator("theme")
-    @classmethod
-    def validate_theme(cls, v):
-        if v != "base":
-            raise ValueError("Infrastructure theme must be 'base'")
-        return v
-
-    @field_validator("type")
-    @classmethod
-    def validate_type(cls, v):
-        if v != "infrastructure":
-            raise ValueError("Infrastructure type must be 'infrastructure'")
-        return v
-
 
 class InfrastructureFeature(OvertureFeature):
     """Infrastructure feature model."""
@@ -127,28 +124,22 @@ class InfrastructureFeature(OvertureFeature):
     properties: InfrastructureProperties = Field(
         ..., description="Infrastructure feature properties"
     )
-
-    @field_validator("geometry")
-    @classmethod
-    def validate_geometry_type(cls, v):
-        """Infrastructure can have any geometry type."""
-        # Call parent validation first
-        super().validate_geometry_structure(v)
-
-        geom_type = v.get("type")
-        valid_types = [
-            "Point",
-            "LineString",
-            "Polygon",
-            "MultiPoint",
-            "MultiLineString",
-            "MultiPolygon",
-        ]
-        if geom_type not in valid_types:
-            raise ValueError(
-                f"Infrastructure geometry must be one of {valid_types}, got {geom_type}"
-            )
-        return v
+    geometry: Annotated[
+        Dict[str, Any],
+        GeometryTypeConstraint(
+            [
+                "Point",
+                "LineString",
+                "Polygon",
+                "MultiPoint",
+                "MultiLineString",
+                "MultiPolygon",
+                "GeometryCollection",
+            ]
+        ),
+    ] = Field(
+        ..., description="Feature geometry - Infrastructure can have any geometry type"
+    )
 
 
 # Register Pydantic models when module is imported

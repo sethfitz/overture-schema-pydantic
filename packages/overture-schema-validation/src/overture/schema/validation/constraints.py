@@ -1,5 +1,7 @@
 """Constraint-based validation for Overture Maps schemas."""
 
+from __future__ import annotations
+
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Collection
@@ -522,13 +524,6 @@ class UniqueItemsConstraint(CollectionConstraint):
                     )
                 ],
             )
-
-    def __get_pydantic_json_schema__(
-        self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
-        json_schema = handler(core_schema)
-        json_schema["uniqueItems"] = True
-        return json_schema
 
 
 class CategoryPatternConstraint(StringConstraint):
@@ -1363,13 +1358,22 @@ class ParentDivisionConstraint(BaseConstraint):
         if not isinstance(value, BaseModel):
             return
 
-        if hasattr(value, self.subtype_field) and hasattr(value, self.parent_field):
-            subtype = getattr(value, self.subtype_field)
-            parent_division_id = getattr(value, self.parent_field)
+        # Handle both direct properties and feature objects
+        target_obj = value
+        if hasattr(value, "properties") and hasattr(
+            value.properties, self.subtype_field
+        ):
+            target_obj = value.properties
+
+        if hasattr(target_obj, self.subtype_field) and hasattr(
+            target_obj, self.parent_field
+        ):
+            subtype = getattr(target_obj, self.subtype_field)
+            parent_division_id = getattr(target_obj, self.parent_field)
 
             if subtype == self.country_subtype_value and parent_division_id is not None:
                 context = info.context or {}
-                loc = context.get("loc_prefix", ()) + (self.parent_field,)
+                loc = context.get("loc_prefix", ()) + ("properties", self.parent_field)
                 raise ValidationError.from_exception_data(
                     title=self.__class__.__name__,
                     line_errors=[
@@ -1385,7 +1389,7 @@ class ParentDivisionConstraint(BaseConstraint):
                 )
             elif subtype != self.country_subtype_value and parent_division_id is None:
                 context = info.context or {}
-                loc = context.get("loc_prefix", ()) + (self.parent_field,)
+                loc = context.get("loc_prefix", ()) + ("properties", self.parent_field)
                 raise ValidationError.from_exception_data(
                     title=self.__class__.__name__,
                     line_errors=[
@@ -1415,3 +1419,158 @@ class ParentDivisionConstraint(BaseConstraint):
             return value
 
         return core_schema.with_info_after_validator_function(validator_wrapper, schema)
+
+
+class GeometryTypeConstraint(BaseConstraint):
+    """Constraint for validating GeoJSON geometry types using Shapely."""
+
+    def __init__(self, allowed_types: List[str]):
+        """Initialize with allowed geometry types.
+
+        Args:
+            allowed_types: List of allowed GeoJSON geometry types (e.g., ["Point", "Polygon"])
+        """
+        # Validate allowed types at constraint creation
+        self._geometry_types = (
+            "GeometryCollection",
+            "LineString",
+            "Point",
+            "Polygon",
+            "MultiLineString",
+            "MultiPoint",
+            "MultiPolygon",
+        )
+
+        if not allowed_types:
+            raise ValueError(
+                f"allowed_types is empty (it must contain at least one of: {self._geometry_types})"
+            )
+
+        if not all(item in self._geometry_types for item in allowed_types):
+            invalid = [
+                item for item in allowed_types if item not in self._geometry_types
+            ]
+            raise ValueError(
+                f"allowed_types contains invalid values: {invalid} (allowed: {self._geometry_types})"
+            )
+
+        self.allowed_types = tuple(sorted(allowed_types))
+
+    def validate(self, value: Dict[str, Any], info: ValidationInfo) -> None:
+        """Validate GeoJSON geometry type and structure."""
+        if not isinstance(value, dict):
+            context = info.context or {}
+            loc = context.get("loc_prefix", ()) + ("value",)
+            raise ValidationError.from_exception_data(
+                title=self.__class__.__name__,
+                line_errors=[
+                    InitErrorDetails(
+                        type="value_error",
+                        loc=loc,
+                        input=value,
+                        ctx={"error": "Geometry must be an object"},
+                    )
+                ],
+            )
+
+        geometry_type = value.get("type")
+        if not geometry_type:
+            context = info.context or {}
+            loc = context.get("loc_prefix", ()) + ("type",)
+            raise ValidationError.from_exception_data(
+                title=self.__class__.__name__,
+                line_errors=[
+                    InitErrorDetails(
+                        type="value_error",
+                        loc=loc,
+                        input=value,
+                        ctx={"error": "Geometry must have a 'type' property"},
+                    )
+                ],
+            )
+
+        if geometry_type not in self._geometry_types:
+            context = info.context or {}
+            loc = context.get("loc_prefix", ()) + ("type",)
+            raise ValidationError.from_exception_data(
+                title=self.__class__.__name__,
+                line_errors=[
+                    InitErrorDetails(
+                        type="value_error",
+                        loc=loc,
+                        input=value,
+                        ctx={
+                            "error": f"Invalid geometry type '{geometry_type}' (allowed: {self._geometry_types})"
+                        },
+                    )
+                ],
+            )
+
+        if geometry_type not in self.allowed_types:
+            context = info.context or {}
+            loc = context.get("loc_prefix", ()) + ("type",)
+            allowed_list = ", ".join(self.allowed_types)
+            raise ValidationError.from_exception_data(
+                title=self.__class__.__name__,
+                line_errors=[
+                    InitErrorDetails(
+                        type="value_error",
+                        loc=loc,
+                        input=value,
+                        ctx={
+                            "error": f"Geometry type '{geometry_type}' not allowed (allowed: [{allowed_list}])"
+                        },
+                    )
+                ],
+            )
+
+        # Validate geometry structure using Shapely
+        try:
+            from shapely.geometry import shape
+            from shapely.errors import ShapelyError
+
+            # This will validate the GeoJSON structure and coordinates
+            shape(value)
+        except (ShapelyError, ValueError, TypeError) as e:
+            context = info.context or {}
+            loc = context.get("loc_prefix", ()) + ("value",)
+            raise ValidationError.from_exception_data(
+                title=self.__class__.__name__,
+                line_errors=[
+                    InitErrorDetails(
+                        type="value_error",
+                        loc=loc,
+                        input=value,
+                        ctx={"error": f"Invalid geometry structure: {str(e)}"},
+                    )
+                ],
+            )
+
+    def __get_pydantic_core_schema__(
+        self, source: type[Any], handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        python_schema = handler(source)
+
+        def validate_geometry(
+            value: Dict[str, Any], info: ValidationInfo
+        ) -> Dict[str, Any]:
+            self.validate(value, info)
+            return value
+
+        return core_schema.with_info_after_validator_function(
+            validate_geometry, python_schema
+        )
+
+    def __get_pydantic_json_schema__(
+        self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
+    ) -> Dict[str, Any]:
+        json_schema = handler(core_schema)
+        json_schema["properties"] = json_schema.get("properties", {})
+        json_schema["properties"]["type"] = {
+            "type": "string",
+            "enum": self.allowed_types,
+        }
+        json_schema["description"] = (
+            f"GeoJSON geometry with type one of: {', '.join(self.allowed_types)}"
+        )
+        return json_schema
