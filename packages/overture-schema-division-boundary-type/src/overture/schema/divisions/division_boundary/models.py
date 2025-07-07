@@ -2,7 +2,7 @@
 
 from typing import Annotated, List, Optional
 
-from pydantic import Field, model_validator
+from pydantic import Field
 
 from overture.schema.validation import (
     CountryCode,
@@ -11,6 +11,9 @@ from overture.schema.validation import (
     UniqueItemsConstraint,
     theme_literal,
     type_literal,
+    ConstraintValidatedModel,
+    mutually_exclusive,
+    not_required_if,
 )
 
 from overture.schema.core.base import (
@@ -28,7 +31,9 @@ from overture.schema.divisions.common.models import (
 )
 
 
-class DivisionBoundaryProperties(OvertureFeatureProperties):
+@mutually_exclusive("is_land", "is_territorial")
+@not_required_if("subtype", PlaceType.COUNTRY, ["country"])
+class DivisionBoundaryProperties(OvertureFeatureProperties, ConstraintValidatedModel):
     """Properties specific to division boundary features."""
 
     # Override theme and type with constraint-based validation
@@ -73,22 +78,6 @@ class DivisionBoundaryProperties(OvertureFeatureProperties):
     sources: Optional[List[AdvancedSourceItem]] = Field(
         None, min_length=1, description="Advanced source information"
     )
-
-    @model_validator(mode="after")
-    def validate_mutually_exclusive_flags(self):
-        """Validate that is_land and is_territorial are mutually exclusive."""
-        if self.is_land is True and self.is_territorial is True:
-            raise ValueError(
-                "Fields is_land, is_territorial are mutually exclusive and cannot both be true"
-            )
-        return self
-
-    @model_validator(mode="after")
-    def validate_country_required(self):
-        """Validate that country is required for non-country boundaries."""
-        if self.country is None and self.subtype != PlaceType.COUNTRY:
-            raise ValueError("country is required when subtype is not 'country'")
-        return self
 
 
 class DivisionBoundary(

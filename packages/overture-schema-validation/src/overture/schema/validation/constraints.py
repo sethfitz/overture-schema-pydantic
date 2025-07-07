@@ -525,6 +525,13 @@ class UniqueItemsConstraint(CollectionConstraint):
                 ],
             )
 
+    def __get_pydantic_json_schema__(
+        self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
+    ) -> Dict[str, Any]:
+        json_schema = handler(core_schema)
+        json_schema["uniqueItems"] = True
+        return json_schema
+
 
 class CategoryPatternConstraint(StringConstraint):
     """Constraint for place category patterns (snake_case)."""

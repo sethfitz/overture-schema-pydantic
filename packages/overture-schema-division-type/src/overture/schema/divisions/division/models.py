@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any, Dict, List, Optional
 
-from pydantic import Field, model_validator
+from pydantic import Field
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -14,6 +14,7 @@ from overture.schema.core.common import (
     NamesContainer,
 )
 from overture.schema.validation import (
+    ConstraintValidatedModel,
     CountryCode,
     GeometryTypeConstraint,
     MinItemsConstraint,
@@ -23,11 +24,12 @@ from overture.schema.validation import (
     type_literal,
     UniqueItemsConstraint,
 )
-from overture.schema.divisions.common.models import (
+from overture.schema.divisions.common import (
     CapitalOfDivisionItem,
     DivisionClass,
     HierarchyItem,
     Norms,
+    parent_division_required_unless,
     Perspectives,
     PlaceType,
 )
@@ -99,7 +101,8 @@ class DivisionProperties(OvertureFeatureProperties):
     )
 
 
-class Division(OvertureFeature):
+@parent_division_required_unless("subtype", PlaceType.COUNTRY)
+class Division(OvertureFeature, ConstraintValidatedModel):
     """Division feature model."""
 
     properties: DivisionProperties = Field(
@@ -110,21 +113,6 @@ class Division(OvertureFeature):
     geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["Point"])] = Field(
         ..., description="Point geometry for division location"
     )
-
-    @model_validator(mode="after")
-    def validate_parent_division_logic(self):
-        """Validate parent division ID based on subtype."""
-        subtype = self.properties.subtype
-        parent_division_id = self.properties.parent_division_id
-
-        if subtype == PlaceType.COUNTRY and parent_division_id is not None:
-            raise ValueError("Countries must not have parent_division_id")
-        elif subtype != PlaceType.COUNTRY and parent_division_id is None:
-            raise ValueError(
-                f"parent_division_id is required for sub-country divisions (subtype: {subtype})"
-            )
-
-        return self
 
 
 # Register the model

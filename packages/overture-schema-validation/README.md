@@ -1,25 +1,14 @@
 # Overture Schema Validation
 
-A comprehensive constraint-based validation library for Overture Maps Pydantic schemas. This package provides reusable validation constraints that enforce data quality and business rules across Overture Maps feature data.
+A comprehensive constraint-based validation library for Overture Maps Pydantic
+schemas. This package provides reusable validation constraints that enforce
+data quality and business rules across Overture Maps feature data.
 
 ## Overview
 
 This package provides constraint-based validation utilities for Overture Maps
-Pydantic schemas. While some constraints work reliably, there are important
-limitations to be aware of.
-
-### ✅ What Works Reliably
-
-- **Field-level constraints**: All single-field validation constraints work
-- **Collection constraints on fields**: List/array validation constraints work
-- **String pattern validation**: Regex and format constraints work
-- **Numeric range validation**: Min/max value constraints work
-
-### ❌ Known Limitations
-
-**Model-level constraints via `Annotated` do NOT work reliably.**
-
-Use `@model_validator` instead for cross-field validation.
+Pydantic schemas, offering both field-level and model-level validation
+capabilities through a comprehensive constraint system.
 
 ## Benefits of Working Constraints
 
@@ -74,18 +63,18 @@ Validate string formats against common patterns:
 
 | Constraint | Purpose | Example |
 |------------|---------|---------|
-| `PatternConstraint` | Generic regex pattern matching | Custom patterns with error messages |
+| `PatternConstraint` | Generic regex pattern matching | Custom patterns |
 | `LanguageTagConstraint` | IETF BCP-47 language tags | `"en-US"`, `"fr-CA"` |
-| `CountryCodeConstraint` | ISO 3166-1 alpha-2 country codes | `"US"`, `"CA"`, `"GB"` |
+| `CountryCodeConstraint` | ISO 3166-1 alpha-2 codes | `"US"`, `"CA"`, `"GB"` |
 | `RegionCodeConstraint` | ISO 3166-2 subdivision codes | `"US-CA"`, `"CA-ON"` |
-| `ISO8601DateTimeConstraint` | ISO 8601 datetime strings | `"2023-12-25T10:30:00Z"` |
-| `CategoryPatternConstraint` | Snake_case category names | `"shopping_mall"`, `"gas_station"` |
+| `ISO8601DateTimeConstraint` | ISO 8601 datetime strings | `"2023-12-25T10Z"` |
+| `CategoryPatternConstraint` | Snake_case category names | `"shopping_mall"` |
 | `WikidataConstraint` | Wikidata identifiers | `"Q123456"` |
 | `PhoneNumberConstraint` | International phone numbers | `"+1-555-123-4567"` |
-| `HexColorConstraint` | Hexadecimal color codes | `"#FF0000"`, `"#00FF00"` |
+| `HexColorConstraint` | Hexadecimal color codes | `"#FF0000"` |
 | `JSONPointerConstraint` | RFC 6901 JSON Pointers | `"/properties/name"` |
-| `WhitespaceConstraint` | No leading/trailing whitespace | Trims input validation |
-| `NoWhitespaceConstraint` | No whitespace characters allowed | `"identifier123"`, `"snake_case"` |
+| `WhitespaceConstraint` | No leading/trailing whitespace | Trims input |
+| `NoWhitespaceConstraint` | No whitespace characters | `"identifier123"` |
 
 ### Collection Constraints
 
@@ -124,9 +113,10 @@ Domain-specific validation logic:
 
 | Constraint | Purpose |
 |------------|---------|
-| `LinearReferenceRangeConstraint` | Linear referencing ranges [start, end] where 0 ≤ start < end ≤ 1 |
-| `ExtensionPrefixConstraint` | Validate extension field naming (e.g., `ext_*`) |
-| `LiteralValueConstraint` | Enforce exact literal values (e.g., theme="places") |
+| `LinearReferenceRangeConstraint` | Linear referencing ranges [start, end] |
+| | where 0 ≤ start < end ≤ 1 |
+| `ExtensionPrefixConstraint` | Validate extension field naming |
+| `LiteralValueConstraint` | Enforce exact literal values |
 
 ### Conditional Constraints
 
@@ -157,33 +147,14 @@ class SegmentProperties(
 
 ### Registry Constraints
 
-**⚠️ WARNING: Registry constraints via `Annotated` do NOT work.**
-
-The following registry constraints are **non-functional**:
-
-| Constraint | Status | Alternative |
-|------------|--------|-------------|
-| `ThemeRegistryConstraint` | ❌ Not working | Use `theme_literal()` |
-| `TypeRegistryConstraint` | ❌ Not working | Use `type_literal()` |
-| `ThemeTypeCompatibilityConstraint` | ❌ Not working | Use field validators |
-| `CountryRequiredConstraint` | ❌ Not working | Use `@model_validator` |
-| `ParentDivisionConstraint` | ❌ Not working | Use `@model_validator` |
-
-**Working Alternative - Field-Level Validation:**
+Registry constraints provide type-safe validation for Overture Maps themes and types:
 
 ```python
 from overture.schema.validation.types import theme_literal, type_literal
 
 class DivisionProperties(BaseModel):
-    # These work because they're field-level constraints
     theme: theme_literal("divisions") = Field("divisions")
     type: type_literal("division") = Field("division")
-    
-    # For complex validation, use @model_validator
-    @model_validator(mode="after")
-    def validate_business_rules(self):
-        # Custom validation logic here
-        return self
 ```
 
 ## Ready-to-Use Types
@@ -263,23 +234,7 @@ osm_id: Annotated[str, OSMIdConstraint] = Field(..., description="OSM ID")
 
 ### Model-Level Validation
 
-**⚠️ IMPORTANT LIMITATION: Model-level constraints via `Annotated` do NOT work
-reliably in this Pydantic setup.**
-
-The following model-level constraints are **NOT functional** and should be
-avoided:
-
-- `MutuallyExclusiveConstraint`
-- `AtLeastOneOfConstraint`
-- `ConditionalRequiredConstraint`
-- `ThemeRegistryConstraint`
-- `TypeRegistryConstraint`
-- `ThemeTypeCompatibilityConstraint`
-- `ParentDivisionConstraint`
-- `CountryRequiredConstraint`
-- `ExtensionPrefixConstraint`
-
-Use `@model_validator` instead for cross-field validation:
+Model-level validation is handled through the mixin-based constraint system and standard Pydantic validators:
 
 ```python
 from pydantic import model_validator
@@ -360,37 +315,22 @@ class PlaceProperties(BaseModel):
     )
 ```
 
-#### Replacing @model_validator
+#### Using Constraint-Based Validation
 
-Instead of using Pydantic's `@model_validator` decorator, use constraint-based validation:
-
-**Before (using @model_validator):**
+For complex model-level validation, use the mixin-based constraint system:
 
 ```python
-class SpeedLimitRule(BaseModel):
-    max_speed: Optional[Speed] = None
-    min_speed: Optional[Speed] = None
-    
-    @model_validator(mode="after")
-    def validate_speed_required(self):
-        if not self.max_speed and not self.min_speed:
-            raise ValueError("Either max_speed or min_speed is required")
-        return self
-```
+from overture.schema.validation.mixin import ConstraintValidatedModel, at_least_one_of
 
-**After (using constraints):**
-
-```python
-class SpeedLimitRule(
-    Annotated[BaseModel, AtLeastOneOfConstraint("max_speed", "min_speed")]
-):
+@at_least_one_of("max_speed", "min_speed")
+class SpeedLimitRule(ConstraintValidatedModel, BaseModel):
     max_speed: Optional[Speed] = None
     min_speed: Optional[Speed] = None
 ```
 
 #### Common Migration Patterns
 
-**Pattern 1: Range Validation**
+#### Pattern 1: Range Validation
 
 ```python
 # Before
@@ -426,7 +366,7 @@ tags: Annotated[
 ]
 ```
 
-**Pattern 3: Custom Pattern Validation**
+#### Pattern 3: Custom Pattern Validation
 
 ```python
 # Before
@@ -444,38 +384,15 @@ postal_code: Annotated[
 ]
 ```
 
-**Pattern 4: Complex Model Validation**
+#### Pattern 4: Complex Model Validation
 
 ```python
-# Before
-class DivisionBoundary(BaseModel):
-    subtype: PlaceType
-    country: Optional[str] = None
-    is_land: Optional[bool] = None  
-    is_territorial: Optional[bool] = None
-    
-    @model_validator(mode="after")
-    def validate_country_required(self):
-        if self.country is None and self.subtype != PlaceType.COUNTRY:
-            raise ValueError("Country required for non-country boundaries")
-        return self
-        
-    @model_validator(mode="after") 
-    def validate_territorial_flags(self):
-        if self.is_land is True and self.is_territorial is True:
-            raise ValueError("is_land and is_territorial are mutually exclusive")
-        return self
+# Using mixin-based constraint validation
+from overture.schema.validation.mixin import ConstraintValidatedModel, mutually_exclusive
 
-# After
-class DivisionBoundary(
-    Annotated[
-        BaseModel,
-        CountryRequiredConstraint(PlaceType.COUNTRY),
-        MutuallyExclusiveConstraint("is_land", "is_territorial"),
-    ]
-):
+@mutually_exclusive("is_land", "is_territorial")
+class DivisionBoundary(ConstraintValidatedModel, BaseModel):
     subtype: PlaceType
-    country: Optional[str] = None
     is_land: Optional[bool] = None
     is_territorial: Optional[bool] = None
 ```
@@ -538,7 +455,8 @@ This validation package integrates with Overture Maps schema packages using
 a hybrid approach:
 
 - **Field-level constraints**: Used for single-field validation
-- **@model_validator**: Used for cross-field validation
+- **Mixin-based constraints**: Used for complex model-level validation
+- **@model_validator**: Used for custom cross-field validation
 
 ```python
 # In your schema models
@@ -546,32 +464,159 @@ from typing import Annotated
 from pydantic import model_validator
 from overture.schema.validation import CountryCode, LanguageTag
 from overture.schema.validation.types import theme_literal, type_literal
+from overture.schema.validation.mixin import ConstraintValidatedModel
 
-# Base properties with field-level validation only
+# Base properties with field-level validation
 class OvertureFeatureProperties(BaseModel):
     theme: str = Field(..., description="Overture theme")
     type: str = Field(..., description="Feature type")
     country: Optional[CountryCode] = None
     names: Dict[LanguageTag, str] = Field(default_factory=dict)
 
-# Division-specific validation with @model_validator
-class DivisionProperties(OvertureFeatureProperties):
-    # Field-level constraints work
+# Division-specific validation with mixin constraints
+@required_if("subtype", "region", ["parent_division_id"])
+class DivisionProperties(ConstraintValidatedModel, OvertureFeatureProperties):
     theme: theme_literal("divisions") = Field("divisions")
     type: type_literal("division") = Field("division")
     
     subtype: PlaceType = Field(..., description="Administrative level")
     parent_division_id: Optional[str] = Field(None, description="Parent ID")
-    
-    # Model-level validation via decorator
-    @model_validator(mode="after")
-    def validate_parent_division_logic(self):
-        if self.subtype == PlaceType.COUNTRY and self.parent_division_id:
-            raise ValueError("Countries must not have parent_division_id")
-        elif self.subtype != PlaceType.COUNTRY and not self.parent_division_id:
-            raise ValueError("Non-countries must have parent_division_id")
-        return self
 ```
+
+## Alternative Approach: Mixin-Based Constraint Validation
+
+### 🚀 NEW: Structured Constraint Validation with JSON Schema Generation
+
+For complex model-level validation with better JSON Schema integration,
+use the mixin-based approach with decorators:
+
+#### ⚠️ CRITICAL: Inheritance Order Matters
+
+When using `ConstraintValidatedModel`, it **MUST** come first in the inheritance list:
+
+```python
+# ✅ CORRECT - ConstraintValidatedModel first
+class MyModel(ConstraintValidatedModel, BaseModel):
+    pass
+
+# ❌ WRONG - Will not generate JSON Schema metadata
+class MyModel(BaseModel, ConstraintValidatedModel):
+    pass
+```
+
+This is due to Python's Method Resolution Order (MRO). When `ConstraintValidatedModel`
+comes first, its `model_json_schema` method is called, which adds constraint metadata
+to the generated JSON Schema.
+
+```python
+from typing import Dict, List, Any, Optional, Type
+from pydantic import BaseModel, model_validator, Field
+from abc import ABC, abstractmethod
+
+# Base constraint validator
+class BaseConstraintValidator(ABC):
+    @abstractmethod
+    def validate(self, model_instance: BaseModel) -> None:
+        pass
+    
+    @abstractmethod
+    def get_json_schema_metadata(self) -> Dict[str, Any]:
+        pass
+
+# Registry for constraint validators
+_constraint_registry: Dict[str, List[BaseConstraintValidator]] = {}
+
+# Base model with constraint validation (mixin - does not inherit from BaseModel)
+class ConstraintValidatedModel:
+    @model_validator(mode="after")
+    def validate_constraints(self):
+        constraints = _constraint_registry.get(self.__class__.__name__, [])
+        for constraint in constraints:
+            constraint.validate(self)
+        return self
+    
+    @classmethod
+    def model_json_schema(
+        cls, by_alias: bool = True, ref_template: str = "#/$defs/{model}"
+    ) -> Dict[str, Any]:
+        schema = super().model_json_schema(by_alias=by_alias, ref_template=ref_template)
+        
+        # Add constraint metadata to JSON Schema
+        constraints = _constraint_registry.get(cls.__name__, [])
+        if constraints:
+            for constraint in constraints:
+                constraint_metadata = constraint.get_json_schema_metadata()
+                if constraint_metadata:
+                    # Add standard JSON Schema conditionals
+                    if constraint_metadata.get("if") and constraint_metadata.get("then"):
+                        conditional_schema = {
+                            "if": constraint_metadata["if"],
+                            "then": constraint_metadata.get("then"),
+                        }
+                        if constraint_metadata.get("else"):
+                            conditional_schema["else"] = constraint_metadata["else"]
+                        
+                        schema.setdefault("allOf", []).append(conditional_schema)
+
+                    # Add custom extensions for tooling
+                    schema.setdefault("x-constraints", []).append(constraint_metadata)
+        
+        return schema
+
+# Decorator for mutually exclusive constraint
+def mutually_exclusive(*field_names: str):
+    def decorator(cls: Type[BaseModel]) -> Type[BaseModel]:
+        constraint = MutuallyExclusiveValidator(field_names)
+        _constraint_registry.setdefault(cls.__name__, []).append(constraint)
+        return cls
+    return decorator
+
+# Usage example
+@mutually_exclusive("is_land", "is_territorial")
+class DivisionBoundary(ConstraintValidatedModel, BaseModel):
+    is_land: Optional[bool] = Field(None, description="Land boundary flag")
+    is_territorial: Optional[bool] = Field(
+        None, description="Territorial boundary flag"
+    )
+```
+
+### Benefits of Mixin Approach
+
+- **Structured validation**: Clean separation of constraint logic
+- **Declarative configuration**: Simple decorators for constraint application
+- **JSON Schema integration**: Automatic generation of proper `if/then/else` conditionals
+- **Custom extensions**: `x-constraints` metadata for tooling integration
+- **Better maintainability**: Reusable constraint validators
+
+### Generated JSON Schema
+
+The mixin approach generates proper JSON Schema with conditional logic:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "subtype": {"type": "string", "enum": ["country", "region", "locality"]},
+    "parent_division_id": {"type": "string"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"subtype": {"const": "country"}}},
+      "then": {"not": {"required": ["parent_division_id"]}},
+      "else": {"required": ["parent_division_id"]}
+    }
+  ],
+  "x-constraints": [
+    {
+      "type": "mutually_exclusive_constraint",
+      "fields": ["is_land", "is_territorial"]
+    }
+  ]
+}
+```
+
+This approach provides better structure for complex validation scenarios
+while maintaining full JSON Schema compatibility.
 
 ### Real-World Usage in Overture Schema
 

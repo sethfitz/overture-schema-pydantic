@@ -97,6 +97,21 @@ from .types import (
     type_literal,
 )
 
+from .mixin import (
+    # Mixin-based constraint validation
+    ConstraintValidatedModel,
+    BaseConstraintValidator,
+    MutuallyExclusiveValidator,
+    RequiredIfValidator,
+    NotRequiredIfValidator,
+    AtLeastOneOfValidator,
+    # Decorators
+    mutually_exclusive,
+    required_if,
+    not_required_if,
+    at_least_one_of,
+)
+
 __all__ = [
     # Base classes
     "BaseConstraint",
@@ -159,4 +174,16 @@ __all__ = [
     # Type utilities
     "theme_literal",
     "type_literal",
+    # Mixin-based constraint validation
+    "ConstraintValidatedModel",
+    "BaseConstraintValidator",
+    "MutuallyExclusiveValidator",
+    "RequiredIfValidator",
+    "NotRequiredIfValidator",
+    "AtLeastOneOfValidator",
+    # Decorators
+    "mutually_exclusive",
+    "required_if",
+    "not_required_if",
+    "at_least_one_of",
 ]

@@ -28,6 +28,11 @@ dependencies = [
     "shapely>=2.0.0",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+]
+
 [project.urls]
 Homepage = "https://overturemaps.org"
 Documentation = "https://docs.overturemaps.org"

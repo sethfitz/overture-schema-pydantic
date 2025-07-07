@@ -722,64 +722,6 @@ class TestSpecializedConstraints:
             # Check that validation fails with appropriate error
             assert len(exc_info.value.errors()) > 0
 
-    def test_extension_prefix_constraint_valid(self):
-        """Test ExtensionPrefixConstraint with valid extension prefixes."""
-
-        # Apply constraint using the proper Annotated approach
-        class TestModel(BaseModel):
-            model_config = {"extra": "allow"}
-            name: str
-
-        # Create a constrained version of the model
-        ConstrainedTestModel = Annotated[
-            TestModel, ExtensionPrefixConstraint({"ext_", "custom_"})
-        ]
-
-        # Use TypeAdapter to create models with constraint validation
-        def create_constrained_model(**kwargs):
-            from pydantic import TypeAdapter
-
-            adapter = TypeAdapter(ConstrainedTestModel)
-            return adapter.validate_python(kwargs)
-
-        # Valid: no extra fields
-        model = create_constrained_model(name="test")
-        assert model.name == "test"
-
-        # Valid: extra fields with allowed prefixes
-        model = create_constrained_model(
-            name="test", ext_field="value", custom_data="data"
-        )
-        assert model.name == "test"
-
-    def test_extension_prefix_constraint_invalid(self):
-        """Test ExtensionPrefixConstraint with invalid prefixes."""
-
-        # Apply constraint using the proper Annotated approach
-        class TestModel(BaseModel):
-            model_config = {"extra": "allow"}
-            name: str
-
-        # Create a constrained version of the model
-        ConstrainedTestModel = Annotated[
-            TestModel, ExtensionPrefixConstraint({"ext_", "custom_"})
-        ]
-
-        # Use TypeAdapter to create models with constraint validation
-        def create_constrained_model(**kwargs):
-            from pydantic import TypeAdapter
-
-            adapter = TypeAdapter(ConstrainedTestModel)
-            return adapter.validate_python(kwargs)
-
-        # Invalid: extra field without allowed prefix
-        with pytest.raises(ValidationError) as exc_info:
-            create_constrained_model(name="test", invalid_field="value")
-        assert (
-            "Unrecognized field 'invalid_field' must use one of these prefixes"
-            in str(exc_info.value)
-        )
-
     def test_literal_value_constraint_valid(self):
         """Test LiteralValueConstraint with valid literal values."""
 

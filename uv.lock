@@ -904,9 +904,11 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0.0" },
     { name = "shapely", specifier = ">=2.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0" },
 ]
+provides-extras = ["test"]
 
 [[package]]
 name = "overture-schema-water-type"

@@ -1873,7 +1873,15 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "GeoJSON geometry (LineString)",
+      "properties": {
+        "type": {
+          "enum": [
+            "LineString"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -1888,6 +1896,7 @@
       "description": "Segment feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

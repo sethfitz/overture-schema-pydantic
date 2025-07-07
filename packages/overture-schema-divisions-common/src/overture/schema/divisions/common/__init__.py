@@ -12,6 +12,9 @@ from .models import (
     PlaceType,
     Side,
 )
+from .validation import (
+    parent_division_required_unless,
+)
 
 __all__ = [
     "PlaceType",
@@ -24,4 +27,5 @@ __all__ = [
     "Norms",
     "CountryCode",
     "DivisionSubtype",
+    "parent_division_required_unless",
 ]

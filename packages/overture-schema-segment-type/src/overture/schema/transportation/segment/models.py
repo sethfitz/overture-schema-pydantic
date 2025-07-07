@@ -1,17 +1,8 @@
 """Segment feature models for Overture Maps transportation theme."""
 
-from typing import Annotated, Dict, Any, List, Literal, Optional
+from typing import Annotated, Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
-
-from overture.schema.validation import (
-    CompositeUniqueConstraint,
-    ConditionalRequiredConstraint,
-    MinItemsConstraint,
-    GeometryTypeConstraint,
-    theme_literal,
-    type_literal,
-)
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -65,6 +56,15 @@ from overture.schema.transportation.rules import (
 from overture.schema.transportation.rules import (
     WidthRule as StrictWidthRule,
 )
+from overture.schema.validation import (
+    CompositeUniqueConstraint,
+    ConstraintValidatedModel,
+    GeometryTypeConstraint,
+    MinItemsConstraint,
+    required_if,
+    theme_literal,
+    type_literal,
+)
 
 
 class LevelRule(GeometricRangeScopeContainer):
@@ -88,13 +88,9 @@ class RailFlags(BaseModel):
     )
 
 
-class SegmentProperties(
-    Annotated[
-        OvertureFeatureProperties,
-        ConditionalRequiredConstraint("subtype", SegmentSubtype.ROAD, ["class_"]),
-        ConditionalRequiredConstraint("subtype", SegmentSubtype.RAIL, ["class_"]),
-    ]
-):
+@required_if("subtype", SegmentSubtype.ROAD, ["class_"])
+@required_if("subtype", SegmentSubtype.RAIL, ["class_"])
+class SegmentProperties(ConstraintValidatedModel, OvertureFeatureProperties):
     """Properties specific to segment features."""
 
     # Override theme and type with constraint-based validation
