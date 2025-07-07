@@ -1,15 +1,9 @@
 """Division area models for Overture Maps divisions theme."""
 
-from typing import Annotated, Dict, Any, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import Field
 
-from overture.schema.validation import (
-    GeometryTypeConstraint,
-    theme_literal,
-    type_literal,
-    MutuallyExclusiveConstraint,
-)
 from overture.schema.core.base import (
     OvertureFeature,
     OvertureFeatureProperties,
@@ -22,6 +16,12 @@ from overture.schema.core.common import (
 from overture.schema.divisions.common.models import (
     AreaBoundaryClass,
     PlaceType,
+)
+from overture.schema.validation import (
+    GeometryTypeConstraint,
+    MutuallyExclusiveConstraint,
+    theme_literal,
+    type_literal,
 )
 
 

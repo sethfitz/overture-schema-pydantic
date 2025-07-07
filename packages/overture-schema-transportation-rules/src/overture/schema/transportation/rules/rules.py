@@ -3,14 +3,7 @@
 from enum import Enum
 from typing import Annotated, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator
-
-from overture.schema.validation import (
-    CompositeUniqueConstraint,
-    UniqueItemsConstraint,
-    ConstraintValidatedModel,
-    at_least_one_of,
-)
+from pydantic import BaseModel, Field
 
 from overture.schema.core.common import (
     GeometricRangeScopeContainer,
@@ -21,6 +14,12 @@ from overture.schema.core.common import (
     TemporalScopeContainer,
     TravelModeScopeContainer,
     VehicleScopeContainer,
+)
+from overture.schema.validation import (
+    CompositeUniqueConstraint,
+    ConstraintValidatedModel,
+    UniqueItemsConstraint,
+    at_least_one_of,
 )
 
 

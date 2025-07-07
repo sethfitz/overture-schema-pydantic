@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Collection
-from typing import Any, Dict, List, Optional, Set, Union, get_origin
+from typing import Any, get_origin
 
 from pydantic import (
     BaseModel,
@@ -14,7 +14,7 @@ from pydantic import (
     ValidationError,
     ValidationInfo,
 )
-from pydantic_core import core_schema, InitErrorDetails
+from pydantic_core import InitErrorDetails, core_schema
 
 
 class BaseConstraint(ABC):
@@ -34,7 +34,7 @@ class BaseConstraint(ABC):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate JSON schema. Override in subclasses for custom schema."""
         return handler(core_schema)
 
@@ -108,7 +108,7 @@ class PatternConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern_str
         return json_schema
@@ -142,7 +142,7 @@ class LanguageTagConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = "IETF BCP-47 language tag"
@@ -175,7 +175,7 @@ class CountryCodeConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = "ISO 3166-1 alpha-2 country code"
@@ -206,7 +206,7 @@ class RegionCodeConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = "ISO 3166-2 subdivision code"
@@ -242,7 +242,7 @@ class ISO8601DateTimeConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["format"] = "date-time"
         json_schema["description"] = "ISO 8601 datetime"
@@ -276,7 +276,7 @@ class JSONPointerConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["description"] = "JSON Pointer (RFC 6901)"
         return json_schema
@@ -285,7 +285,7 @@ class JSONPointerConstraint(StringConstraint):
 class LinearReferenceRangeConstraint(CollectionConstraint):
     """Linear reference range constraint (0.0 to 1.0)."""
 
-    def validate(self, value: List[float], info: ValidationInfo) -> None:
+    def validate(self, value: list[float], info: ValidationInfo) -> None:
         if len(value) != 2:
             context = info.context or {}
             loc = context.get("loc_prefix", ()) + ("value",)
@@ -340,7 +340,7 @@ class LinearReferenceRangeConstraint(CollectionConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["type"] = "array"
         json_schema["minItems"] = 2
@@ -385,7 +385,7 @@ class MinItemsConstraint(CollectionConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         schema_type = json_schema.get("type")
         if schema_type == "array":
@@ -428,7 +428,7 @@ class MaxItemsConstraint(CollectionConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         schema_type = json_schema.get("type")
         if schema_type == "array":
@@ -463,7 +463,7 @@ class WhitespaceConstraint(StringConstraint):
 class ExtensionPrefixConstraint(BaseConstraint):
     """Constraint to validate extension field prefixes."""
 
-    def __init__(self, allowed_prefixes: Optional[Set[str]] = None):
+    def __init__(self, allowed_prefixes: set[str] | None = None):
         self.allowed_prefixes = allowed_prefixes or {"ext_"}
 
     def validate(self, value: BaseModel, info: ValidationInfo) -> None:
@@ -509,7 +509,7 @@ class ExtensionPrefixConstraint(BaseConstraint):
 class UniqueItemsConstraint(CollectionConstraint):
     """Constraint to ensure all items in a collection are unique."""
 
-    def validate(self, value: List[Any], info: ValidationInfo) -> None:
+    def validate(self, value: list[Any], info: ValidationInfo) -> None:
         if len(value) != len(set(value)):
             context = info.context or {}
             loc = context.get("loc_prefix", ()) + ("value",)
@@ -527,7 +527,7 @@ class UniqueItemsConstraint(CollectionConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["uniqueItems"] = True
         return json_schema
@@ -559,7 +559,7 @@ class CategoryPatternConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = "Category in snake_case format"
@@ -592,7 +592,7 @@ class WikidataConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = "Wikidata identifier (Q followed by digits)"
@@ -625,7 +625,7 @@ class PhoneNumberConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = (
@@ -670,7 +670,7 @@ class ConfidenceScoreConstraint(BaseConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["minimum"] = 0.0
         json_schema["maximum"] = 1.0
@@ -714,7 +714,7 @@ class ZoomLevelConstraint(BaseConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["minimum"] = 0
         json_schema["maximum"] = 23
@@ -725,7 +725,7 @@ class ZoomLevelConstraint(BaseConstraint):
 class NonNegativeConstraint(BaseConstraint):
     """Constraint for non-negative numbers."""
 
-    def validate(self, value: Union[int, float], info: ValidationInfo) -> None:
+    def validate(self, value: int | float, info: ValidationInfo) -> None:
         if value < 0:
             context = info.context or {}
             loc = context.get("loc_prefix", ()) + ("value",)
@@ -747,8 +747,8 @@ class NonNegativeConstraint(BaseConstraint):
         python_schema = handler(source)
 
         def validate_non_negative(
-            value: Union[int, float], info: ValidationInfo
-        ) -> Union[int, float]:
+            value: int | float, info: ValidationInfo
+        ) -> int | float:
             self.validate(value, info)
             return value
 
@@ -758,7 +758,7 @@ class NonNegativeConstraint(BaseConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["minimum"] = 0
         json_schema["description"] = "Non-negative number"
@@ -805,7 +805,7 @@ class LiteralValueConstraint(BaseConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["const"] = self.expected_value
         json_schema["description"] = f"Must be exactly '{self.expected_value}'"
@@ -838,7 +838,7 @@ class HexColorConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = "Hexadecimal color code in format #RRGGBB"
@@ -871,7 +871,7 @@ class NoWhitespaceConstraint(StringConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["pattern"] = self.pattern.pattern
         json_schema["description"] = "String without whitespace characters"
@@ -892,7 +892,7 @@ class CompositeUniqueConstraint(CollectionConstraint):
             raise ValueError("At least one attribute path must be specified")
         self.attribute_paths = attribute_paths
 
-    def validate(self, value: List[Any], info: ValidationInfo) -> None:
+    def validate(self, value: list[Any], info: ValidationInfo) -> None:
         """Validate that items are unique based on composite attribute values."""
         composite_keys = []
 
@@ -940,7 +940,7 @@ class CompositeUniqueConstraint(CollectionConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["uniqueItems"] = True
         attr_names = ", ".join(self.attribute_paths)
@@ -952,7 +952,7 @@ class ConditionalRequiredConstraint(BaseConstraint):
     """Constraint for conditional field requirements based on other field values."""
 
     def __init__(
-        self, condition_field: str, condition_value: Any, required_fields: List[str]
+        self, condition_field: str, condition_value: Any, required_fields: list[str]
     ):
         """Initialize conditional requirement constraint.
 
@@ -1146,7 +1146,7 @@ class ThemeRegistryConstraint(BaseConstraint):
             return
 
         if hasattr(value, "theme"):
-            theme = getattr(value, "theme")
+            theme = value.theme
             if not self.registry_check_func(theme):
                 context = info.context or {}
                 loc = context.get("loc_prefix", ()) + ("theme",)
@@ -1194,7 +1194,7 @@ class TypeRegistryConstraint(BaseConstraint):
             return
 
         if hasattr(value, "type"):
-            feature_type = getattr(value, "type")
+            feature_type = value.type
             if not self.registry_check_func(feature_type):
                 context = info.context or {}
                 loc = context.get("loc_prefix", ()) + ("type",)
@@ -1242,8 +1242,8 @@ class ThemeTypeCompatibilityConstraint(BaseConstraint):
             return
 
         if hasattr(value, "theme") and hasattr(value, "type"):
-            theme = getattr(value, "theme")
-            feature_type = getattr(value, "type")
+            theme = value.theme
+            feature_type = value.type
 
             if not self.compatibility_check_func(theme, feature_type):
                 context = info.context or {}
@@ -1431,7 +1431,7 @@ class ParentDivisionConstraint(BaseConstraint):
 class GeometryTypeConstraint(BaseConstraint):
     """Constraint for validating GeoJSON geometry types using Shapely."""
 
-    def __init__(self, allowed_types: List[str]):
+    def __init__(self, allowed_types: list[str]):
         """Initialize with allowed geometry types.
 
         Args:
@@ -1463,7 +1463,7 @@ class GeometryTypeConstraint(BaseConstraint):
 
         self.allowed_types = tuple(sorted(allowed_types))
 
-    def validate(self, value: Dict[str, Any], info: ValidationInfo) -> None:
+    def validate(self, value: dict[str, Any], info: ValidationInfo) -> None:
         """Validate GeoJSON geometry type and structure."""
         if not isinstance(value, dict):
             context = info.context or {}
@@ -1533,8 +1533,8 @@ class GeometryTypeConstraint(BaseConstraint):
 
         # Validate geometry structure using Shapely
         try:
-            from shapely.geometry import shape
             from shapely.errors import ShapelyError
+            from shapely.geometry import shape
 
             # This will validate the GeoJSON structure and coordinates
             shape(value)
@@ -1559,8 +1559,8 @@ class GeometryTypeConstraint(BaseConstraint):
         python_schema = handler(source)
 
         def validate_geometry(
-            value: Dict[str, Any], info: ValidationInfo
-        ) -> Dict[str, Any]:
+            value: dict[str, Any], info: ValidationInfo
+        ) -> dict[str, Any]:
             self.validate(value, info)
             return value
 
@@ -1570,7 +1570,7 @@ class GeometryTypeConstraint(BaseConstraint):
 
     def __get_pydantic_json_schema__(
         self, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         json_schema = handler(core_schema)
         json_schema["properties"] = json_schema.get("properties", {})
         json_schema["properties"]["type"] = {

@@ -1,18 +1,9 @@
 """Address feature models for Overture Maps addresses theme."""
 
-from typing import Annotated, Dict, Any, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-from overture.schema.validation import (
-    CountryCodeConstraint,
-    MinItemsConstraint,
-    MaxItemsConstraint,
-    WhitespaceConstraint,
-    GeometryTypeConstraint,
-    theme_literal,
-    type_literal,
-)
 from overture.schema.core.base import (
     OvertureFeature,
     OvertureFeatureProperties,
@@ -20,6 +11,15 @@ from overture.schema.core.base import (
 )
 from overture.schema.core.common import (
     AdvancedSourceItem,
+)
+from overture.schema.validation import (
+    CountryCodeConstraint,
+    GeometryTypeConstraint,
+    MaxItemsConstraint,
+    MinItemsConstraint,
+    WhitespaceConstraint,
+    theme_literal,
+    type_literal,
 )
 
 

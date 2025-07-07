@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Dict, Any
+from typing import Annotated, Any, Dict
 
 from pydantic import Field
 
-from overture.schema.validation import (
-    type_literal,
-    GeometryTypeConstraint,
-)
 from overture.schema.buildings.common import BaseBuildingProperties
 from overture.schema.core.base import OvertureFeature, register_model
+from overture.schema.validation import (
+    GeometryTypeConstraint,
+    type_literal,
+)
 
 
 class BuildingProperties(BaseBuildingProperties):

@@ -5,16 +5,8 @@ from typing import Annotated, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
-from .base import ExtensibleBaseModel
 from overture.schema.validation import (
-    CountryCodeConstraint,
-    ISO8601DateTimeConstraint,
-    JSONPointerConstraint,
-    LanguageTagConstraint,
-    LinearReferenceRangeConstraint,
     MinItemsConstraint,
-    RegionCodeConstraint,
-    WhitespaceConstraint,
 )
 from overture.schema.validation.types import (
     CountryCode,
@@ -25,6 +17,8 @@ from overture.schema.validation.types import (
     RegionCode,
     TrimmedString,
 )
+
+from .base import ExtensibleBaseModel
 
 
 class NameVariant(str, Enum):

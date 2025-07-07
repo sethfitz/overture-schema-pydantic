@@ -1,20 +1,19 @@
 """Test JSON Schema generation for mixin-based constraint validation."""
 
-from typing import Optional
 from enum import Enum
+
 import pytest
 from pydantic import BaseModel, Field
 
-from overture.schema.validation.mixin import (
-    ConstraintValidatedModel,
-    mutually_exclusive,
-    required_if,
-    not_required_if,
-    at_least_one_of,
-    _constraint_registry,
-)
 from overture.schema.divisions.common.validation import (
     parent_division_required_unless,
+)
+from overture.schema.validation.mixin import (
+    ConstraintValidatedModel,
+    _constraint_registry,
+    at_least_one_of,
+    mutually_exclusive,
+    required_if,
 )
 
 
@@ -43,7 +42,7 @@ class TestJSONSchemaGeneration:
         @parent_division_required_unless("subtype", TestSubtype.COUNTRY)
         class TestModel(ConstraintValidatedModel, BaseModel):
             subtype: TestSubtype
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         schema = TestModel.model_json_schema()
 
@@ -86,8 +85,8 @@ class TestJSONSchemaGeneration:
 
         @mutually_exclusive("field_a", "field_b")
         class TestModel(ConstraintValidatedModel, BaseModel):
-            field_a: Optional[bool] = None
-            field_b: Optional[bool] = None
+            field_a: bool | None = None
+            field_b: bool | None = None
 
         schema = TestModel.model_json_schema()
 
@@ -112,7 +111,7 @@ class TestJSONSchemaGeneration:
         @required_if("type_field", "special", ["required_field"])
         class TestModel(ConstraintValidatedModel, BaseModel):
             type_field: str
-            required_field: Optional[str] = None
+            required_field: str | None = None
 
         schema = TestModel.model_json_schema()
 
@@ -139,8 +138,8 @@ class TestJSONSchemaGeneration:
 
         @at_least_one_of("field_a", "field_b")
         class TestModel(ConstraintValidatedModel, BaseModel):
-            field_a: Optional[str] = None
-            field_b: Optional[str] = None
+            field_a: str | None = None
+            field_b: str | None = None
 
         schema = TestModel.model_json_schema()
 
@@ -173,11 +172,11 @@ class TestJSONSchemaGeneration:
         @at_least_one_of("required_a", "required_b")
         class TestModel(ConstraintValidatedModel, BaseModel):
             subtype: TestSubtype
-            parent_division_id: Optional[str] = None
-            flag_a: Optional[bool] = None
-            flag_b: Optional[bool] = None
-            required_a: Optional[str] = None
-            required_b: Optional[str] = None
+            parent_division_id: str | None = None
+            flag_a: bool | None = None
+            flag_b: bool | None = None
+            required_a: str | None = None
+            required_b: str | None = None
 
         schema = TestModel.model_json_schema()
 
@@ -227,7 +226,7 @@ class TestJSONSchemaGeneration:
 
         class NestedProperties(BaseModel):
             subtype: TestSubtype
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         @parent_division_required_unless("subtype", TestSubtype.COUNTRY)
         class TestModel(ConstraintValidatedModel, BaseModel):
@@ -254,9 +253,9 @@ class TestJSONSchemaGeneration:
         @mutually_exclusive("is_active", "is_inactive")
         class TestModel(ConstraintValidatedModel, BaseModel):
             subtype: TestSubtype
-            parent_division_id: Optional[str] = None
-            is_active: Optional[bool] = None
-            is_inactive: Optional[bool] = None
+            parent_division_id: str | None = None
+            is_active: bool | None = None
+            is_inactive: bool | None = None
             name: str = Field(..., description="Model name")
 
         schema = TestModel.model_json_schema()
@@ -302,7 +301,7 @@ class TestJSONSchemaGeneration:
         @parent_division_required_unless("subtype", TestSubtype.COUNTRY)
         class TestModel(ConstraintValidatedModel, BaseModel):
             subtype: TestSubtype
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         schema = TestModel.model_json_schema()
 

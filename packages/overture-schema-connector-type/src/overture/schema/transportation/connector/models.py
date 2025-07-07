@@ -1,18 +1,18 @@
 """Connector feature models for Overture Maps transportation theme."""
 
-from typing import Annotated, Dict, Any, Optional
+from typing import Annotated, Any, Dict, Optional
 
 from pydantic import Field
 
-from overture.schema.validation import (
-    theme_literal,
-    type_literal,
-    GeometryTypeConstraint,
-)
 from overture.schema.core.base import (
     OvertureFeature,
     OvertureFeatureProperties,
     register_model,
+)
+from overture.schema.validation import (
+    GeometryTypeConstraint,
+    theme_literal,
+    type_literal,
 )
 
 

@@ -1,20 +1,9 @@
 """Place feature models for Overture Maps places theme."""
 
 import re
-from typing import Annotated, Dict, List, Optional, Any
+from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import AnyUrl, BaseModel, EmailStr, Field
-
-from overture.schema.validation import (
-    CategoryPatternConstraint,
-    UniqueItemsConstraint,
-    PatternConstraint,
-    ConfidenceScoreConstraint,
-    WikidataConstraint,
-    PhoneNumberConstraint,
-    MinItemsConstraint,
-    GeometryTypeConstraint,
-)
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -26,13 +15,19 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.validation import (
+    GeometryTypeConstraint,
+    MinItemsConstraint,
+    PatternConstraint,
+    UniqueItemsConstraint,
+)
 from overture.schema.validation.types import (
     CategoryPattern,
+    ConfidenceScore,
+    PhoneNumber,
+    WikidataId,
     theme_literal,
     type_literal,
-    WikidataId,
-    PhoneNumber,
-    ConfidenceScore,
 )
 
 

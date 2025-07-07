@@ -17,7 +17,6 @@ from overture.schema.validation import (
     ConfidenceScoreConstraint,
     CountryCode,
     CountryCodeConstraint,
-    ExtensionPrefixConstraint,
     HexColor,
     HexColorConstraint,
     ISO8601DateTime,

@@ -536,9 +536,13 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-building-part-type"
@@ -552,10 +556,14 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-buildings-common" },
     { name = "overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-building-type"
@@ -569,10 +577,14 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-buildings-common" },
     { name = "overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-buildings-common"
@@ -624,10 +636,14 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
     { name = "overture-schema-transportation-common" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-core"
@@ -658,10 +674,14 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
     { name = "overture-schema-divisions-common" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-division-boundary-type"
@@ -676,11 +696,15 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
     { name = "overture-schema-divisions-common" },
     { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-division-type"
@@ -757,10 +781,14 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-base-common" },
     { name = "overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-land-type"
@@ -774,10 +802,14 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-base-common" },
     { name = "overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-place-type"
@@ -832,12 +864,16 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
     { name = "overture-schema-transportation-common" },
     { name = "overture-schema-transportation-rules" },
     { name = "overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "overture-schema-transportation-common"
@@ -921,9 +957,13 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "packaging"

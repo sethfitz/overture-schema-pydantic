@@ -2,6 +2,7 @@
 
 from .models import (
     AreaBoundaryClass,
+    CapitalOfDivisionItem,
     CountryCode,
     DivisionClass,
     DivisionSubtype,
@@ -20,6 +21,7 @@ __all__ = [
     "PlaceType",
     "DivisionClass",
     "AreaBoundaryClass",
+    "CapitalOfDivisionItem",
     "PerspectiveMode",
     "Side",
     "Perspectives",

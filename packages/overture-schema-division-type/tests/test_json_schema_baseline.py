@@ -2,6 +2,7 @@
 
 import json
 import os
+
 from overture.schema.divisions.division.models import Division
 
 
@@ -24,7 +25,7 @@ def test_division_json_schema_baseline():
         return
 
     # Load baseline and compare
-    with open(baseline_file, "r") as f:
+    with open(baseline_file) as f:
         baseline_schema = json.load(f)
 
     # Compare the generated schema with the baseline

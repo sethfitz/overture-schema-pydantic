@@ -18,6 +18,13 @@ dependencies = [
 ]
 requires-python = ">=3.10"
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+]
+
 [project.urls]
 Homepage = "https://github.com/overturemaps/pydantic-schema"
 

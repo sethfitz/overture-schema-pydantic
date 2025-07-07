@@ -1,27 +1,27 @@
 """Comprehensive tests for mixin-based constraint validation."""
 
-from typing import Optional, List
 from enum import Enum
-import pytest
-from pydantic import BaseModel, Field, ValidationError
 
-from overture.schema.validation import (
-    # Mixin classes and decorators
-    ConstraintValidatedModel,
-    BaseConstraintValidator,
-    MutuallyExclusiveValidator,
-    RequiredIfValidator,
-    NotRequiredIfValidator,
-    AtLeastOneOfValidator,
-    # Decorators
-    mutually_exclusive,
-    required_if,
-    not_required_if,
-    at_least_one_of,
-)
+import pytest
+from pydantic import BaseModel, ValidationError
+
 from overture.schema.divisions.common.validation import (
     ParentDivisionValidator,
     parent_division_required_unless,
+)
+from overture.schema.validation import (
+    AtLeastOneOfValidator,
+    BaseConstraintValidator,
+    # Mixin classes and decorators
+    ConstraintValidatedModel,
+    MutuallyExclusiveValidator,
+    NotRequiredIfValidator,
+    RequiredIfValidator,
+    at_least_one_of,
+    # Decorators
+    mutually_exclusive,
+    not_required_if,
+    required_if,
 )
 from overture.schema.validation.mixin import _constraint_registry
 
@@ -141,7 +141,7 @@ class TestParentDivisionValidator:
 
         class TestModel(BaseModel):
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         validator = ParentDivisionValidator(PlaceType.COUNTRY)
 
@@ -173,7 +173,7 @@ class TestParentDivisionValidator:
         @parent_division_required_unless("subtype", PlaceType.COUNTRY)
         class DivisionModel(ConstraintValidatedModel, BaseModel):
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         # Valid: country without parent
         model = DivisionModel(subtype=PlaceType.COUNTRY, parent_division_id=None)
@@ -202,7 +202,7 @@ class TestParentDivisionValidator:
 
         class PropertiesModel(BaseModel):
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         @parent_division_required_unless("subtype", PlaceType.COUNTRY)
         class FeatureModel(ConstraintValidatedModel, BaseModel):
@@ -231,7 +231,7 @@ class TestParentDivisionValidator:
         @parent_division_required_unless("subtype", PlaceType.COUNTRY)
         class DivisionModel(ConstraintValidatedModel, BaseModel):
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         schema = DivisionModel.model_json_schema()
 
@@ -260,8 +260,8 @@ class TestMutuallyExclusiveValidator:
         """Test MutuallyExclusiveValidator directly."""
 
         class TestModel(BaseModel):
-            field_a: Optional[bool] = None
-            field_b: Optional[bool] = None
+            field_a: bool | None = None
+            field_b: bool | None = None
 
         validator = MutuallyExclusiveValidator("field_a", "field_b")
 
@@ -292,8 +292,8 @@ class TestMutuallyExclusiveValidator:
 
         @mutually_exclusive("is_land", "is_territorial")
         class BoundaryModel(ConstraintValidatedModel, BaseModel):
-            is_land: Optional[bool] = None
-            is_territorial: Optional[bool] = None
+            is_land: bool | None = None
+            is_territorial: bool | None = None
 
         # Valid cases
         model = BoundaryModel(is_land=True, is_territorial=False)
@@ -318,9 +318,9 @@ class TestMutuallyExclusiveValidator:
 
         @mutually_exclusive("option_a", "option_b", "option_c")
         class OptionsModel(ConstraintValidatedModel, BaseModel):
-            option_a: Optional[bool] = None
-            option_b: Optional[bool] = None
-            option_c: Optional[bool] = None
+            option_a: bool | None = None
+            option_b: bool | None = None
+            option_c: bool | None = None
 
         # Valid: only one option True
         model = OptionsModel(option_a=True, option_b=False, option_c=False)
@@ -336,8 +336,8 @@ class TestMutuallyExclusiveValidator:
 
         @mutually_exclusive("field_a", "field_b")
         class TestModel(ConstraintValidatedModel, BaseModel):
-            field_a: Optional[bool] = None
-            field_b: Optional[bool] = None
+            field_a: bool | None = None
+            field_b: bool | None = None
 
         schema = TestModel.model_json_schema()
 
@@ -361,7 +361,7 @@ class TestConditionalRequiredValidator:
 
         class TestModel(BaseModel):
             type_field: str
-            required_field: Optional[str] = None
+            required_field: str | None = None
 
         validator = RequiredIfValidator("type_field", "special", ["required_field"])
 
@@ -388,7 +388,7 @@ class TestConditionalRequiredValidator:
         @required_if("subtype", "rail", ["class_"])
         class SegmentModel(ConstraintValidatedModel, BaseModel):
             subtype: str
-            class_: Optional[str] = None
+            class_: str | None = None
 
         # Valid: subtype doesn't require class_
         model = SegmentModel(subtype="water", class_=None)
@@ -421,8 +421,8 @@ class TestConditionalRequiredValidator:
         @required_if("type", "complex", ["field_a", "field_b"])
         class TestModel(ConstraintValidatedModel, BaseModel):
             type: str
-            field_a: Optional[str] = None
-            field_b: Optional[str] = None
+            field_a: str | None = None
+            field_b: str | None = None
 
         # Valid: condition not met
         model = TestModel(type="simple", field_a=None, field_b=None)
@@ -448,7 +448,7 @@ class TestConditionalNotRequiredValidator:
 
         class TestModel(BaseModel):
             subtype: PlaceType
-            country: Optional[str] = None
+            country: str | None = None
 
         validator = NotRequiredIfValidator("subtype", PlaceType.COUNTRY, ["country"])
 
@@ -473,7 +473,7 @@ class TestConditionalNotRequiredValidator:
         @not_required_if("subtype", PlaceType.COUNTRY, ["country"])
         class BoundaryModel(ConstraintValidatedModel, BaseModel):
             subtype: PlaceType
-            country: Optional[str] = None
+            country: str | None = None
 
         # Valid: country subtype, no country field needed
         model = BoundaryModel(subtype=PlaceType.COUNTRY, country=None)
@@ -500,8 +500,8 @@ class TestAtLeastOneOfValidator:
         """Test AtLeastOneOfValidator directly."""
 
         class TestModel(BaseModel):
-            max_speed: Optional[str] = None
-            min_speed: Optional[str] = None
+            max_speed: str | None = None
+            min_speed: str | None = None
 
         validator = AtLeastOneOfValidator("max_speed", "min_speed")
 
@@ -529,8 +529,8 @@ class TestAtLeastOneOfValidator:
 
         @at_least_one_of("max_speed", "min_speed")
         class SpeedRuleModel(ConstraintValidatedModel, BaseModel):
-            max_speed: Optional[str] = None
-            min_speed: Optional[str] = None
+            max_speed: str | None = None
+            min_speed: str | None = None
 
         # Valid cases
         model = SpeedRuleModel(max_speed="50", min_speed=None)
@@ -557,9 +557,9 @@ class TestAtLeastOneOfValidator:
 
         @at_least_one_of("field_a", "field_b", "field_c")
         class TestModel(ConstraintValidatedModel, BaseModel):
-            field_a: Optional[str] = None
-            field_b: Optional[str] = None
-            field_c: Optional[str] = None
+            field_a: str | None = None
+            field_b: str | None = None
+            field_c: str | None = None
 
         # Valid: one field provided
         model = TestModel(field_a="value", field_b=None, field_c=None)
@@ -589,10 +589,10 @@ class TestMultipleConstraints:
         @required_if("subtype", PlaceType.REGION, ["region_code"])
         class ComplexModel(ConstraintValidatedModel, BaseModel):
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
-            is_land: Optional[bool] = None
-            is_territorial: Optional[bool] = None
-            region_code: Optional[str] = None
+            parent_division_id: str | None = None
+            is_land: bool | None = None
+            is_territorial: bool | None = None
+            region_code: str | None = None
 
         # Valid: country with no parent, land boundary, no region code needed
         model = ComplexModel(
@@ -659,11 +659,11 @@ class TestMultipleConstraints:
         @at_least_one_of("required_a", "required_b")
         class MultiConstraintModel(ConstraintValidatedModel, BaseModel):
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
-            field_a: Optional[bool] = None
-            field_b: Optional[bool] = None
-            required_a: Optional[str] = None
-            required_b: Optional[str] = None
+            parent_division_id: str | None = None
+            field_a: bool | None = None
+            field_b: bool | None = None
+            required_a: str | None = None
+            required_b: str | None = None
 
         schema = MultiConstraintModel.model_json_schema()
 
@@ -698,13 +698,13 @@ class TestConstraintInheritance:
 
         @mutually_exclusive("field_a", "field_b")
         class TestBaseModel(ConstraintValidatedModel, BaseModel):
-            field_a: Optional[bool] = None
-            field_b: Optional[bool] = None
+            field_a: bool | None = None
+            field_b: bool | None = None
 
         @at_least_one_of("required_c", "required_d")
         class DerivedModel(TestBaseModel):
-            required_c: Optional[str] = None
-            required_d: Optional[str] = None
+            required_c: str | None = None
+            required_d: str | None = None
 
         # Valid: satisfies both constraints
         model = DerivedModel(
@@ -760,7 +760,7 @@ class TestConstraintErrorHandling:
         @parent_division_required_unless("subtype", PlaceType.COUNTRY)
         class InvalidModel(BaseModel):  # Missing ConstraintValidatedModel
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
+            parent_division_id: str | None = None
 
         # This should NOT fail validation since ConstraintValidatedModel isn't mixed in
         model = InvalidModel(
@@ -775,7 +775,7 @@ class TestConstraintErrorHandling:
         @required_if("type_field", "special", ["required_field"])
         class OrderTestModel(ConstraintValidatedModel, BaseModel):
             type_field: str
-            required_field: Optional[str] = None
+            required_field: str | None = None
 
         # Field validation should catch invalid type_field before constraint validation
         with pytest.raises(ValidationError) as exc_info:
@@ -810,9 +810,9 @@ class TestRealWorldScenarios:
 
         class PropertiesModel(BaseModel):
             subtype: PlaceType
-            parent_division_id: Optional[str] = None
-            is_land: Optional[bool] = None
-            is_territorial: Optional[bool] = None
+            parent_division_id: str | None = None
+            is_land: bool | None = None
+            is_territorial: bool | None = None
 
         @parent_division_required_unless("subtype", PlaceType.COUNTRY)
         @mutually_exclusive("is_land", "is_territorial")
@@ -860,10 +860,10 @@ class TestRealWorldScenarios:
         @at_least_one_of("max_speed", "min_speed")
         @required_if("is_variable", True, ["conditions"])
         class SpeedLimitRule(ConstraintValidatedModel, BaseModel):
-            max_speed: Optional[dict] = None
-            min_speed: Optional[dict] = None
+            max_speed: dict | None = None
+            min_speed: dict | None = None
             is_variable: bool = False
-            conditions: Optional[List[str]] = None
+            conditions: list[str] | None = None
 
         # Valid: has max_speed, not variable
         rule = SpeedLimitRule(

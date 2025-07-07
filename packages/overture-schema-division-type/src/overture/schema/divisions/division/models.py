@@ -13,6 +13,15 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.divisions.common import (
+    CapitalOfDivisionItem,
+    DivisionClass,
+    HierarchyItem,
+    Norms,
+    Perspectives,
+    PlaceType,
+    parent_division_required_unless,
+)
 from overture.schema.validation import (
     ConstraintValidatedModel,
     CountryCode,
@@ -20,18 +29,9 @@ from overture.schema.validation import (
     MinItemsConstraint,
     NoWhitespaceString,
     RegionCode,
+    UniqueItemsConstraint,
     theme_literal,
     type_literal,
-    UniqueItemsConstraint,
-)
-from overture.schema.divisions.common import (
-    CapitalOfDivisionItem,
-    DivisionClass,
-    HierarchyItem,
-    Norms,
-    parent_division_required_unless,
-    Perspectives,
-    PlaceType,
 )
 
 

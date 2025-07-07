@@ -4,7 +4,7 @@ import re
 from enum import Enum
 from typing import Annotated, List, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 from overture.schema.validation import CountryCode, UniqueItemsConstraint
 

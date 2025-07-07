@@ -5,11 +5,6 @@ from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import Field
 
-from overture.schema.validation import (
-    GeometryTypeConstraint,
-    theme_literal,
-    type_literal,
-)
 from overture.schema.core.base import (
     OvertureFeature,
     OvertureFeatureProperties,
@@ -18,6 +13,11 @@ from overture.schema.core.base import (
 from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
+)
+from overture.schema.validation import (
+    GeometryTypeConstraint,
+    theme_literal,
+    type_literal,
 )
 
 

@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Dict, List
+from typing import Annotated
 
 from .constraints import (
     CategoryPatternConstraint,
-    CompositeUniqueConstraint,
     ConfidenceScoreConstraint,
     CountryCodeConstraint,
     HexColorConstraint,
@@ -19,7 +18,6 @@ from .constraints import (
     NoWhitespaceConstraint,
     PhoneNumberConstraint,
     RegionCodeConstraint,
-    UniqueItemsConstraint,
     WhitespaceConstraint,
     WikidataConstraint,
     ZoomLevelConstraint,
@@ -45,7 +43,7 @@ NonNegativeFloat = Annotated[float, NonNegativeConstraint()]
 NonNegativeInt = Annotated[int, NonNegativeConstraint()]
 
 # Collection types with constraints
-LinearReferenceRange = Annotated[List[float], LinearReferenceRangeConstraint()]
+LinearReferenceRange = Annotated[list[float], LinearReferenceRangeConstraint()]
 
 
 # Theme/type validation aliases
@@ -60,4 +58,4 @@ def type_literal(type_name: str) -> type:
 
 
 # Commonly used dictionary types
-LanguageNameMap = Dict[LanguageTag, str]
+LanguageNameMap = dict[LanguageTag, str]

@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 from overture.schema.core.base import OvertureFeatureProperties
 from overture.schema.core.common import (

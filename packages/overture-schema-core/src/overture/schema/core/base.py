@@ -8,10 +8,11 @@ from typing import Annotated, Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from overture.schema.validation import (
-    MinItemsConstraint,
     LiteralValueConstraint,
+    MinItemsConstraint,
 )
 from overture.schema.validation.types import ISO8601DateTime, JSONPointer
+
 from .validation_rules import validate_with_rules
 
 # Registry for valid themes and feature types (extensible)

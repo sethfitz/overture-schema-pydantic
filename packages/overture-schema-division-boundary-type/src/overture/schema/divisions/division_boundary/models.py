@@ -4,18 +4,6 @@ from typing import Annotated, List, Optional
 
 from pydantic import Field
 
-from overture.schema.validation import (
-    CountryCode,
-    GeometryTypeConstraint,
-    RegionCode,
-    UniqueItemsConstraint,
-    theme_literal,
-    type_literal,
-    ConstraintValidatedModel,
-    mutually_exclusive,
-    not_required_if,
-)
-
 from overture.schema.core.base import (
     OvertureFeature,
     OvertureFeatureProperties,
@@ -28,6 +16,17 @@ from overture.schema.divisions.common.models import (
     AreaBoundaryClass,
     Perspectives,
     PlaceType,
+)
+from overture.schema.validation import (
+    ConstraintValidatedModel,
+    CountryCode,
+    GeometryTypeConstraint,
+    RegionCode,
+    UniqueItemsConstraint,
+    mutually_exclusive,
+    not_required_if,
+    theme_literal,
+    type_literal,
 )
 
 

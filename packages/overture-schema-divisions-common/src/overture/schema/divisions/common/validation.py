@@ -3,6 +3,7 @@
 from typing import Any
 
 from pydantic import BaseModel
+
 from overture.schema.validation.mixin import (
     BaseConstraintValidator,
     register_constraint,

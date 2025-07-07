@@ -1,14 +1,10 @@
 """JSON Schema generation command for Overture Maps schemas."""
 
+import argparse
 import json
 import sys
-import argparse
-from typing import Dict, Any, Type, Optional
-import importlib.util
-import pkgutil
 from pathlib import Path
-
-from pydantic import BaseModel
+from typing import Any, Dict, Optional
 
 # Import all model packages to trigger registration
 try:
