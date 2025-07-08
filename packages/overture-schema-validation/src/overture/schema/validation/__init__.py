@@ -43,7 +43,6 @@ from .constraints import (
     ConfidenceScoreConstraint,
     CountryCodeConstraint,
     CountryRequiredConstraint,
-    ExtensionPrefixConstraint,
     GeometryTypeConstraint,
     HexColorConstraint,
     ISO8601DateTimeConstraint,
@@ -57,16 +56,13 @@ from .constraints import (
     MutuallyExclusiveConstraint,
     NonNegativeConstraint,
     NoWhitespaceConstraint,
-    ParentDivisionConstraint,
     # String constraints
     PatternConstraint,
     PhoneNumberConstraint,
     RegionCodeConstraint,
     StringConstraint,
     # Registry constraints
-    ThemeRegistryConstraint,
     ThemeTypeCompatibilityConstraint,
-    TypeRegistryConstraint,
     # Collection constraints
     UniqueItemsConstraint,
     WhitespaceConstraint,
@@ -139,18 +135,14 @@ __all__ = [
     "NonNegativeConstraint",
     # Specialized constraints
     "LinearReferenceRangeConstraint",
-    "ExtensionPrefixConstraint",
     "LiteralValueConstraint",
     # Conditional constraints
     "ConditionalRequiredConstraint",
     "MutuallyExclusiveConstraint",
     "AtLeastOneOfConstraint",
     # Registry constraints
-    "ThemeRegistryConstraint",
-    "TypeRegistryConstraint",
     "ThemeTypeCompatibilityConstraint",
     "CountryRequiredConstraint",
-    "ParentDivisionConstraint",
     "GeometryTypeConstraint",
     # Constrained types
     "LanguageTag",
