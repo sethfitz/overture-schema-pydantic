@@ -2,12 +2,12 @@
 
 from .models import (
     WaterClass,
-    WaterFeature,
+    Water,
     WaterSubtype,
 )
 
 __all__ = [
-    "WaterFeature",
+    "Water",
     "WaterSubtype",
     "WaterClass",
 ]

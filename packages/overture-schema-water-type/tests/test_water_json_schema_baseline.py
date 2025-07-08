@@ -3,12 +3,12 @@
 import json
 import os
 
-from overture.schema.base.water.models import WaterFeature
+from overture.schema.base.water.models import Water
 
 
 def test_water_json_schema_baseline():
-    """Test that WaterFeature generates consistent JSON Schema (baseline comparison)."""
-    schema = WaterFeature.model_json_schema()
+    """Test that Water generates consistent JSON Schema (baseline comparison)."""
+    schema = Water.model_json_schema()
 
     # Path to baseline file
     baseline_file = os.path.join(
@@ -21,7 +21,7 @@ def test_water_json_schema_baseline():
             json.dump(schema, f, indent=2, sort_keys=True)
         # On first run, just verify basic structure
         assert schema["type"] == "object"
-        assert schema["title"] == "WaterFeature"
+        assert schema["title"] == "Water"
         return
 
     # Load baseline and compare

@@ -118,7 +118,7 @@ class InfrastructureProperties(OvertureFeatureProperties):
     )
 
 
-class InfrastructureFeature(OvertureFeature):
+class Infrastructure(OvertureFeature):
     """Infrastructure feature model."""
 
     properties: InfrastructureProperties = Field(
@@ -144,4 +144,4 @@ class InfrastructureFeature(OvertureFeature):
 
 # Register Pydantic models when module is imported
 
-register_model("base", "infrastructure", InfrastructureFeature)
+register_model("base", "infrastructure", Infrastructure)

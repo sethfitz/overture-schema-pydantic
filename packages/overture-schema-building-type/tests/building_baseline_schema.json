@@ -1005,6 +1005,6 @@
     "geometry",
     "properties"
   ],
-  "title": "BuildingFeature",
+  "title": "Building",
   "type": "object"
 }

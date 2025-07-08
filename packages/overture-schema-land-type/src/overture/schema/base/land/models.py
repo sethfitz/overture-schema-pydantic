@@ -114,7 +114,7 @@ class LandProperties(OvertureFeatureProperties):
     )
 
 
-class LandFeature(OvertureFeature):
+class Land(OvertureFeature):
     """Land feature model."""
 
     properties: LandProperties = Field(..., description="Land feature properties")
@@ -126,4 +126,4 @@ class LandFeature(OvertureFeature):
 
 # Register Pydantic models when module is imported
 
-register_model("base", "land", LandFeature)
+register_model("base", "land", Land)

@@ -229,6 +229,6 @@
     "geometry",
     "properties"
   ],
-  "title": "ConnectorFeature",
+  "title": "Connector",
   "type": "object"
 }

@@ -3,12 +3,12 @@
 import json
 import os
 
-from overture.schema.transportation.segment.models import SegmentFeature
+from overture.schema.transportation.segment.models import Segment
 
 
 def test_segment_json_schema_baseline():
-    """Test that SegmentFeature generates consistent JSON Schema (baseline comparison)."""
-    schema = SegmentFeature.model_json_schema()
+    """Test that Segment generates consistent JSON Schema (baseline comparison)."""
+    schema = Segment.model_json_schema()
 
     # Path to baseline file
     baseline_file = os.path.join(
@@ -21,7 +21,7 @@ def test_segment_json_schema_baseline():
             json.dump(schema, f, indent=2, sort_keys=True)
         # On first run, just verify basic structure
         assert schema["type"] == "object"
-        assert schema["title"] == "SegmentFeature"
+        assert schema["title"] == "Segment"
         return
 
     # Load baseline and compare

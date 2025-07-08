@@ -1908,6 +1908,6 @@
     "geometry",
     "properties"
   ],
-  "title": "SegmentFeature",
+  "title": "Segment",
   "type": "object"
 }

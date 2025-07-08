@@ -773,6 +773,6 @@
     "geometry",
     "properties"
   ],
-  "title": "PlaceFeature",
+  "title": "Place",
   "type": "object"
 }

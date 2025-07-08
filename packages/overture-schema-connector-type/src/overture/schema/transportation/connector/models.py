@@ -26,7 +26,7 @@ class ConnectorProperties(OvertureFeatureProperties):
     type: type_literal("connector") = Field("connector", description="Feature type")
 
 
-class ConnectorFeature(OvertureFeature):
+class Connector(OvertureFeature):
     """Connector feature model."""
 
     properties: ConnectorProperties = Field(
@@ -39,4 +39,4 @@ class ConnectorFeature(OvertureFeature):
 
 # Register Pydantic models when module is imported
 
-register_model("transportation", "connector", ConnectorFeature)
+register_model("transportation", "connector", Connector)

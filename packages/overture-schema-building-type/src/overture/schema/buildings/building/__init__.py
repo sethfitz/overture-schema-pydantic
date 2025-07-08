@@ -16,12 +16,12 @@ from overture.schema.buildings.common import (
 # Register theme-type mappings for strict validation
 from overture.schema.core.base import add_theme_type_mapping
 
-from .models import BuildingFeature, BuildingProperties
+from .models import Building, BuildingProperties
 
 add_theme_type_mapping("buildings", "building")
 
 __all__ = [
-    "BuildingFeature",
+    "Building",
     "BuildingProperties",
     "BuildingSubtype",
     "BuildingClass",

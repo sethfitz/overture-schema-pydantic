@@ -3,12 +3,12 @@
 import json
 import os
 
-from overture.schema.transportation.connector.models import ConnectorFeature
+from overture.schema.transportation.connector.models import Connector
 
 
 def test_connector_json_schema_baseline():
-    """Test that ConnectorFeature generates consistent JSON Schema (baseline comparison)."""
-    schema = ConnectorFeature.model_json_schema()
+    """Test that Connector generates consistent JSON Schema (baseline comparison)."""
+    schema = Connector.model_json_schema()
 
     # Path to baseline file
     baseline_file = os.path.join(
@@ -21,7 +21,7 @@ def test_connector_json_schema_baseline():
             json.dump(schema, f, indent=2, sort_keys=True)
         # On first run, just verify basic structure
         assert schema["type"] == "object"
-        assert schema["title"] == "ConnectorFeature"
+        assert schema["title"] == "Connector"
         return
 
     # Load baseline and compare

@@ -3,12 +3,12 @@
 import json
 import os
 
-from overture.schema.addresses.address.models import AddressFeature
+from overture.schema.addresses.address.models import Address
 
 
 def test_address_json_schema_baseline():
-    """Test that AddressFeature generates consistent JSON Schema (baseline comparison)."""
-    schema = AddressFeature.model_json_schema()
+    """Test that Address generates consistent JSON Schema (baseline comparison)."""
+    schema = Address.model_json_schema()
 
     # Path to baseline file
     baseline_file = os.path.join(
@@ -21,7 +21,7 @@ def test_address_json_schema_baseline():
             json.dump(schema, f, indent=2, sort_keys=True)
         # On first run, just verify basic structure
         assert schema["type"] == "object"
-        assert schema["title"] == "AddressFeature"
+        assert schema["title"] == "Address"
         return
 
     # Load baseline and compare

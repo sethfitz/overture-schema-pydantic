@@ -359,6 +359,6 @@
     "geometry",
     "properties"
   ],
-  "title": "AddressFeature",
+  "title": "Address",
   "type": "object"
 }

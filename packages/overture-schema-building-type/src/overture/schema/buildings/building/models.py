@@ -21,7 +21,7 @@ class BuildingProperties(BaseBuildingProperties):
     type: type_literal("building") = Field("building", description="Feature type")
 
 
-class BuildingFeature(OvertureFeature):
+class Building(OvertureFeature):
     """Building feature model."""
 
     properties: BuildingProperties = Field(
@@ -33,4 +33,4 @@ class BuildingFeature(OvertureFeature):
 
 
 # Register Pydantic models when module is imported
-register_model("buildings", "building", BuildingFeature)
+register_model("buildings", "building", Building)

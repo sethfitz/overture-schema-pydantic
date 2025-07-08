@@ -3,8 +3,8 @@
 # Register theme-type mappings for strict validation
 from overture.schema.core.base import add_theme_type_mapping
 
-from .models import BuildingPartFeature, BuildingPartProperties
+from .models import BuildingPart, BuildingPartProperties
 
 add_theme_type_mapping("buildings", "building_part")
 
-__all__ = ["BuildingPartFeature", "BuildingPartProperties"]
+__all__ = ["BuildingPart", "BuildingPartProperties"]

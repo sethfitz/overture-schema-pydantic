@@ -137,7 +137,7 @@ class PlaceProperties(OvertureFeatureProperties):
     )
 
 
-class PlaceFeature(OvertureFeature):
+class Place(OvertureFeature):
     """Place feature model."""
 
     properties: PlaceProperties = Field(..., description="Place feature properties")
@@ -148,4 +148,4 @@ class PlaceFeature(OvertureFeature):
 
 # Register Pydantic models when module is imported
 
-register_model("places", "place", PlaceFeature)
+register_model("places", "place", Place)

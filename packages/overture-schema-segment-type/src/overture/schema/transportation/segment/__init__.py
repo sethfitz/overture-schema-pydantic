@@ -3,8 +3,8 @@
 # Register theme-type mappings for strict validation
 from overture.schema.core.base import add_theme_type_mapping
 
-from .models import SegmentFeature, SegmentProperties
+from .models import Segment, SegmentProperties
 
 add_theme_type_mapping("transportation", "segment")
 
-__all__ = ["SegmentFeature", "SegmentProperties"]
+__all__ = ["Segment", "SegmentProperties"]

@@ -3,12 +3,12 @@
 import json
 import os
 
-from overture.schema.base.land.models import LandFeature
+from overture.schema.base.land.models import Land
 
 
 def test_land_json_schema_baseline():
-    """Test that LandFeature generates consistent JSON Schema (baseline comparison)."""
-    schema = LandFeature.model_json_schema()
+    """Test that Land generates consistent JSON Schema (baseline comparison)."""
+    schema = Land.model_json_schema()
 
     # Path to baseline file
     baseline_file = os.path.join(os.path.dirname(__file__), "land_baseline_schema.json")
@@ -19,7 +19,7 @@ def test_land_json_schema_baseline():
             json.dump(schema, f, indent=2, sort_keys=True)
         # On first run, just verify basic structure
         assert schema["type"] == "object"
-        assert schema["title"] == "LandFeature"
+        assert schema["title"] == "Land"
         return
 
     # Load baseline and compare

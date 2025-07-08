@@ -24,7 +24,7 @@ class BuildingPartProperties(BaseBuildingProperties):
     building_id: str = Field(..., min_length=1, description="Parent building ID")
 
 
-class BuildingPartFeature(OvertureFeature):
+class BuildingPart(OvertureFeature):
     """Building part feature model."""
 
     properties: BuildingPartProperties = Field(
@@ -36,4 +36,4 @@ class BuildingPartFeature(OvertureFeature):
 
 
 # Register Pydantic models when module is imported
-register_model("buildings", "building_part", BuildingPartFeature)
+register_model("buildings", "building_part", BuildingPart)

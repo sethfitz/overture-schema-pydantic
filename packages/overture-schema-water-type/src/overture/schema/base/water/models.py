@@ -110,7 +110,7 @@ class WaterProperties(OvertureFeatureProperties):
     wikidata: Optional[str] = Field(None, description="Wikidata identifier")
 
 
-class WaterFeature(OvertureFeature):
+class Water(OvertureFeature):
     """Water feature model."""
 
     properties: WaterProperties = Field(..., description="Water feature properties")
@@ -125,4 +125,4 @@ class WaterFeature(OvertureFeature):
 
 # Register Pydantic models when module is imported
 
-register_model("base", "water", WaterFeature)
+register_model("base", "water", Water)

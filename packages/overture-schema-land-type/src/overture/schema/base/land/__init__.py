@@ -2,12 +2,12 @@
 
 from .models import (
     LandClass,
-    LandFeature,
+    Land,
     LandSubtype,
 )
 
 __all__ = [
-    "LandFeature",
+    "Land",
     "LandSubtype",
     "LandClass",
 ]

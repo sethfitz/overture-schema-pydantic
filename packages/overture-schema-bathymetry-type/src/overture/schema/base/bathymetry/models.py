@@ -25,7 +25,7 @@ class BathymetryProperties(OvertureFeatureProperties):
     type: Annotated[str, type_literal("bathymetry")]
 
 
-class BathymetryFeature(OvertureFeature):
+class Bathymetry(OvertureFeature):
     """Bathymetry feature model."""
 
     properties: BathymetryProperties = Field(
@@ -37,4 +37,4 @@ class BathymetryFeature(OvertureFeature):
 
 
 # Register Pydantic models when module is imported
-register_model("base", "bathymetry", BathymetryFeature)
+register_model("base", "bathymetry", Bathymetry)

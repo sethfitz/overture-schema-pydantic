@@ -233,6 +233,6 @@
     "geometry",
     "properties"
   ],
-  "title": "BathymetryFeature",
+  "title": "Bathymetry",
   "type": "object"
 }

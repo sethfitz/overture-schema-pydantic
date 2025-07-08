@@ -3,12 +3,12 @@
 import json
 import os
 
-from overture.schema.base.infrastructure.models import InfrastructureFeature
+from overture.schema.base.infrastructure.models import Infrastructure
 
 
 def test_infrastructure_json_schema_baseline():
-    """Test that InfrastructureFeature generates consistent JSON Schema (baseline comparison)."""
-    schema = InfrastructureFeature.model_json_schema()
+    """Test that Infrastructure generates consistent JSON Schema (baseline comparison)."""
+    schema = Infrastructure.model_json_schema()
 
     # Path to baseline file
     baseline_file = os.path.join(
@@ -21,7 +21,7 @@ def test_infrastructure_json_schema_baseline():
             json.dump(schema, f, indent=2, sort_keys=True)
         # On first run, just verify basic structure
         assert schema["type"] == "object"
-        assert schema["title"] == "InfrastructureFeature"
+        assert schema["title"] == "Infrastructure"
         return
 
     # Load baseline and compare

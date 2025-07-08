@@ -2,13 +2,13 @@
 
 from .models import (
     InfrastructureClass,
-    InfrastructureFeature,
+    Infrastructure,
     InfrastructureSubtype,
     SurfaceMaterial,
 )
 
 __all__ = [
-    "InfrastructureFeature",
+    "Infrastructure",
     "InfrastructureSubtype",
     "InfrastructureClass",
     "SurfaceMaterial",

@@ -84,7 +84,7 @@ class AddressProperties(OvertureFeatureProperties):
     )
 
 
-class AddressFeature(OvertureFeature):
+class Address(OvertureFeature):
     """Address feature model."""
 
     properties: AddressProperties = Field(..., description="Address feature properties")
@@ -95,4 +95,4 @@ class AddressFeature(OvertureFeature):
 
 # Register Pydantic models when module is imported
 
-register_model("addresses", "address", AddressFeature)
+register_model("addresses", "address", Address)

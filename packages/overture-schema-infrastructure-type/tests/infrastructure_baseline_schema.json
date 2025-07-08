@@ -594,6 +594,6 @@
     "geometry",
     "properties"
   ],
-  "title": "InfrastructureFeature",
+  "title": "Infrastructure",
   "type": "object"
 }

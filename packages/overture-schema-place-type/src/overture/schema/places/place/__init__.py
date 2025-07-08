@@ -8,7 +8,7 @@ from .models import (
     PlaceCategories,
     PlaceConfidence,
     PlaceContact,
-    PlaceFeature,
+    Place,
     PlaceOperatingHours,
     PlaceProperties,
 )
@@ -16,7 +16,7 @@ from .models import (
 add_theme_type_mapping("places", "place")
 
 __all__ = [
-    "PlaceFeature",
+    "Place",
     "PlaceProperties",
     "PlaceCategories",
     "PlaceBrand",

@@ -1012,6 +1012,6 @@
     "geometry",
     "properties"
   ],
-  "title": "BuildingPartFeature",
+  "title": "BuildingPart",
   "type": "object"
 }

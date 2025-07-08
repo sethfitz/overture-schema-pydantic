@@ -178,7 +178,7 @@ class SegmentProperties(ConstraintValidatedModel, OvertureFeatureProperties):
     )
 
 
-class SegmentFeature(OvertureFeature):
+class Segment(OvertureFeature):
     """Segment feature model."""
 
     properties: SegmentProperties = Field(..., description="Segment feature properties")
@@ -189,4 +189,4 @@ class SegmentFeature(OvertureFeature):
 
 # Register Pydantic models when module is imported
 
-register_model("transportation", "segment", SegmentFeature)
+register_model("transportation", "segment", Segment)

@@ -3,8 +3,8 @@
 # Register theme-type mappings for strict validation
 from overture.schema.core.base import add_theme_type_mapping
 
-from .models import ConnectorFeature, ConnectorProperties
+from .models import Connector, ConnectorProperties
 
 add_theme_type_mapping("transportation", "connector")
 
-__all__ = ["ConnectorFeature", "ConnectorProperties"]
+__all__ = ["Connector", "ConnectorProperties"]

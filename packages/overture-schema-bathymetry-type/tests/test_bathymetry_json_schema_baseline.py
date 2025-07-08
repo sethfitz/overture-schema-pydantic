@@ -3,12 +3,12 @@
 import json
 import os
 
-from overture.schema.base.bathymetry.models import BathymetryFeature
+from overture.schema.base.bathymetry.models import Bathymetry
 
 
 def test_bathymetry_json_schema_baseline():
-    """Test that BathymetryFeature generates consistent JSON Schema (baseline comparison)."""
-    schema = BathymetryFeature.model_json_schema()
+    """Test that Bathymetry generates consistent JSON Schema (baseline comparison)."""
+    schema = Bathymetry.model_json_schema()
 
     # Path to baseline file
     baseline_file = os.path.join(
@@ -21,7 +21,7 @@ def test_bathymetry_json_schema_baseline():
             json.dump(schema, f, indent=2, sort_keys=True)
         # On first run, just verify basic structure
         assert schema["type"] == "object"
-        assert schema["title"] == "BathymetryFeature"
+        assert schema["title"] == "Bathymetry"
         return
 
     # Load baseline and compare
