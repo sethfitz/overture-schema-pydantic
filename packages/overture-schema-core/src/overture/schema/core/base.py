@@ -13,8 +13,6 @@ from overture.schema.validation import (
 )
 from overture.schema.validation.types import ISO8601DateTime, JSONPointer
 
-from .validation_rules import validate_with_rules
-
 # Registry for valid themes and feature types (extensible)
 _VALID_THEMES: set[str] = set()
 _VALID_FEATURE_TYPES: set[str] = set()
@@ -214,11 +212,6 @@ def validate_feature(feature: Dict[str, Any]) -> tuple[bool, str]:
                 f"Invalid theme-type combination: theme='{theme}', type='{feature_type}'",
             )
 
-        # Apply generic validation rules
-        rule_valid, rule_error = validate_with_rules(theme, feature_type, feature)
-        if not rule_valid:
-            return False, rule_error
-
         # Look up registered Pydantic model
         model_class = get_registered_model(theme, feature_type)
         if model_class:
@@ -270,11 +263,6 @@ def get_parsed_feature(feature: Dict[str, Any]) -> Dict[str, Any]:
             raise ValueError(
                 f"Invalid theme-type combination: theme='{theme}', type='{feature_type}'"
             )
-
-        # Apply generic validation rules
-        rule_valid, rule_error = validate_with_rules(theme, feature_type, feature)
-        if not rule_valid:
-            raise ValueError(rule_error)
 
         # Look up registered Pydantic model
         model_class = get_registered_model(theme, feature_type)

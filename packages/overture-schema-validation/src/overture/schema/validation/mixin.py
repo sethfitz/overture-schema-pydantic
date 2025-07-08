@@ -183,6 +183,72 @@ class AtLeastOneOfValidator(BaseConstraintValidator):
         }
 
 
+class ConditionalEnumValidator(BaseConstraintValidator):
+    """Validates enum field values based on another field's value."""
+
+    def __init__(
+        self,
+        enum_field: str,
+        condition_field: str,
+        enum_mapping: dict[str, list[str]],
+    ):
+        super().__init__()
+        self.enum_field = enum_field
+        self.condition_field = condition_field
+        self.enum_mapping = enum_mapping
+
+    def validate(self, model_instance: BaseModel) -> None:
+        target = model_instance
+        if hasattr(model_instance, "properties"):
+            target = model_instance.properties
+
+        # Get values of both fields
+        if not (
+            hasattr(target, self.enum_field) and hasattr(target, self.condition_field)
+        ):
+            return
+
+        enum_value = getattr(target, self.enum_field)
+        condition_value = getattr(target, self.condition_field)
+
+        # Skip validation if enum field is None (optional field)
+        if enum_value is None:
+            return
+
+        # Check if condition value has a mapping
+        if condition_value not in self.enum_mapping:
+            return
+
+        allowed_values = self.enum_mapping[condition_value]
+        if enum_value not in allowed_values:
+            allowed_list = ", ".join(f"'{v}'" for v in allowed_values)
+            raise ValueError(
+                f"Invalid {self.enum_field} '{enum_value}' for {self.condition_field} '{condition_value}'. "
+                f"Allowed values: {allowed_list}"
+            )
+
+    def get_json_schema_metadata(self) -> dict[str, Any]:
+        # Generate conditional schema using if/then structure
+        conditions = []
+        for condition_value, allowed_values in self.enum_mapping.items():
+            conditions.append(
+                {
+                    "if": {
+                        "properties": {self.condition_field: {"const": condition_value}}
+                    },
+                    "then": {"properties": {self.enum_field: {"enum": allowed_values}}},
+                }
+            )
+
+        return {
+            "type": "conditional_enum",
+            "enum_field": self.enum_field,
+            "condition_field": self.condition_field,
+            "enum_mapping": self.enum_mapping,
+            "allOf": conditions,
+        }
+
+
 def register_constraint(
     model_class: type[BaseModel], constraint: BaseConstraintValidator
 ):
@@ -238,6 +304,19 @@ def not_required_if(
         constraint = NotRequiredIfValidator(
             condition_field, condition_value, not_required_fields
         )
+        register_constraint(cls, constraint)
+        return cls
+
+    return decorator
+
+
+def conditional_enum(
+    enum_field: str, condition_field: str, enum_mapping: dict[str, list[str]]
+):
+    """Decorator to add conditional enum validation."""
+
+    def decorator(cls: type[BaseModel]) -> type[BaseModel]:
+        constraint = ConditionalEnumValidator(enum_field, condition_field, enum_mapping)
         register_constraint(cls, constraint)
         return cls
 

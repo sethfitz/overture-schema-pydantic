@@ -72,12 +72,14 @@ from .constraints import (
 from .mixin import (
     AtLeastOneOfValidator,
     BaseConstraintValidator,
+    ConditionalEnumValidator,
     # Mixin-based constraint validation
     ConstraintValidatedModel,
     MutuallyExclusiveValidator,
     NotRequiredIfValidator,
     RequiredIfValidator,
     at_least_one_of,
+    conditional_enum,
     # Decorators
     mutually_exclusive,
     not_required_if,
@@ -171,9 +173,11 @@ __all__ = [
     "RequiredIfValidator",
     "NotRequiredIfValidator",
     "AtLeastOneOfValidator",
+    "ConditionalEnumValidator",
     # Decorators
     "mutually_exclusive",
     "required_if",
     "not_required_if",
     "at_least_one_of",
+    "conditional_enum",
 ]

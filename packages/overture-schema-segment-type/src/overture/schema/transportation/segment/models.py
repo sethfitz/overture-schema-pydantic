@@ -62,6 +62,7 @@ from overture.schema.validation import (
     ConstraintValidatedModel,
     GeometryTypeConstraint,
     MinItemsConstraint,
+    conditional_enum,
     required_if,
     theme_literal,
     type_literal,
@@ -91,6 +92,14 @@ class RailFlags(BaseModel):
 
 @required_if("subtype", SegmentSubtype.ROAD, ["class_"])
 @required_if("subtype", SegmentSubtype.RAIL, ["class_"])
+@conditional_enum(
+    enum_field="class_",
+    condition_field="subtype",
+    enum_mapping={
+        "road": [e.value for e in RoadClass],
+        "rail": [e.value for e in RailClass],
+    },
+)
 class SegmentProperties(ConstraintValidatedModel, OvertureFeatureProperties):
     """Properties specific to segment features."""
 
