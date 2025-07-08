@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "overture-schema-place-type"
 version = "0.1.0"
 description = "Pydantic models for Overture Maps place type"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.0",
     "pydantic[email]",

@@ -2,7 +2,7 @@
 name = "overture-schema-water-type"
 version = "0.1.0"
 description = "Pydantic schemas for Overture Maps water features"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 readme = "README.md"
 dependencies = [
     "overture-schema-core",
