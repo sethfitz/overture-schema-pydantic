@@ -6,16 +6,17 @@ build-backend = "hatchling.build"
 name = "overture-schema-place-type"
 version = "0.1.0"
 description = "Pydantic models for Overture Maps place type"
-authors = [
-    {name = "Overture Maps Foundation"},
-]
+requires-python = ">=3.8"
 dependencies = [
     "pydantic>=2.0",
     "pydantic[email]",
     "overture-schema-core",
     "overture-schema-validation",
 ]
-requires-python = ">=3.8"
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-validation = { workspace = true }
 
 [project.optional-dependencies]
 dev = [

@@ -11,3 +11,5 @@ Import specific schemas from their respective theme packages:
     from overture.schema.divisions import DivisionFeature
     from overture.schema.addresses import AddressFeature
 """
+
+__path__ = __import__("pkgutil").extend_path(__path__, __name__)

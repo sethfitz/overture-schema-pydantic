@@ -266,12 +266,16 @@
           "description": "Administrative level"
         },
         "theme": {
-          "description": "Top-level Overture theme",
+          "const": "divisions",
+          "default": "divisions",
+          "description": "Feature theme",
           "title": "Theme",
           "type": "string"
         },
         "type": {
-          "description": "Specific feature type within theme",
+          "const": "division_area",
+          "default": "division_area",
+          "description": "Feature type",
           "title": "Type",
           "type": "string"
         },
@@ -283,8 +287,6 @@
         }
       },
       "required": [
-        "theme",
-        "type",
         "version",
         "subtype",
         "class",
@@ -504,7 +506,16 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "GeoJSON geometry (Polygon or MultiPolygon)",
+      "properties": {
+        "type": {
+          "enum": [
+            "MultiPolygon",
+            "Polygon"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -519,6 +530,7 @@
       "description": "Division area feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

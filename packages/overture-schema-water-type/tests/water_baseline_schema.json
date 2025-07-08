@@ -472,12 +472,16 @@
           "description": "Water subtype"
         },
         "theme": {
-          "description": "Top-level Overture theme",
+          "const": "base",
+          "default": "base",
+          "description": "Feature theme",
           "title": "Theme",
           "type": "string"
         },
         "type": {
-          "description": "Specific feature type within theme",
+          "const": "water",
+          "default": "water",
+          "description": "Feature type",
           "title": "Type",
           "type": "string"
         },
@@ -502,8 +506,6 @@
         }
       },
       "required": [
-        "theme",
-        "type",
         "version",
         "subtype",
         "class"
@@ -535,7 +537,18 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "GeoJSON geometry (Point, LineString, Polygon, or MultiPolygon)",
+      "properties": {
+        "type": {
+          "enum": [
+            "LineString",
+            "MultiPolygon",
+            "Point",
+            "Polygon"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -550,6 +563,7 @@
       "description": "Water feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

@@ -112,12 +112,16 @@
           "title": "Sources"
         },
         "theme": {
-          "description": "Top-level Overture theme",
+          "const": "transportation",
+          "default": "transportation",
+          "description": "Feature theme",
           "title": "Theme",
           "type": "string"
         },
         "type": {
-          "description": "Specific feature type within theme",
+          "const": "connector",
+          "default": "connector",
+          "description": "Feature type",
           "title": "Type",
           "type": "string"
         },
@@ -129,8 +133,6 @@
         }
       },
       "required": [
-        "theme",
-        "type",
         "version"
       ],
       "title": "ConnectorProperties",
@@ -205,7 +207,15 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "GeoJSON geometry (Point)",
+      "properties": {
+        "type": {
+          "enum": [
+            "Point"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -220,6 +230,7 @@
       "description": "Connector feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

@@ -1,5 +1,7 @@
 """Overture Maps schema validation package."""
 
+__path__ = __import__("pkgutil").extend_path(__path__, __name__)
+
 try:
     import importlib.metadata
 

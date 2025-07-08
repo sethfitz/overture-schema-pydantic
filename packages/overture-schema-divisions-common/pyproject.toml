@@ -10,8 +10,15 @@ dependencies = [
     "pydantic>=2.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/OvertureMaps/pydantic-schema"
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+]
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-validation = { workspace = true }
+
 
 [build-system]
 requires = ["hatchling"]

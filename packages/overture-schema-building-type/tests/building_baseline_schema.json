@@ -605,7 +605,9 @@
           "type": "string"
         },
         "type": {
-          "description": "Specific feature type within theme",
+          "const": "building",
+          "default": "building",
+          "description": "Feature type",
           "title": "Type",
           "type": "string"
         },
@@ -617,7 +619,6 @@
         }
       },
       "required": [
-        "type",
         "version"
       ],
       "title": "BuildingProperties",
@@ -968,7 +969,16 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "GeoJSON geometry (Polygon or MultiPolygon)",
+      "properties": {
+        "type": {
+          "enum": [
+            "MultiPolygon",
+            "Polygon"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -983,6 +993,7 @@
       "description": "Building feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

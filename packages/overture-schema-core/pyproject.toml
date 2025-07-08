@@ -12,5 +12,8 @@ dependencies = [
     "overture-schema-validation",
 ]
 
+[tool.uv.sources]
+overture-schema-validation = { workspace = true }
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/overture"]

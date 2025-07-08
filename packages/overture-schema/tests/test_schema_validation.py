@@ -248,7 +248,7 @@ class TestSchemaValidation:
 
     def setup_class(self):
         """Setup test paths."""
-        self.project_root = Path(__file__).parent.parent
+        self.project_root = Path(__file__).parent.parent.parent.parent
         self.examples_dir = self.project_root / "reference" / "examples"
         self.counterexamples_dir = self.project_root / "reference" / "counterexamples"
 
@@ -269,7 +269,7 @@ def pytest_generate_tests(metafunc):
     """Generate parameterized tests for examples and counterexamples."""
     if "example_file" in metafunc.fixturenames:
         # Generate tests for examples (should pass validation)
-        project_root = Path(__file__).parent.parent
+        project_root = Path(__file__).parent.parent.parent.parent
         examples_dir = project_root / "reference" / "examples"
 
         if examples_dir.exists():
@@ -300,7 +300,7 @@ def pytest_generate_tests(metafunc):
 
     elif "counterexample_file" in metafunc.fixturenames:
         # Generate tests for counterexamples (should fail validation)
-        project_root = Path(__file__).parent.parent
+        project_root = Path(__file__).parent.parent.parent.parent
         counterexamples_dir = project_root / "reference" / "counterexamples"
 
         if counterexamples_dir.exists():
@@ -354,7 +354,7 @@ def test_counterexample_validation(counterexample_file):
 
 def get_disabled_test_cases():
     """Get all disabled test cases for reporting."""
-    project_root = Path(__file__).parent.parent
+    project_root = Path(__file__).parent.parent.parent.parent
 
     disabled_examples = []
     disabled_counterexamples = []

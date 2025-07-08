@@ -1551,7 +1551,7 @@ class GeometryTypeConstraint(BaseConstraint):
                         ctx={"error": f"Invalid geometry structure: {str(e)}"},
                     )
                 ],
-            )
+            ) from e
 
     def __get_pydantic_core_schema__(
         self, source: type[Any], handler: GetCoreSchemaHandler
@@ -1575,7 +1575,7 @@ class GeometryTypeConstraint(BaseConstraint):
         json_schema["properties"] = json_schema.get("properties", {})
         json_schema["properties"]["type"] = {
             "type": "string",
-            "enum": self.allowed_types,
+            "enum": list(self.allowed_types),
         }
         json_schema["description"] = (
             f"GeoJSON geometry with type one of: {', '.join(self.allowed_types)}"

@@ -6,9 +6,7 @@ build-backend = "hatchling.build"
 name = "overture-schema-segment-type"
 version = "0.1.0"
 description = "Pydantic schemas for Overture Maps segment type"
-authors = [
-    { name = "Overture Maps Foundation" },
-]
+requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.0",
     "overture-schema-core",
@@ -16,7 +14,12 @@ dependencies = [
     "overture-schema-transportation-common",
     "overture-schema-transportation-rules",
 ]
-requires-python = ">=3.10"
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-validation = { workspace = true }
+overture-schema-transportation-common = { workspace = true }
+overture-schema-transportation-rules = { workspace = true }
 
 [project.optional-dependencies]
 dev = [
@@ -25,8 +28,6 @@ dev = [
     "mypy",
 ]
 
-[project.urls]
-Homepage = "https://github.com/overturemaps/pydantic-schema"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/overture"]

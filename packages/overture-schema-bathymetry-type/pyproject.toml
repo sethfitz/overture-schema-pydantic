@@ -2,16 +2,15 @@
 name = "overture-schema-bathymetry-type"
 version = "0.1.0"
 description = "Overture Maps bathymetry type schema"
-authors = [
-    {name = "Claude Code", email = "noreply@anthropic.com"},
-]
+requires-python = ">=3.10"
+readme = "README.md"
 dependencies = [
     "overture-schema-core",
     "pydantic>=2.0",
 ]
-requires-python = ">=3.10"
-readme = "README.md"
-license = {text = "MIT"}
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
 
 [project.optional-dependencies]
 dev = [

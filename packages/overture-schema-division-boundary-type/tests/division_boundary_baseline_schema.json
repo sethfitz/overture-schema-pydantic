@@ -397,6 +397,7 @@
       "description": "Division boundary feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

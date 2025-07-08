@@ -474,6 +474,7 @@
         "wikidata": {
           "anyOf": [
             {
+              "description": "Wikidata identifier (Q followed by digits)",
               "pattern": "^Q\\d+$",
               "type": "string"
             },
@@ -588,6 +589,7 @@
         "confidence": {
           "anyOf": [
             {
+              "description": "Confidence score between 0.0 and 1.0",
               "maximum": 1.0,
               "minimum": 0.0,
               "type": "number"
@@ -635,6 +637,8 @@
           "anyOf": [
             {
               "items": {
+                "description": "International phone number (+ followed by country code and number)",
+                "pattern": "^\\+\\d{1,3}[\\s\\-\\(\\)0-9]+$",
                 "type": "string"
               },
               "minItems": 1,
@@ -734,7 +738,15 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "GeoJSON geometry (Point)",
+      "properties": {
+        "type": {
+          "enum": [
+            "Point"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -749,6 +761,7 @@
       "description": "Place feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

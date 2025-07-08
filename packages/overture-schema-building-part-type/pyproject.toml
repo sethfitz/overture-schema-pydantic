@@ -2,15 +2,16 @@
 name = "overture-schema-building-part-type"
 version = "0.1.0"
 description = "Pydantic schemas for Overture Maps building_part type"
-authors = [
-    { name = "Overture Maps Foundation" },
-]
+requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.0",
     "overture-schema-core",
     "overture-schema-buildings-common",
 ]
-requires-python = ">=3.10"
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-buildings-common = { workspace = true }
 
 [project.optional-dependencies]
 dev = [
@@ -19,8 +20,6 @@ dev = [
     "mypy",
 ]
 
-[project.urls]
-Homepage = "https://github.com/overturemaps/pydantic-schema"
 
 [build-system]
 requires = ["hatchling"]

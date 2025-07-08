@@ -85,6 +85,26 @@
       "title": "AdvancedSourceItem",
       "type": "object"
     },
+    "CapitalOfDivisionItem": {
+      "description": "Division that has this division as capital.",
+      "properties": {
+        "division_id": {
+          "description": "Division identifier",
+          "title": "Division Id",
+          "type": "string"
+        },
+        "subtype": {
+          "$ref": "#/$defs/PlaceType",
+          "description": "Administrative level"
+        }
+      },
+      "required": [
+        "division_id",
+        "subtype"
+      ],
+      "title": "CapitalOfDivisionItem",
+      "type": "object"
+    },
     "CartographyContainer": {
       "description": "Cartographic hints for optimal map display.",
       "properties": {
@@ -190,11 +210,11 @@
           "anyOf": [
             {
               "items": {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/$defs/CapitalOfDivisionItem"
               },
               "minItems": 1,
-              "type": "array"
+              "type": "array",
+              "uniqueItems": true
             },
             {
               "type": "null"
@@ -240,7 +260,9 @@
             "items": {
               "$ref": "#/$defs/HierarchyItem"
             },
-            "type": "array"
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
           },
           "minItems": 1,
           "title": "Hierarchies",
@@ -709,7 +731,15 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "Point geometry for division location",
+      "properties": {
+        "type": {
+          "enum": [
+            "Point"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -724,6 +754,7 @@
       "description": "Division feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

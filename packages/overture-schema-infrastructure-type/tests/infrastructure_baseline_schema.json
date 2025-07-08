@@ -282,12 +282,12 @@
           "description": "Surface material"
         },
         "theme": {
-          "description": "Top-level Overture theme",
+          "description": "Feature theme",
           "title": "Theme",
           "type": "string"
         },
         "type": {
-          "description": "Specific feature type within theme",
+          "description": "Feature type",
           "title": "Type",
           "type": "string"
         },
@@ -553,7 +553,21 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "Feature geometry - Infrastructure can have any geometry type",
+      "properties": {
+        "type": {
+          "enum": [
+            "GeometryCollection",
+            "LineString",
+            "MultiLineString",
+            "MultiPoint",
+            "MultiPolygon",
+            "Point",
+            "Polygon"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -568,6 +582,7 @@
       "description": "Infrastructure feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

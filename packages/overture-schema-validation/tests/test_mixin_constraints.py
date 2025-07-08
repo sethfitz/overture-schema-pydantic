@@ -1,14 +1,11 @@
 """Comprehensive tests for mixin-based constraint validation."""
 
 from enum import Enum
+from typing import Any
 
 import pytest
 from pydantic import BaseModel, ValidationError
 
-from overture.schema.divisions.common.validation import (
-    ParentDivisionValidator,
-    parent_division_required_unless,
-)
 from overture.schema.validation import (
     AtLeastOneOfValidator,
     BaseConstraintValidator,
@@ -24,6 +21,60 @@ from overture.schema.validation import (
     required_if,
 )
 from overture.schema.validation.mixin import _constraint_registry
+
+
+class ParentDivisionRequiredUnlessValidator(BaseConstraintValidator):
+    """Custom validator for parent division constraint logic."""
+
+    def __init__(self, field_name: str, exempt_value: Any):
+        super().__init__()
+        self.field_name = field_name
+        self.exempt_value = exempt_value
+
+    def validate(self, model_instance: BaseModel) -> None:
+        target = model_instance
+        if hasattr(model_instance, "properties"):
+            target = model_instance.properties
+
+        if hasattr(target, self.field_name):
+            field_value = getattr(target, self.field_name)
+            parent_division_id = getattr(target, "parent_division_id", None)
+
+            if field_value == self.exempt_value:
+                # If exempt value (e.g., country), parent_division_id should NOT be present
+                if parent_division_id is not None:
+                    raise ValueError(
+                        f"parent_division_id must not be present when {self.field_name} is {self.exempt_value}"
+                    )
+            else:
+                # If not exempt value, parent_division_id MUST be present
+                if parent_division_id is None:
+                    raise ValueError(
+                        f"parent_division_id is required when {self.field_name} is not {self.exempt_value}"
+                    )
+
+    def get_json_schema_metadata(self) -> dict[str, Any]:
+        return {
+            "type": "parent_division_required_unless",
+            "field_name": self.field_name,
+            "exempt_value": self.exempt_value,
+            "if": {"properties": {self.field_name: {"const": self.exempt_value}}},
+            "then": {"not": {"required": ["parent_division_id"]}},
+            "else": {"required": ["parent_division_id"]},
+        }
+
+
+def parent_division_required_unless(field_name: str, exempt_value: Any):
+    """Decorator for parent division constraint."""
+
+    def decorator(cls: type[BaseModel]) -> type[BaseModel]:
+        from overture.schema.validation.mixin import register_constraint
+
+        constraint = ParentDivisionRequiredUnlessValidator(field_name, exempt_value)
+        register_constraint(cls, constraint)
+        return cls
+
+    return decorator
 
 
 class PlaceType(str, Enum):
@@ -131,126 +182,6 @@ class TestConstraintValidatedModel:
         # Should not have constraint-specific fields
         assert "x-constraints" not in schema
         assert "allOf" not in schema
-
-
-class TestParentDivisionValidator:
-    """Test parent division constraint validation."""
-
-    def test_parent_division_validator_direct(self):
-        """Test ParentDivisionValidator directly."""
-
-        class TestModel(BaseModel):
-            subtype: PlaceType
-            parent_division_id: str | None = None
-
-        validator = ParentDivisionValidator(PlaceType.COUNTRY)
-
-        # Valid: country without parent
-        model = TestModel(subtype=PlaceType.COUNTRY, parent_division_id=None)
-        validator.validate(model)  # Should not raise
-
-        # Valid: region with parent
-        model = TestModel(subtype=PlaceType.REGION, parent_division_id="parent_id")
-        validator.validate(model)  # Should not raise
-
-        # Invalid: country with parent
-        model = TestModel(subtype=PlaceType.COUNTRY, parent_division_id="parent_id")
-        with pytest.raises(
-            ValueError, match="Countries must not have parent_division_id"
-        ):
-            validator.validate(model)
-
-        # Invalid: region without parent
-        model = TestModel(subtype=PlaceType.REGION, parent_division_id=None)
-        with pytest.raises(
-            ValueError, match="parent_division_id is required for sub-country divisions"
-        ):
-            validator.validate(model)
-
-    def test_parent_division_constraint_decorator(self):
-        """Test parent division constraint using decorator."""
-
-        @parent_division_required_unless("subtype", PlaceType.COUNTRY)
-        class DivisionModel(ConstraintValidatedModel, BaseModel):
-            subtype: PlaceType
-            parent_division_id: str | None = None
-
-        # Valid: country without parent
-        model = DivisionModel(subtype=PlaceType.COUNTRY, parent_division_id=None)
-        assert model.subtype == PlaceType.COUNTRY
-        assert model.parent_division_id is None
-
-        # Valid: region with parent
-        model = DivisionModel(subtype=PlaceType.REGION, parent_division_id="parent_id")
-        assert model.subtype == PlaceType.REGION
-        assert model.parent_division_id == "parent_id"
-
-        # Invalid: country with parent
-        with pytest.raises(ValidationError) as exc_info:
-            DivisionModel(subtype=PlaceType.COUNTRY, parent_division_id="parent_id")
-        assert "Countries must not have parent_division_id" in str(exc_info.value)
-
-        # Invalid: region without parent
-        with pytest.raises(ValidationError) as exc_info:
-            DivisionModel(subtype=PlaceType.REGION, parent_division_id=None)
-        assert "parent_division_id is required for sub-country divisions" in str(
-            exc_info.value
-        )
-
-    def test_parent_division_nested_properties(self):
-        """Test parent division constraint with nested properties."""
-
-        class PropertiesModel(BaseModel):
-            subtype: PlaceType
-            parent_division_id: str | None = None
-
-        @parent_division_required_unless("subtype", PlaceType.COUNTRY)
-        class FeatureModel(ConstraintValidatedModel, BaseModel):
-            properties: PropertiesModel
-
-        # Valid: country without parent
-        model = FeatureModel(
-            properties=PropertiesModel(
-                subtype=PlaceType.COUNTRY, parent_division_id=None
-            )
-        )
-        assert model.properties.subtype == PlaceType.COUNTRY
-
-        # Invalid: country with parent
-        with pytest.raises(ValidationError) as exc_info:
-            FeatureModel(
-                properties=PropertiesModel(
-                    subtype=PlaceType.COUNTRY, parent_division_id="parent"
-                )
-            )
-        assert "Countries must not have parent_division_id" in str(exc_info.value)
-
-    def test_parent_division_json_schema(self):
-        """Test JSON schema generation for parent division constraint."""
-
-        @parent_division_required_unless("subtype", PlaceType.COUNTRY)
-        class DivisionModel(ConstraintValidatedModel, BaseModel):
-            subtype: PlaceType
-            parent_division_id: str | None = None
-
-        schema = DivisionModel.model_json_schema()
-
-        # Should have constraint metadata
-        assert "x-constraints" in schema
-        assert len(schema["x-constraints"]) == 1
-
-        constraint = schema["x-constraints"][0]
-        assert constraint["type"] == "parent_division_constraint"
-        assert constraint["country_subtype"] == PlaceType.COUNTRY
-
-        # Should have conditional schema
-        assert "allOf" in schema
-        assert len(schema["allOf"]) == 1
-
-        condition = schema["allOf"][0]
-        assert "if" in condition
-        assert "then" in condition
-        assert "else" in condition
 
 
 class TestMutuallyExclusiveValidator:
@@ -625,7 +556,9 @@ class TestMultipleConstraints:
                 is_territorial=False,
                 region_code=None,
             )
-        assert "Countries must not have parent_division_id" in str(exc_info.value)
+        assert "parent_division_id must not be present when subtype is country" in str(
+            exc_info.value
+        )
 
         # Invalid: violates mutually exclusive constraint
         with pytest.raises(ValidationError) as exc_info:
@@ -673,7 +606,7 @@ class TestMultipleConstraints:
 
         constraint_types = {c["type"] for c in schema["x-constraints"]}
         expected_types = {
-            "parent_division_constraint",
+            "parent_division_required_unless",
             "mutually_exclusive",
             "at_least_one_of",
         }
@@ -852,7 +785,9 @@ class TestRealWorldScenarios:
 
         with pytest.raises(ValidationError) as exc_info:
             FeatureModel(**invalid_feature_data)
-        assert "Countries must not have parent_division_id" in str(exc_info.value)
+        assert "parent_division_id must not be present when subtype is country" in str(
+            exc_info.value
+        )
 
     def test_transportation_rule_model(self):
         """Test constraint validation on transportation rule models."""

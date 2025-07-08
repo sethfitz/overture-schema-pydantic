@@ -2,17 +2,19 @@
 name = "overture-schema-division-boundary-type"
 version = "0.1.0"
 description = "Pydantic models for Overture Maps division boundary type"
-authors = [
-    {name = "Overture Maps Foundation", email = "info@overturemaps.org"}
-]
+readme = "README.md"
+requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     "overture-schema-divisions-common", 
     "overture-schema-validation",
     "pydantic>=2.0",
 ]
-readme = "README.md"
-requires-python = ">=3.10"
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-divisions-common = { workspace = true }
+overture-schema-validation = { workspace = true }
 
 [project.optional-dependencies]
 dev = [
@@ -28,6 +30,3 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/overture"]
 
-[project.urls]
-Homepage = "https://overturemaps.org"
-Repository = "https://github.com/OvertureMaps/pydantic-schema"

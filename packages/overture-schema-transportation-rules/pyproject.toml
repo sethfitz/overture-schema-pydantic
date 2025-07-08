@@ -7,10 +7,6 @@ name = "overture-schema-transportation-rules"
 version = "0.1.0"
 description = "Shared transportation theme structures for Overture Maps schema"
 readme = "README.md"
-license = {text = "MIT"}
-authors = [
-    {name = "Overture Maps Foundation"}
-]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -27,9 +23,10 @@ dependencies = [
     "pydantic>=2.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/OvertureMaps/overture-schema"
-Repository = "https://github.com/OvertureMaps/overture-schema"
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-validation = { workspace = true }
+
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/overture"]

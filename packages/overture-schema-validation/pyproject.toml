@@ -8,10 +8,6 @@ dynamic = ["version"]
 description = "Constraint-based validation utilities for Overture Maps schemas"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
-authors = [
-    { name = "Overture Maps Foundation" },
-]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -33,11 +29,6 @@ test = [
     "pytest>=7.0.0",
 ]
 
-[project.urls]
-Homepage = "https://overturemaps.org"
-Documentation = "https://docs.overturemaps.org"
-Repository = "https://github.com/OvertureMaps/pydantic-schema"
-Issues = "https://github.com/OvertureMaps/pydantic-schema/issues"
 
 [tool.hatch.version]
 path = "src/overture/schema/validation/__init__.py"

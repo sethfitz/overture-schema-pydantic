@@ -9,7 +9,12 @@ description = "Overture Maps address type Pydantic schemas"
 dependencies = [
     "pydantic>=2.0.0",
     "overture-schema-core",
+    "pytest>=8.4.1",
+    "ruff>=0.12.1",
 ]
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
 
 [project.optional-dependencies]
 dev = [
@@ -20,3 +25,7 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/overture"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

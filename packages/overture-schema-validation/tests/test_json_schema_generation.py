@@ -1,14 +1,13 @@
 """Test JSON Schema generation for mixin-based constraint validation."""
 
 from enum import Enum
+from typing import Any
 
 import pytest
 from pydantic import BaseModel, Field
 
-from overture.schema.divisions.common.validation import (
-    parent_division_required_unless,
-)
 from overture.schema.validation.mixin import (
+    BaseConstraintValidator,
     ConstraintValidatedModel,
     _constraint_registry,
     at_least_one_of,
@@ -33,6 +32,60 @@ def clear_constraint_registry():
     _constraint_registry.clear()
 
 
+class ParentDivisionRequiredUnlessValidator(BaseConstraintValidator):
+    """Custom validator for parent division constraint logic."""
+
+    def __init__(self, field_name: str, exempt_value: Any):
+        super().__init__()
+        self.field_name = field_name
+        self.exempt_value = exempt_value
+
+    def validate(self, model_instance: BaseModel) -> None:
+        target = model_instance
+        if hasattr(model_instance, "properties"):
+            target = model_instance.properties
+
+        if hasattr(target, self.field_name):
+            field_value = getattr(target, self.field_name)
+            parent_division_id = getattr(target, "parent_division_id", None)
+
+            if field_value == self.exempt_value:
+                # If exempt value (e.g., country), parent_division_id should NOT be present
+                if parent_division_id is not None:
+                    raise ValueError(
+                        f"parent_division_id must not be present when {self.field_name} is {self.exempt_value}"
+                    )
+            else:
+                # If not exempt value, parent_division_id MUST be present
+                if parent_division_id is None:
+                    raise ValueError(
+                        f"parent_division_id is required when {self.field_name} is not {self.exempt_value}"
+                    )
+
+    def get_json_schema_metadata(self) -> dict[str, Any]:
+        return {
+            "type": "parent_division_required_unless",
+            "field_name": self.field_name,
+            "exempt_value": self.exempt_value,
+            "if": {"properties": {self.field_name: {"const": self.exempt_value}}},
+            "then": {"not": {"required": ["parent_division_id"]}},
+            "else": {"required": ["parent_division_id"]},
+        }
+
+
+def parent_division_required_unless(field_name: str, exempt_value: Any):
+    """Decorator for parent division constraint."""
+
+    def decorator(cls: type[BaseModel]) -> type[BaseModel]:
+        from overture.schema.validation.mixin import register_constraint
+
+        constraint = ParentDivisionRequiredUnlessValidator(field_name, exempt_value)
+        register_constraint(cls, constraint)
+        return cls
+
+    return decorator
+
+
 class TestJSONSchemaGeneration:
     """Test JSON Schema generation for constraint-validated models."""
 
@@ -51,8 +104,8 @@ class TestJSONSchemaGeneration:
         assert len(schema["x-constraints"]) == 1
 
         constraint = schema["x-constraints"][0]
-        assert constraint["type"] == "parent_division_constraint"
-        assert constraint["country_subtype"] == TestSubtype.COUNTRY
+        assert constraint["type"] == "parent_division_required_unless"
+        assert constraint["exempt_value"] == TestSubtype.COUNTRY
 
         # Should have conditional schema in allOf
         assert "allOf" in schema
@@ -186,7 +239,7 @@ class TestJSONSchemaGeneration:
 
         constraint_types = {c["type"] for c in schema["x-constraints"]}
         expected_types = {
-            "parent_division_constraint",
+            "parent_division_required_unless",
             "mutually_exclusive",
             "at_least_one_of",
         }
@@ -240,7 +293,7 @@ class TestJSONSchemaGeneration:
         assert len(schema["x-constraints"]) == 1
 
         constraint = schema["x-constraints"][0]
-        assert constraint["type"] == "parent_division_constraint"
+        assert constraint["type"] == "parent_division_required_unless"
 
         # Should have conditional constraints
         assert "allOf" in schema
@@ -309,7 +362,7 @@ class TestJSONSchemaGeneration:
         constraint = schema["x-constraints"][0]
 
         # Should have all required metadata fields
-        required_fields = ["type", "country_subtype", "if", "then", "else"]
+        required_fields = ["type", "exempt_value", "if", "then", "else"]
         for field in required_fields:
             assert field in constraint, f"Missing required field: {field}"
 

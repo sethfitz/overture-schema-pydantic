@@ -13,6 +13,11 @@ dependencies = [
     "overture-schema-validation",
 ]
 
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-divisions-common = { workspace = true }
+overture-schema-validation = { workspace = true }
+
 [project.optional-dependencies]
 dev = [
     "pytest",

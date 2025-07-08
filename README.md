@@ -156,28 +156,75 @@ This project uses [Hatch](https://hatch.pypa.io/) for project management and
 
 ## Development
 
+### Setup
+
 ```bash
 # Install dependencies for entire workspace
 uv sync
+```
 
-# Install specific package in development mode
-uv pip install -e packages/overture-schema-core
+### Testing
 
-# Run tests across all packages
-uv run pytest
+```bash
+# Run all tests across all packages
+make test
+
+# Run all tests, continuing on failure (for CI)
+make test-all
 
 # Run tests for specific package
-uv run pytest packages/overture-schema-core
+make test-overture-schema-building-type
 
+# Run tests directly with pytest (for specific options)
+uv run pytest packages/overture-schema-building-type/
+
+# Run specific test file
+uv run pytest packages/overture-schema-building-type/tests/test_json_schema_baseline.py
+
+## Run the following from within a package directory
+
+# Run tests with verbose output
+uv run pytest -v
+
+# Run tests matching a pattern
+uv run pytest -k "building"
+
+# Run tests and stop on first failure
+uv run pytest -x
+
+# Run tests showing print statements
+uv run pytest -s
+```
+
+### Code Quality
+
+```bash
 # Run linting and formatting
 uv run ruff check .
 uv run ruff format .
 
 # Type checking
 uv run mypy packages/
+```
 
-# Build specific package
-uv run python -m build packages/overture-schema-core
+### Schema Validation
+
+```bash
+# Validate examples against Pydantic schemas
+uv run python scripts/validate_examples.py
+
+# Validate counterexamples (should fail)
+uv run python scripts/validate_counterexamples.py
+
+# Compare Pydantic JSON Schema output with reference
+uv run python scripts/compare_schemas.py
+```
+
+### Building
+
+```bash
+# Generate JSON Schema from a package
+uv run python -m packages.overture-schema.src.overture.schema --theme buildings --type building
 ```
 
 ## Model Registration System

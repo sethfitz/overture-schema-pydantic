@@ -40,12 +40,10 @@
           "title": "Sources"
         },
         "theme": {
-          "description": "Top-level Overture theme",
           "title": "Theme",
           "type": "string"
         },
         "type": {
-          "description": "Specific feature type within theme",
           "title": "Type",
           "type": "string"
         },
@@ -199,7 +197,16 @@
   "properties": {
     "geometry": {
       "additionalProperties": true,
-      "description": "GeoJSON geometry",
+      "description": "GeoJSON geometry with type one of: MultiPolygon, Polygon",
+      "properties": {
+        "type": {
+          "enum": [
+            "MultiPolygon",
+            "Polygon"
+          ],
+          "type": "string"
+        }
+      },
       "title": "Geometry",
       "type": "object"
     },
@@ -214,6 +221,7 @@
       "description": "Bathymetry feature properties"
     },
     "type": {
+      "const": "Feature",
       "default": "Feature",
       "description": "GeoJSON type",
       "title": "Type",

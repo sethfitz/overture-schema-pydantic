@@ -2,17 +2,17 @@
 name = "overture-schema-infrastructure-type"
 version = "0.1.0"
 description = "Pydantic schemas for Overture Maps infrastructure features"
-authors = [
-    {name = "Overture Maps", email = "info@overturemaps.org"}
-]
+requires-python = ">=3.8"
+readme = "README.md"
 dependencies = [
     "overture-schema-core",
     "overture-schema-base-common",
     "pydantic>=2.0",
 ]
-requires-python = ">=3.8"
-readme = "README.md"
-license = {text = "MIT"}
+
+[tool.uv.sources]
+overture-schema-core = { workspace = true }
+overture-schema-base-common = { workspace = true }
 
 [project.optional-dependencies]
 dev = [
@@ -21,9 +21,6 @@ dev = [
     "mypy",
 ]
 
-[project.urls]
-Homepage = "https://github.com/overturemaps/pydantic-schema"
-Repository = "https://github.com/overturemaps/pydantic-schema"
 
 [build-system]
 requires = ["hatchling"]
