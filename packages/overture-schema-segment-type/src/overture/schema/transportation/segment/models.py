@@ -2,7 +2,8 @@
 
 from typing import Annotated, Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
+
 
 from overture.schema.core.base import (
     OvertureFeature,
@@ -166,47 +167,6 @@ class SegmentProperties(ConstraintValidatedModel, OvertureFeatureProperties):
     prohibited_transitions: Optional[List[StrictProhibitedTransitionRule]] = Field(
         None, description="Turn restrictions"
     )
-
-    @field_validator("class_")
-    @classmethod
-    def validate_class_with_subtype(cls, v, info):
-        """Validate class against appropriate enum based on subtype."""
-        if v is not None and hasattr(info, "data"):
-            subtype = info.data.get("subtype")
-            # Validate against appropriate enum
-            if subtype == SegmentSubtype.ROAD:
-                valid_classes = [e.value for e in RoadClass]
-                if v not in valid_classes:
-                    raise ValueError(f"Invalid road class: {v}")
-            elif subtype == SegmentSubtype.RAIL:
-                valid_classes = [e.value for e in RailClass]
-                if v not in valid_classes:
-                    raise ValueError(f"Invalid rail class: {v}")
-        return v
-
-    @field_validator("road_flags")
-    @classmethod
-    def validate_road_flags_with_subtype(cls, v, info):
-        """Road flags can only be used with road subtype."""
-        if v is not None and hasattr(info, "data"):
-            subtype = info.data.get("subtype")
-            if subtype != SegmentSubtype.ROAD:
-                raise ValueError(
-                    f"road_flags property not allowed for subtype '{subtype}', only for 'road'"
-                )
-        return v
-
-    @field_validator("rail_flags")
-    @classmethod
-    def validate_rail_flags_with_subtype(cls, v, info):
-        """Rail flags can only be used with rail subtype."""
-        if v is not None and hasattr(info, "data"):
-            subtype = info.data.get("subtype")
-            if subtype != SegmentSubtype.RAIL:
-                raise ValueError(
-                    f"rail_flags property not allowed for subtype '{subtype}', only for 'rail'"
-                )
-        return v
 
 
 class SegmentFeature(OvertureFeature):
