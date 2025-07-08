@@ -81,19 +81,6 @@
           "default": null,
           "description": "Cartographic display hints"
         },
-        "level": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Z-order level",
-          "title": "Level"
-        },
         "sources": {
           "anyOf": [
             {

@@ -25,11 +25,6 @@ class ConnectorProperties(OvertureFeatureProperties):
     )
     type: type_literal("connector") = Field("connector", description="Feature type")
 
-    # Connectors are very simple - they mostly just support extension fields
-
-    # Optional level property for z-order
-    level: Optional[int] = Field(None, description="Z-order level")
-
 
 class ConnectorFeature(OvertureFeature):
     """Connector feature model."""
