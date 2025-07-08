@@ -37,6 +37,12 @@ members = [
     "overture-schema-water-type",
 ]
 
+[manifest.dependency-groups]
+dev = [
+    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pytest-cov", specifier = ">=6.2.1" },
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
