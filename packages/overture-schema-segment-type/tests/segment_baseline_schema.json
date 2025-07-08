@@ -32,7 +32,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "when": {
@@ -67,7 +67,7 @@
             }
           ],
           "default": null,
-          "description": "OSM opening hours format",
+          "description": "Time periods in OSM opening hours format (e.g., 'Mo-Fr 08:00-17:00')",
           "title": "During"
         },
         "heading": {
@@ -84,7 +84,7 @@
             }
           ],
           "default": null,
-          "description": "Direction of travel",
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
           "title": "Heading"
         },
         "mode": {
@@ -101,7 +101,7 @@
             }
           ],
           "default": null,
-          "description": "Travel modes",
+          "description": "Transportation modes affected by this rule (car, foot, bike, etc.)",
           "title": "Mode"
         },
         "recognized": {
@@ -118,7 +118,7 @@
             }
           ],
           "default": null,
-          "description": "Recognized status",
+          "description": "Legal or social recognition status (as_private, as_employee, as_public, etc.)",
           "title": "Recognized"
         },
         "using": {
@@ -135,7 +135,7 @@
             }
           ],
           "default": null,
-          "description": "Purpose of use",
+          "description": "Purpose of travel (to_deliver, at_destination, for_through_traffic, etc.)",
           "title": "Using"
         },
         "vehicle": {
@@ -152,7 +152,7 @@
             }
           ],
           "default": null,
-          "description": "Vehicle constraints",
+          "description": "Physical vehicle constraints (weight, height, width, length limits)",
           "title": "Vehicle"
         }
       },
@@ -471,7 +471,7 @@
             }
           ],
           "default": null,
-          "description": "Direction of travel",
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
           "title": "Heading"
         }
       },
@@ -500,7 +500,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "value": {
@@ -723,7 +723,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "final_heading": {
@@ -799,7 +799,7 @@
             }
           ],
           "default": null,
-          "description": "OSM opening hours format",
+          "description": "Time periods in OSM opening hours format (e.g., 'Mo-Fr 08:00-17:00')",
           "title": "During"
         },
         "heading": {
@@ -816,7 +816,7 @@
             }
           ],
           "default": null,
-          "description": "Direction of travel",
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
           "title": "Heading"
         },
         "mode": {
@@ -833,7 +833,7 @@
             }
           ],
           "default": null,
-          "description": "Travel modes",
+          "description": "Transportation modes affected by this rule (car, foot, bike, etc.)",
           "title": "Mode"
         },
         "recognized": {
@@ -850,7 +850,7 @@
             }
           ],
           "default": null,
-          "description": "Recognized status",
+          "description": "Legal or social recognition status (as_private, as_employee, as_public, etc.)",
           "title": "Recognized"
         },
         "using": {
@@ -867,7 +867,7 @@
             }
           ],
           "default": null,
-          "description": "Purpose of use",
+          "description": "Purpose of travel (to_deliver, at_destination, for_through_traffic, etc.)",
           "title": "Using"
         },
         "vehicle": {
@@ -884,7 +884,7 @@
             }
           ],
           "default": null,
-          "description": "Vehicle constraints",
+          "description": "Physical vehicle constraints (weight, height, width, length limits)",
           "title": "Vehicle"
         }
       },
@@ -925,7 +925,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "values": {
@@ -994,7 +994,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "values": {
@@ -1064,7 +1064,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "name": {
@@ -1505,7 +1505,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "is_max_speed_variable": {
@@ -1574,7 +1574,7 @@
             }
           ],
           "default": null,
-          "description": "OSM opening hours format",
+          "description": "Time periods in OSM opening hours format (e.g., 'Mo-Fr 08:00-17:00')",
           "title": "During"
         },
         "heading": {
@@ -1591,7 +1591,7 @@
             }
           ],
           "default": null,
-          "description": "Direction of travel",
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
           "title": "Heading"
         },
         "mode": {
@@ -1608,7 +1608,7 @@
             }
           ],
           "default": null,
-          "description": "Travel modes",
+          "description": "Transportation modes affected by this rule (car, foot, bike, etc.)",
           "title": "Mode"
         },
         "recognized": {
@@ -1625,7 +1625,7 @@
             }
           ],
           "default": null,
-          "description": "Recognized status",
+          "description": "Legal or social recognition status (as_private, as_employee, as_public, etc.)",
           "title": "Recognized"
         },
         "using": {
@@ -1642,7 +1642,7 @@
             }
           ],
           "default": null,
-          "description": "Purpose of use",
+          "description": "Purpose of travel (to_deliver, at_destination, for_through_traffic, etc.)",
           "title": "Using"
         },
         "vehicle": {
@@ -1659,7 +1659,7 @@
             }
           ],
           "default": null,
-          "description": "Vehicle constraints",
+          "description": "Physical vehicle constraints (weight, height, width, length limits)",
           "title": "Vehicle"
         }
       },
@@ -1688,7 +1688,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "value": {
@@ -1725,7 +1725,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "value": {
@@ -1846,7 +1846,7 @@
             }
           ],
           "default": null,
-          "description": "Linear referencing range [start, end]",
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
           "title": "Between"
         },
         "value": {
