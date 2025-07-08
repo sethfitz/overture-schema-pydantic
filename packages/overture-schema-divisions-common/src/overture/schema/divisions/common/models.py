@@ -1,6 +1,5 @@
 """Common divisions theme structures and enums."""
 
-import re
 from enum import Enum
 from typing import Annotated, List, Optional
 
@@ -111,25 +110,6 @@ class Norms(BaseModel):
     driving_side: Optional[Side] = Field(
         None, description="Driving side (inheritable from parent)"
     )
-
-
-class CountryCode(str):
-    """ISO 3166-1 alpha-2 country code type."""
-
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not isinstance(v, str):
-            raise TypeError("Country code must be a string")
-
-        pattern = re.compile(r"^[A-Z]{2}$")
-        if not pattern.match(v):
-            raise ValueError(f"Invalid country code format: {v}")
-
-        return cls(v)
 
 
 class DivisionSubtype(str, Enum):

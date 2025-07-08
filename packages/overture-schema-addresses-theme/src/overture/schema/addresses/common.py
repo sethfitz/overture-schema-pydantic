@@ -17,25 +17,6 @@ class AddressLevel(BaseModel):
     )
 
 
-class CountryCode(str):
-    """ISO 3166-1 alpha-2 country code for addresses."""
-
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not isinstance(v, str):
-            raise TypeError("Country code must be a string")
-
-        pattern = re.compile(r"^[A-Z]{2}$")
-        if not pattern.match(v):
-            raise ValueError(f"Invalid country code format: {v}")
-
-        return cls(v)
-
-
 class AddressComponent(BaseModel):
     """Base class for address components with whitespace validation."""
 

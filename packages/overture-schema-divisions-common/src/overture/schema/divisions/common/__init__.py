@@ -3,7 +3,6 @@
 from .models import (
     AreaBoundaryClass,
     CapitalOfDivisionItem,
-    CountryCode,
     DivisionClass,
     DivisionSubtype,
     HierarchyItem,
@@ -27,7 +26,6 @@ __all__ = [
     "Perspectives",
     "HierarchyItem",
     "Norms",
-    "CountryCode",
     "DivisionSubtype",
     "parent_division_required_unless",
 ]
