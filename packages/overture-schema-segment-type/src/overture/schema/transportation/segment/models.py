@@ -12,7 +12,7 @@ from overture.schema.core.base import (
 )
 from overture.schema.core.common import (
     AdvancedSourceItem,
-    GeometricRangeScopeContainer,
+    GeometricRangeScope,
     NamesContainer,
     ScopingConditions,
 )
@@ -69,7 +69,7 @@ from overture.schema.validation import (
 )
 
 
-class LevelRule(GeometricRangeScopeContainer):
+class LevelRule(GeometricRangeScope):
     """Level/elevation rule with scoping."""
 
     value: int = Field(

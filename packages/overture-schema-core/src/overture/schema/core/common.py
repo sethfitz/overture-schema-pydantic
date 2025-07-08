@@ -212,7 +212,7 @@ class VehicleConstraint(BaseModel):
     unit: Optional[str] = Field(None, description="Unit of measurement")
 
 
-class GeometricRangeScopeContainer(ExtensibleBaseModel):
+class GeometricRangeScope(ExtensibleBaseModel):
     """Base class for geometric range scoping using linear referencing.
 
     Enables rules to apply to specific portions of a linear feature by specifying
@@ -222,7 +222,7 @@ class GeometricRangeScopeContainer(ExtensibleBaseModel):
     Examples:
         Simple geometric scoping:
         ```python
-        class WidthRule(GeometricRangeScopeContainer):
+        class WidthRule(GeometricRangeScope):
             width: Dimension
         ```
 
@@ -242,7 +242,7 @@ class GeometricRangeScopeContainer(ExtensibleBaseModel):
     )
 
 
-class TemporalScopeContainer(BaseModel):
+class TemporalScope(BaseModel):
     """Base class for temporal scoping using OSM opening hours format.
 
     Enables rules to apply during specific time periods, days of week, or date ranges.
@@ -275,7 +275,7 @@ class TemporalScopeContainer(BaseModel):
     )
 
 
-class HeadingScopeContainer(BaseModel):
+class HeadingScope(BaseModel):
     """Base class for directional scoping based on travel direction.
 
     Enables rules to apply differently depending on the direction of travel
@@ -306,7 +306,7 @@ class HeadingScopeContainer(BaseModel):
     )
 
 
-class TravelModeScopeContainer(BaseModel):
+class TravelModeScope(BaseModel):
     """Base class for travel mode scoping by transportation method.
 
     Enables rules to apply only to specific modes of transportation,
@@ -337,7 +337,7 @@ class TravelModeScopeContainer(BaseModel):
     )
 
 
-class PurposeOfUseScopeContainer(BaseModel):
+class PurposeOfUseScope(BaseModel):
     """Base class for purpose of use scoping by travel intent.
 
     Enables rules to apply based on why someone is using the transportation
@@ -368,7 +368,7 @@ class PurposeOfUseScopeContainer(BaseModel):
     )
 
 
-class RecognizedStatusScopeContainer(BaseModel):
+class RecognizedStatusScope(BaseModel):
     """Base class for recognized status scoping by legal/social recognition.
 
     Enables rules to apply based on how a person or vehicle is recognized
@@ -401,7 +401,7 @@ class RecognizedStatusScopeContainer(BaseModel):
     )
 
 
-class VehicleScopeContainer(BaseModel):
+class VehicleScope(BaseModel):
     """Base class for vehicle attribute scoping by physical characteristics.
 
     Enables rules to apply based on specific vehicle dimensions, weight,
@@ -447,12 +447,12 @@ class VehicleScopeContainer(BaseModel):
 
 
 class ScopingConditions(
-    TemporalScopeContainer,
-    HeadingScopeContainer,
-    TravelModeScopeContainer,
-    PurposeOfUseScopeContainer,
-    RecognizedStatusScopeContainer,
-    VehicleScopeContainer,
+    TemporalScope,
+    HeadingScope,
+    TravelModeScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
+    VehicleScope,
 ):
     """Combined scoping conditions providing comprehensive conditional rule application.
 
@@ -492,14 +492,14 @@ class ScopingConditions(
 
     Design Pattern:
         Rule-specific when clauses typically inherit from a subset of individual
-        scope containers rather than using this complete implementation:
+        scope classes rather than using this complete implementation:
 
         ```python
         class SpeedLimitWhenClause(
-            TemporalScopeContainer,
-            HeadingScopeContainer,
-            TravelModeScopeContainer,
-            VehicleScopeContainer
+            TemporalScope,
+            HeadingScope,
+            TravelModeScope,
+            VehicleScope
         ):
             pass  # Excludes purpose and status for speed limits
         ```

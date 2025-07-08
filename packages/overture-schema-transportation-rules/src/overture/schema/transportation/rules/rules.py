@@ -6,14 +6,14 @@ from typing import Annotated, List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 
 from overture.schema.core.common import (
-    GeometricRangeScopeContainer,
-    HeadingScopeContainer,
-    PurposeOfUseScopeContainer,
-    RecognizedStatusScopeContainer,
+    GeometricRangeScope,
+    HeadingScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
     Speed,
-    TemporalScopeContainer,
-    TravelModeScopeContainer,
-    VehicleScopeContainer,
+    TemporalScope,
+    TravelModeScope,
+    VehicleScope,
 )
 from overture.schema.validation import (
     CompositeUniqueConstraint,
@@ -97,12 +97,12 @@ class RoadSurface(str, Enum):
 
 # Scoping condition models for when clauses
 class SpeedLimitWhenClause(
-    TemporalScopeContainer,
-    HeadingScopeContainer,
-    PurposeOfUseScopeContainer,
-    RecognizedStatusScopeContainer,
-    TravelModeScopeContainer,
-    VehicleScopeContainer,
+    TemporalScope,
+    HeadingScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
+    TravelModeScope,
+    VehicleScope,
 ):
     """When clause for speed limit rules."""
 
@@ -110,12 +110,12 @@ class SpeedLimitWhenClause(
 
 
 class AccessRestrictionWhenClause(
-    TemporalScopeContainer,
-    HeadingScopeContainer,
-    PurposeOfUseScopeContainer,
-    RecognizedStatusScopeContainer,
-    TravelModeScopeContainer,
-    VehicleScopeContainer,
+    TemporalScope,
+    HeadingScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
+    TravelModeScope,
+    VehicleScope,
 ):
     """When clause for access restriction rules."""
 
@@ -123,19 +123,19 @@ class AccessRestrictionWhenClause(
 
 
 class ProhibitedTransitionWhenClause(
-    HeadingScopeContainer,
-    TemporalScopeContainer,
-    PurposeOfUseScopeContainer,
-    RecognizedStatusScopeContainer,
-    TravelModeScopeContainer,
-    VehicleScopeContainer,
+    HeadingScope,
+    TemporalScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
+    TravelModeScope,
+    VehicleScope,
 ):
     """When clause for prohibited transition rules."""
 
     pass
 
 
-class DestinationWhenClause(HeadingScopeContainer):
+class DestinationWhenClause(HeadingScope):
     """When clause for destination rules."""
 
     pass
@@ -143,7 +143,7 @@ class DestinationWhenClause(HeadingScopeContainer):
 
 # Core rule models using mix-in composition
 @at_least_one_of("max_speed", "min_speed")
-class SpeedLimitRule(GeometricRangeScopeContainer, ConstraintValidatedModel):
+class SpeedLimitRule(GeometricRangeScope, ConstraintValidatedModel):
     """Speed limit rule with scoping via when clause."""
 
     max_speed: Optional[Speed] = Field(None, description="Maximum speed limit")
@@ -154,7 +154,7 @@ class SpeedLimitRule(GeometricRangeScopeContainer, ConstraintValidatedModel):
     when: Optional[SpeedLimitWhenClause] = Field(None, description="Scoping conditions")
 
 
-class AccessRestrictionRule(GeometricRangeScopeContainer):
+class AccessRestrictionRule(GeometricRangeScope):
     """Access restriction rule with scoping via when clause."""
 
     access_type: Literal["allowed", "denied", "designated"] = Field(
@@ -210,7 +210,7 @@ class ProhibitedTransitionSequence(BaseModel):
     segment_id: str = Field(..., description="Segment identifier")
 
 
-class ProhibitedTransitionRule(GeometricRangeScopeContainer):
+class ProhibitedTransitionRule(GeometricRangeScope):
     """Prohibited transition (turn restriction) rule."""
 
     sequence: Annotated[
@@ -229,7 +229,7 @@ class ProhibitedTransitionRule(GeometricRangeScopeContainer):
     )
 
 
-class RoadFlagRule(GeometricRangeScopeContainer):
+class RoadFlagRule(GeometricRangeScope):
     """Road-specific flag rule with geometric scoping only."""
 
     values: Annotated[List[RoadFlagType], UniqueItemsConstraint()] = Field(
@@ -237,7 +237,7 @@ class RoadFlagRule(GeometricRangeScopeContainer):
     )
 
 
-class RailFlagRule(GeometricRangeScopeContainer):
+class RailFlagRule(GeometricRangeScope):
     """Rail-specific flag rule with geometric scoping only."""
 
     values: Annotated[List[RailFlagType], UniqueItemsConstraint()] = Field(
@@ -245,31 +245,31 @@ class RailFlagRule(GeometricRangeScopeContainer):
     )
 
 
-class WidthRule(GeometricRangeScopeContainer):
+class WidthRule(GeometricRangeScope):
     """Width rule with linear referencing."""
 
     value: Union[int, float] = Field(..., description="Width value")
 
 
-class SurfaceRule(GeometricRangeScopeContainer):
+class SurfaceRule(GeometricRangeScope):
     """Surface material rule with linear referencing."""
 
     value: RoadSurface = Field(..., description="Surface material")
 
 
-class LevelRule(GeometricRangeScopeContainer):
+class LevelRule(GeometricRangeScope):
     """Level/elevation rule with linear referencing."""
 
     value: int = Field(..., description="Level/elevation value")
 
 
-class SubclassRule(GeometricRangeScopeContainer):
+class SubclassRule(GeometricRangeScope):
     """Subclass rule with linear referencing."""
 
     value: str = Field(..., description="Subclass value")
 
 
-class RouteReference(GeometricRangeScopeContainer):
+class RouteReference(GeometricRangeScope):
     """Route reference with linear referencing support."""
 
     name: Optional[str] = Field(None, description="Route name")

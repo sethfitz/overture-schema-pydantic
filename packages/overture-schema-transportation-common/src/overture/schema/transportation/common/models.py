@@ -6,7 +6,7 @@ from typing import Annotated, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 from overture.schema.core.common import (
-    GeometricRangeScopeContainer,
+    GeometricRangeScope,
     ScopingConditions,
     Speed,
 )
@@ -75,9 +75,7 @@ class RouteReference(str):
 
 
 class SpeedLimitRule(
-    Annotated[
-        GeometricRangeScopeContainer, AtLeastOneOfConstraint("min_speed", "max_speed")
-    ]
+    Annotated[GeometricRangeScope, AtLeastOneOfConstraint("min_speed", "max_speed")]
 ):
     """Speed limit rule with scoping."""
 
@@ -87,7 +85,7 @@ class SpeedLimitRule(
     when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
 
 
-class AccessRestriction(GeometricRangeScopeContainer):
+class AccessRestriction(GeometricRangeScope):
     """Access restriction rule with scoping."""
 
     access_type: Literal["allowed", "denied", "designated"] = Field(
@@ -124,14 +122,14 @@ class SurfaceMaterial(str, Enum):
     WOOD = "wood"
 
 
-class SurfaceRule(GeometricRangeScopeContainer):
+class SurfaceRule(GeometricRangeScope):
     """Road surface rule with scoping."""
 
     value: SurfaceMaterial = Field(..., description="Surface type")
     when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
 
 
-class WidthRule(GeometricRangeScopeContainer):
+class WidthRule(GeometricRangeScope):
     """Width rule with scoping."""
 
     value: float = Field(..., description="Width in meters")
@@ -148,7 +146,7 @@ class RoadFlag(str, Enum):
     IS_TUNNEL = "is_tunnel"
 
 
-class RoadFlagsRule(GeometricRangeScopeContainer):
+class RoadFlagsRule(GeometricRangeScope):
     """Road flags rule with scoping."""
 
     values: List[RoadFlag] = Field(..., min_length=1, description="Road flag values")
