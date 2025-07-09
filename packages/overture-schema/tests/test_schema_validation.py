@@ -6,14 +6,26 @@ Similar to the TypeScript version but using pytest, with support for .disabled e
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Tuple
 
+import overture.schema.addresses.address.models  # noqa: F401
+import overture.schema.base.bathymetry.models  # noqa: F401
+import overture.schema.base.infrastructure.models  # noqa: F401
+import overture.schema.base.land.models  # noqa: F401
+import overture.schema.base.water.models  # noqa: F401
+import overture.schema.buildings.building.models  # noqa: F401
+import overture.schema.buildings.building_part.models  # noqa: F401
+import overture.schema.divisions.division.models  # noqa: F401
+import overture.schema.divisions.division_area.models  # noqa: F401
+import overture.schema.divisions.division_boundary.models  # noqa: F401
+import overture.schema.places.place.models  # noqa: F401
+import overture.schema.transportation.connector.models  # noqa: F401
+import overture.schema.transportation.segment.models  # noqa: F401
 import pytest
 import yaml
 from deepdiff import DeepDiff
+from overture.schema.core.base import (
+    parse_feature,
+)
 from yamlcore import CoreLoader
-
-# TODO: Import actual Pydantic models once they exist
-
-# from overture.schema.core.base import validate_feature
 
 
 def load_feature(file_path: str) -> Dict[str, Any]:
@@ -61,93 +73,6 @@ def deep_compare_dicts(
             differences.append(f"  {key}: {change['old_type']} -> {change['new_type']}")
 
     return False, "\n".join(differences)
-
-
-def validate_feature(
-    feature: Dict[str, Any],
-) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
-    """
-    Validate a feature using Pydantic models.
-    Returns (is_valid, error_msg, parsed_feature).
-    """
-    try:
-        # Import from installed packages
-        from overture.schema.core.base import validate_feature as core_validate
-
-        # Import models to register validators
-        try:
-            import overture.schema.base.infrastructure.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.base.land.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.base.water.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.base.bathymetry.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.buildings.building.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.buildings.building_part.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.transportation.connector.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.transportation.segment.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.places.place.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.divisions.division.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.divisions.division_area.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.divisions.division_boundary.models  # noqa: F401
-        except ImportError:
-            pass
-        try:
-            import overture.schema.addresses.address.models  # noqa: F401
-        except ImportError:
-            pass
-
-        is_valid, error_msg = core_validate(feature)
-
-        if is_valid:
-            # Get the parsed feature by validating again and extracting the model dict
-            try:
-                from overture.schema.core.base import get_parsed_feature
-
-                parsed_feature = get_parsed_feature(feature)
-                return is_valid, error_msg, parsed_feature
-            except (ImportError, AttributeError):
-                # If get_parsed_feature doesn't exist, return the original feature
-                return is_valid, error_msg, feature
-        else:
-            return is_valid, error_msg, None
-
-    except ImportError as e:
-        # Re-raise import errors so they're visible
-        raise ImportError(f"Failed to import required validation modules: {e}") from e
-    except Exception as e:
-        return False, str(e), None
 
 
 def walk_directory(directory: Path) -> Generator[Path, None, None]:
@@ -305,7 +230,14 @@ def pytest_generate_tests(metafunc):
 def test_example_validation(example_file):
     """Test that examples pass validation and compare parsed result with original."""
     original_feature = load_feature(example_file)
-    is_valid, error_msg, parsed_feature = validate_feature(original_feature)
+
+    is_valid = False
+    error_msg = None
+    try:
+        parsed_feature = parse_feature(original_feature)
+        is_valid = True
+    except Exception as e:
+        error_msg = e
 
     assert is_valid, f"Example failed validation: {example_file}\nError: {error_msg}"
 
@@ -321,7 +253,13 @@ def test_example_validation(example_file):
 def test_counterexample_validation(counterexample_file):
     """Test that counterexamples fail validation."""
     feature = load_feature(counterexample_file)
-    is_valid, error_msg, parsed_feature = validate_feature(feature)
+
+    is_valid = False
+    try:
+        parse_feature(feature)
+        is_valid = True
+    except Exception as e:
+        pass
 
     assert not is_valid, (
         f"Counterexample should have failed validation: {counterexample_file}"

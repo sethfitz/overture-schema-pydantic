@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -18,8 +18,10 @@ _VALID_THEMES: set[str] = set()
 _VALID_FEATURE_TYPES: set[str] = set()
 
 # Registry for theme-type compatibility (pluggable)
-_THEME_TYPE_MAPPING: Dict[str, set[str]] = {}
+_THEME_TYPE_MAPPING: dict[str, set[str]] = {}
 
+# Global registry for Pydantic feature models
+_FEATURE_MODELS: dict[tuple[str, str], type[BaseModel]] = {}
 
 def register_theme(theme: str) -> None:
     """Register a valid theme."""
@@ -81,11 +83,11 @@ class SourcePropertyItem(BaseModel):
 
     property: JSONPointer = Field(..., description="JSON Pointer to the property")
     dataset: str = Field(..., description="Source dataset identifier")
-    record_id: Optional[str] = Field(None, description="Specific record within dataset")
-    update_time: Optional[ISO8601DateTime] = Field(
+    record_id: str | None = Field(None, description="Specific record within dataset")
+    update_time: ISO8601DateTime | None = Field(
         None, description="When this property was last updated"
     )
-    confidence: Optional[float] = Field(
+    confidence: float | None = Field(
         None, ge=0, le=1, description="Confidence value for ML-derived data"
     )
 
@@ -93,16 +95,16 @@ class SourcePropertyItem(BaseModel):
 class CartographyContainer(BaseModel):
     """Cartographic hints for optimal map display."""
 
-    prominence: Optional[int] = Field(
+    prominence: int | None = Field(
         None, ge=1, le=100, description="Feature significance/importance"
     )
-    min_zoom: Optional[int] = Field(
+    min_zoom: int | None = Field(
         None, ge=0, le=23, description="Minimum recommended zoom level"
     )
-    max_zoom: Optional[int] = Field(
+    max_zoom: int | None = Field(
         None, ge=0, le=23, description="Maximum recommended zoom level"
     )
-    sort_key: Optional[int] = Field(None, description="Drawing order (lower = on top)")
+    sort_key: int | None = Field(None, description="Drawing order (lower = on top)")
 
 
 class ExtensibleBaseModel(BaseModel):
@@ -128,10 +130,10 @@ class OvertureFeatureProperties(ExtensibleBaseModel):
     theme: str = Field(..., description="Top-level Overture theme")
     type: str = Field(..., description="Specific feature type within theme")
     version: int = Field(..., ge=0, description="Feature version number")
-    sources: Optional[Annotated[List[SourcePropertyItem], MinItemsConstraint(1)]] = (
-        Field(None, description="Source information")
+    sources: Annotated[list[SourcePropertyItem], MinItemsConstraint(1)] | None = Field(
+        None, description="Source information"
     )
-    cartography: Optional[CartographyContainer] = Field(
+    cartography: CartographyContainer | None = Field(
         None, description="Cartographic display hints"
     )
 
@@ -143,7 +145,7 @@ class OvertureFeature(BaseModel, ABC):
     type: Annotated[str, LiteralValueConstraint("Feature", "type")] = Field(
         "Feature", description="GeoJSON type"
     )
-    geometry: Dict[str, Any] = Field(..., description="GeoJSON geometry")
+    geometry: dict[str, Any] = Field(..., description="GeoJSON geometry")
     properties: OvertureFeatureProperties = Field(..., description="Feature properties")
 
     @classmethod
@@ -156,80 +158,21 @@ class OvertureFeature(BaseModel, ABC):
         return v
 
 
-# Global registry for Pydantic feature models
-from typing import Type
-
-_FEATURE_MODELS: Dict[tuple[str, str], Type[BaseModel]] = {}
-
-
 def register_model(
     theme: str,
     feature_type: str,
-    model_class: Type[BaseModel],
+    model_class: type[BaseModel],
 ) -> None:
     """Register a Pydantic model class for a specific theme/type combination."""
     _FEATURE_MODELS[(theme, feature_type)] = model_class
 
 
-def get_registered_model(theme: str, feature_type: str) -> Optional[Type[BaseModel]]:
+def get_registered_model(theme: str, feature_type: str) -> type[BaseModel] | None:
     """Get the registered Pydantic model for a theme/type combination."""
     return _FEATURE_MODELS.get((theme, feature_type))
 
 
-def validate_feature(feature: Dict[str, Any]) -> tuple[bool, str]:
-    """
-    Validate a feature dictionary against Overture schemas.
-
-    This is the main validation function called by the test harness.
-    Uses pure Pydantic model validation when available.
-    """
-    try:
-        # Basic structure validation
-        if not isinstance(feature, dict):
-            return False, "Feature must be an object"
-
-        if feature.get("type") != "Feature":
-            return False, "Feature type must be 'Feature'"
-
-        if "properties" not in feature:
-            return False, "Feature must have properties"
-
-        properties = feature["properties"]
-        theme = properties.get("theme")
-        feature_type = properties.get("type")
-
-        # Check if theme and feature type are registered
-        if theme and not validate_theme(theme):
-            return False, f"Unknown theme: {theme}"
-
-        if feature_type and not validate_feature_type(feature_type):
-            return False, f"Unknown feature type: {feature_type}"
-
-        # Try theme-type compatibility validation first
-        if not validate_theme_type_compatibility(theme, feature_type):
-            return (
-                False,
-                f"Invalid theme-type combination: theme='{theme}', type='{feature_type}'",
-            )
-
-        # Look up registered Pydantic model
-        model_class = get_registered_model(theme, feature_type)
-        if model_class:
-            try:
-                model_class.model_validate(feature)
-                return True, ""
-            except Exception as e:
-                return False, f"Pydantic validation failed: {str(e)}"
-
-        # If theme and type are valid but no model is registered, accept for now
-        # This allows for future extensibility
-        return True, ""
-
-    except Exception as e:
-        return False, str(e)
-
-
-def get_parsed_feature(feature: Dict[str, Any]) -> Dict[str, Any]:
+def parse_feature(feature: dict[str, Any]) -> dict[str, Any]:
     """
     Parse and validate a feature, returning the parsed dictionary representation.
 
@@ -274,13 +217,13 @@ def get_parsed_feature(feature: Dict[str, Any]) -> Dict[str, Any]:
                     exclude_none=True, mode="json", by_alias=True
                 )
             except Exception as e:
-                raise ValueError(f"Pydantic validation failed: {str(e)}")
+                raise ValueError(f"Pydantic validation failed: {str(e)}") from e
 
         # If no model is registered, return the original feature
         return feature
 
     except Exception as e:
-        raise ValueError(str(e))
+        raise ValueError(str(e)) from e
 
 
 # Register core themes and feature types
