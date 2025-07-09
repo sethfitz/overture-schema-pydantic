@@ -23,17 +23,12 @@ from overture.schema.validation import (
 )
 
 
-class AccessLevel(str, Enum):
+class AccessType(str, Enum):
     """Access level enumeration."""
 
-    YES = "yes"
-    NO = "no"
+    ALLOWED = "allowed"
+    DENIED = "denied"
     DESIGNATED = "designated"
-    DESTINATION = "destination"
-    PRIVATE = "private"
-    PERMISSIVE = "permissive"
-    CUSTOMERS = "customers"
-    DELIVERY = "delivery"
 
 
 class DestinationLabelType(str, Enum):
@@ -43,19 +38,6 @@ class DestinationLabelType(str, Enum):
     STREET = "street"
     ROUTE_REF = "route_ref"
     TOWARD_ROUTE_REF = "toward_route_ref"
-
-
-class TurnDirection(str, Enum):
-    """Turn direction for prohibited transitions."""
-
-    STRAIGHT = "straight"
-    SLIGHT_LEFT = "slight_left"
-    LEFT = "left"
-    SHARP_LEFT = "sharp_left"
-    SLIGHT_RIGHT = "slight_right"
-    RIGHT = "right"
-    SHARP_RIGHT = "sharp_right"
-    REVERSE = "reverse"
 
 
 class RoadFlagType(str, Enum):
@@ -157,9 +139,7 @@ class SpeedLimitRule(GeometricRangeScope, ConstraintValidatedModel):
 class AccessRestrictionRule(GeometricRangeScope):
     """Access restriction rule with scoping via when clause."""
 
-    access_type: Literal["allowed", "denied", "designated"] = Field(
-        ..., description="Access type"
-    )
+    access_type: AccessType = Field(..., description="Access type")
     when: Optional[AccessRestrictionWhenClause] = Field(
         None, description="Scoping conditions"
     )
