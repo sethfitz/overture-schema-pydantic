@@ -21,9 +21,9 @@ overture-schema-validation = { workspace = true }
 overture-schema-transportation-common = { workspace = true }
 overture-schema-transportation-rules = { workspace = true }
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pytest",
+    "pytest>=7.0",
     "ruff",
     "mypy",
 ]

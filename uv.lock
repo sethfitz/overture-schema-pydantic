@@ -388,7 +388,7 @@ dependencies = [
     { name = "pyyaml" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "deepdiff" },
     { name = "mypy" },
@@ -402,8 +402,6 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "deepdiff", specifier = ">=8.5.0" },
-    { name = "deepdiff", marker = "extra == 'dev'" },
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-addresses-theme", editable = "packages/overture-schema-addresses-theme" },
     { name = "overture-schema-base-theme", editable = "packages/overture-schema-base-theme" },
     { name = "overture-schema-buildings-theme", editable = "packages/overture-schema-buildings-theme" },
@@ -412,14 +410,19 @@ requires-dist = [
     { name = "overture-schema-places-theme", editable = "packages/overture-schema-places-theme" },
     { name = "overture-schema-transportation-theme", editable = "packages/overture-schema-transportation-theme" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=6.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "pyyaml", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
-    { name = "yamlcore", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "deepdiff" },
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "pytest-cov" },
+    { name = "pyyaml" },
+    { name = "ruff" },
+    { name = "yamlcore", specifier = ">=0.0.4" },
+]
 
 [[package]]
 name = "overture-schema-address-type"
@@ -428,11 +431,9 @@ source = { editable = "packages/overture-schema-address-type" }
 dependencies = [
     { name = "overture-schema-core" },
     { name = "pydantic" },
-    { name = "pytest" },
-    { name = "ruff" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -441,15 +442,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "pytest", specifier = ">=8.4.1" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", specifier = ">=0.12.1" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-addresses-theme"
@@ -519,7 +521,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -528,13 +530,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-building-part-type"
@@ -546,7 +551,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -555,14 +560,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-buildings-common", editable = "packages/overture-schema-buildings-common" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-building-type"
@@ -574,7 +582,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -583,14 +591,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-buildings-common", editable = "packages/overture-schema-buildings-common" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-buildings-common"
@@ -640,7 +651,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -649,14 +660,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-transportation-common", editable = "packages/overture-schema-transportation-common" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-core"
@@ -685,7 +699,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -694,14 +708,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-divisions-common", editable = "packages/overture-schema-divisions-common" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-division-boundary-type"
@@ -714,7 +731,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -723,15 +740,18 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-divisions-common", editable = "packages/overture-schema-divisions-common" },
     { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-division-type"
@@ -744,7 +764,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -753,15 +773,18 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-divisions-common", editable = "packages/overture-schema-divisions-common" },
     { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-divisions-common"
@@ -773,9 +796,11 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
-test = [
+[package.dev-dependencies]
+dev = [
+    { name = "mypy" },
     { name = "pytest" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -783,9 +808,14 @@ requires-dist = [
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
 ]
-provides-extras = ["test"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-divisions-theme"
@@ -820,7 +850,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -829,14 +859,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-base-common", editable = "packages/overture-schema-base-common" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-land-type"
@@ -848,7 +881,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -857,14 +890,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-base-common", editable = "packages/overture-schema-base-common" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-place-type"
@@ -876,7 +912,7 @@ dependencies = [
     { name = "pydantic", extra = ["email"] },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -885,15 +921,18 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pydantic", extras = ["email"] },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-places-theme"
@@ -924,7 +963,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -933,16 +972,19 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-transportation-common", editable = "packages/overture-schema-transportation-common" },
     { name = "overture-schema-transportation-rules", editable = "packages/overture-schema-transportation-rules" },
     { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-transportation-common"
@@ -1006,19 +1048,26 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 
-[package.optional-dependencies]
-test = [
+[package.dev-dependencies]
+dev = [
+    { name = "mypy" },
     { name = "pytest" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0.0" },
     { name = "shapely", specifier = ">=2.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0" },
 ]
-provides-extras = ["test"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "overture-schema-water-type"
@@ -1029,7 +1078,7 @@ dependencies = [
     { name = "pydantic" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -1038,13 +1087,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "packaging"

@@ -24,9 +24,11 @@ dependencies = [
     "shapely>=2.0.0",
 ]
 
-[project.optional-dependencies]
-test = [
-    "pytest>=7.0.0",
+[dependency-groups]
+dev = [
+    "pytest>=7.0",
+    "ruff",
+    "mypy",
 ]
 
 

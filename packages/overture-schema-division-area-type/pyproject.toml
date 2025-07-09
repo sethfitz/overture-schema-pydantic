@@ -14,9 +14,9 @@ dependencies = [
 overture-schema-core = { workspace = true }
 overture-schema-divisions-common = { workspace = true }
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pytest",
+    "pytest>=7.0",
     "ruff",
     "mypy",
 ]
