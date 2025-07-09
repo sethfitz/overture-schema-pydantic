@@ -9,6 +9,7 @@ from typing import Any, Dict, Generator, List, Optional, Tuple
 import pytest
 import yaml
 from deepdiff import DeepDiff
+from yamlcore import CoreLoader
 
 # TODO: Import actual Pydantic models once they exist
 
@@ -18,30 +19,8 @@ from deepdiff import DeepDiff
 def load_feature(file_path: str) -> Dict[str, Any]:
     """Load a feature from JSON or YAML file."""
     with open(file_path, encoding="utf-8") as f:
-        # Use safe_load for all files, but then post-process YAML files to handle
-        # boolean-like strings that should remain as strings for validation testing
-        data = yaml.safe_load(f)
-
-        # For YAML files, check if we need to restore string values that were
-        # incorrectly converted to booleans for validation testing
-        if file_path.endswith((".yaml", ".yml")):
-            # Read the raw content to find boolean-like strings
-            f.seek(0)
-            content = f.read()
-
-            # Look for patterns like "is_land: yes" or "is_territorial: no"
-            import re
-
-            for match in re.finditer(
-                r"(is_land|is_territorial):\s*(yes|no|true|false)\b", content
-            ):
-                field, value = match.groups()
-                if value in ("yes", "no"):  # These should remain as strings
-                    # Navigate to the correct nested location and restore string value
-                    if "properties" in data and field in data["properties"]:
-                        data["properties"][field] = value
-
-        return data
+        # use a YAML-1.2-compliant (which dropped support for yes/no boolean values) Loader
+        return yaml.load(f, Loader=CoreLoader)
 
 
 def deep_compare_dicts(
