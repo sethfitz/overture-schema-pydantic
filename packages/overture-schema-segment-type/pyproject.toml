@@ -12,14 +12,12 @@ dependencies = [
     "overture-schema-core",
     "overture-schema-validation",
     "overture-schema-transportation-common",
-    "overture-schema-transportation-rules",
 ]
 
 [tool.uv.sources]
 overture-schema-core = { workspace = true }
 overture-schema-validation = { workspace = true }
 overture-schema-transportation-common = { workspace = true }
-overture-schema-transportation-rules = { workspace = true }
 
 [dependency-groups]
 dev = [

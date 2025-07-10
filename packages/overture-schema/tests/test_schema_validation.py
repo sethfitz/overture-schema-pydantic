@@ -4,7 +4,7 @@ Similar to the TypeScript version but using pytest, with support for .disabled e
 """
 
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional, Tuple
+from typing import Any, Dict, Generator, List, Tuple
 
 import overture.schema.addresses.address.models  # noqa: F401
 import overture.schema.base.bathymetry.models  # noqa: F401

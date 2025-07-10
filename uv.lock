@@ -31,7 +31,6 @@ members = [
     "overture-schema-places-theme",
     "overture-schema-segment-type",
     "overture-schema-transportation-common",
-    "overture-schema-transportation-rules",
     "overture-schema-transportation-theme",
     "overture-schema-validation",
     "overture-schema-water-type",
@@ -958,7 +957,6 @@ source = { editable = "packages/overture-schema-segment-type" }
 dependencies = [
     { name = "overture-schema-core" },
     { name = "overture-schema-transportation-common" },
-    { name = "overture-schema-transportation-rules" },
     { name = "overture-schema-validation" },
     { name = "pydantic" },
 ]
@@ -974,7 +972,6 @@ dev = [
 requires-dist = [
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
     { name = "overture-schema-transportation-common", editable = "packages/overture-schema-transportation-common" },
-    { name = "overture-schema-transportation-rules", editable = "packages/overture-schema-transportation-rules" },
     { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
@@ -998,23 +995,6 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "overture-schema-core", editable = "packages/overture-schema-core" },
-    { name = "pydantic", specifier = ">=2.0" },
-]
-
-[[package]]
-name = "overture-schema-transportation-rules"
-version = "0.1.0"
-source = { editable = "packages/overture-schema-transportation-rules" }
-dependencies = [
-    { name = "overture-schema-core" },
-    { name = "overture-schema-validation" },
-    { name = "pydantic" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "overture-schema-core", editable = "packages/overture-schema-core" },
-    { name = "overture-schema-validation", editable = "packages/overture-schema-validation" },
     { name = "pydantic", specifier = ">=2.0" },
 ]
 

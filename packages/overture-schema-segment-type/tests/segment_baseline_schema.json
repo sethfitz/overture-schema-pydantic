@@ -5,14 +5,8 @@
       "description": "Access restriction rule with scoping via when clause.",
       "properties": {
         "access_type": {
-          "description": "Access type",
-          "enum": [
-            "allowed",
-            "denied",
-            "designated"
-          ],
-          "title": "Access Type",
-          "type": "string"
+          "$ref": "#/$defs/AccessType",
+          "description": "Access type"
         },
         "between": {
           "anyOf": [
@@ -158,6 +152,16 @@
       },
       "title": "AccessRestrictionWhenClause",
       "type": "object"
+    },
+    "AccessType": {
+      "description": "Access level enumeration.",
+      "enum": [
+        "allowed",
+        "denied",
+        "designated"
+      ],
+      "title": "AccessType",
+      "type": "string"
     },
     "AdvancedSourceItem": {
       "description": "Advanced source information with linear referencing support.",

@@ -1,16 +1,27 @@
 """Common transportation theme structures and enums."""
 
 from enum import Enum
-from typing import Annotated, List, Literal, Optional
+from typing import Annotated, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
 from overture.schema.core.common import (
     GeometricRangeScope,
-    ScopingConditions,
+    HeadingScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
     Speed,
+    TemporalScope,
+    TravelModeScope,
+    VehicleScope,
 )
-from overture.schema.validation import AtLeastOneOfConstraint
+from overture.schema.validation import (
+    CompositeUniqueConstraint,
+    ConstraintValidatedModel,
+    UniqueItemsConstraint,
+    at_least_one_of,
+)
+from overture.schema.validation.types import WikidataId
 
 
 class SegmentSubtype(str, Enum):
@@ -65,106 +76,242 @@ class ConnectorReference(BaseModel):
     )
 
 
-class RouteReference(str):
-    """Reference to a route."""
+class AccessType(str, Enum):
+    """Access level enumeration."""
+
+    ALLOWED = "allowed"
+    DENIED = "denied"
+    DESIGNATED = "designated"
+
+
+class DestinationLabelType(str, Enum):
+    """Destination label type classification."""
+
+    UNKNOWN = "unknown"
+    STREET = "street"
+    ROUTE_REF = "route_ref"
+    TOWARD_ROUTE_REF = "toward_route_ref"
+
+
+class RoadFlagType(str, Enum):
+    """Road-specific flag types."""
+
+    IS_BRIDGE = "is_bridge"
+    IS_LINK = "is_link"  # Deprecated - will be removed in favor of link subclass
+    IS_TUNNEL = "is_tunnel"
+    IS_UNDER_CONSTRUCTION = "is_under_construction"
+    IS_ABANDONED = "is_abandoned"
+    IS_COVERED = "is_covered"
+    IS_INDOOR = "is_indoor"
+
+
+class RailFlagType(str, Enum):
+    """Rail-specific flag types."""
+
+    IS_BRIDGE = "is_bridge"
+    IS_TUNNEL = "is_tunnel"  # Also used for subway class (though subways are occasionally above-ground)
+    IS_UNDER_CONSTRUCTION = "is_under_construction"
+    IS_ABANDONED = "is_abandoned"
+    IS_COVERED = "is_covered"
+    IS_PASSENGER = "is_passenger"
+    IS_FREIGHT = "is_freight"
+    IS_DISUSED = "is_disused"
+
+
+class RoadSurface(str, Enum):
+    """Road surface material types."""
+
+    UNKNOWN = "unknown"
+    PAVED = "paved"
+    UNPAVED = "unpaved"
+    GRAVEL = "gravel"
+    DIRT = "dirt"
+    PAVING_STONES = "paving_stones"
+    METAL = "metal"
+
+
+# Scoping condition models for when clauses
+class SpeedLimitWhenClause(
+    TemporalScope,
+    HeadingScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
+    TravelModeScope,
+    VehicleScope,
+):
+    """When clause for speed limit rules."""
 
     pass
 
 
-# Advanced Transportation Properties
-
-
-class SpeedLimitRule(
-    Annotated[GeometricRangeScope, AtLeastOneOfConstraint("min_speed", "max_speed")]
+class AccessRestrictionWhenClause(
+    TemporalScope,
+    HeadingScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
+    TravelModeScope,
+    VehicleScope,
 ):
-    """Speed limit rule with scoping."""
+    """When clause for access restriction rules."""
 
-    min_speed: Optional[Speed] = Field(None, description="Minimum speed")
-    max_speed: Optional[Speed] = Field(None, description="Maximum speed")
-    is_max_speed_variable: bool = Field(False, description="Variable max speed")
-    when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
+    pass
 
 
-class AccessRestriction(GeometricRangeScope):
-    """Access restriction rule with scoping."""
+class ProhibitedTransitionWhenClause(
+    HeadingScope,
+    TemporalScope,
+    PurposeOfUseScope,
+    RecognizedStatusScope,
+    TravelModeScope,
+    VehicleScope,
+):
+    """When clause for prohibited transition rules."""
 
-    access_type: Literal["allowed", "denied", "designated"] = Field(
-        ..., description="Access restriction type"
+    pass
+
+
+class DestinationWhenClause(HeadingScope):
+    """When clause for destination rules."""
+
+    pass
+
+
+# Core rule models using mix-in composition
+@at_least_one_of("max_speed", "min_speed")
+class SpeedLimitRule(GeometricRangeScope, ConstraintValidatedModel):
+    """Speed limit rule with scoping via when clause."""
+
+    max_speed: Optional[Speed] = Field(None, description="Maximum speed limit")
+    min_speed: Optional[Speed] = Field(None, description="Minimum speed limit")
+    is_max_speed_variable: Optional[bool] = Field(
+        None, description="Whether maximum speed is variable"
     )
-    when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
+    when: Optional[SpeedLimitWhenClause] = Field(None, description="Scoping conditions")
 
 
-class SurfaceMaterial(str, Enum):
-    """Surface material enum for road segments."""
+class AccessRestrictionRule(GeometricRangeScope):
+    """Access restriction rule with scoping via when clause."""
 
-    ASPHALT = "asphalt"
-    COBBLESTONE = "cobblestone"
-    COMPACTED = "compacted"
-    CONCRETE = "concrete"
-    CONCRETE_PLATES = "concrete_plates"
-    DIRT = "dirt"
-    EARTH = "earth"
-    FINE_GRAVEL = "fine_gravel"
-    GRASS = "grass"
-    GRAVEL = "gravel"
-    GROUND = "ground"
-    PAVED = "paved"
-    PAVING_STONES = "paving_stones"
-    PEBBLESTONE = "pebblestone"
-    RECREATION_GRASS = "recreation_grass"
-    RECREATION_PAVED = "recreation_paved"
-    RECREATION_SAND = "recreation_sand"
-    RUBBER = "rubber"
-    SAND = "sand"
-    STONE = "stone"
-    UNKNOWN = "unknown"
-    UNPAVED = "unpaved"
-    WOOD = "wood"
-
-
-class SurfaceRule(GeometricRangeScope):
-    """Road surface rule with scoping."""
-
-    value: SurfaceMaterial = Field(..., description="Surface type")
-    when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
-
-
-class WidthRule(GeometricRangeScope):
-    """Width rule with scoping."""
-
-    value: float = Field(..., description="Width in meters")
-    when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
-
-
-class RoadFlag(str, Enum):
-    """Valid road flags."""
-
-    IS_ABANDONED = "is_abandoned"
-    IS_COVERED = "is_covered"
-    IS_INDOOR = "is_indoor"
-    IS_LINK = "is_link"
-    IS_TUNNEL = "is_tunnel"
-
-
-class RoadFlagsRule(GeometricRangeScope):
-    """Road flags rule with scoping."""
-
-    values: List[RoadFlag] = Field(..., min_length=1, description="Road flag values")
-    when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
-
-
-class TurnRestriction(BaseModel):
-    """Turn restriction with sequence of connectors."""
-
-    sequence: List[str] = Field(
-        ..., min_length=1, description="Sequence of connector IDs"
+    access_type: AccessType = Field(..., description="Access type")
+    when: Optional[AccessRestrictionWhenClause] = Field(
+        None, description="Scoping conditions"
     )
-    when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
 
 
 class DestinationLabel(BaseModel):
-    """Destination label with symbols and text."""
+    """Destination label with type classification."""
 
-    text: str = Field(..., description="Destination text")
-    symbol: Optional[str] = Field(None, description="Destination symbol")
-    language: Optional[str] = Field(None, description="Language code")
+    value: str = Field(..., min_length=1, description="Label text")
+    type: DestinationLabelType = Field(..., description="Label type")
+
+
+class DestinationSignSymbol(str, Enum):
+    """Valid destination sign symbols."""
+
+    MOTORWAY = "motorway"
+    AIRPORT = "airport"
+    HOSPITAL = "hospital"
+    CENTER = "center"
+    INDUSTRIAL = "industrial"
+    PARKING = "parking"
+
+
+class HeadingType(str, Enum):
+    """Heading type classification."""
+
+    FORWARD = "forward"
+    BACKWARD = "backward"
+
+
+class DestinationRule(BaseModel):
+    """Destination signage rule with scoping via when clause."""
+
+    from_connector_id: str = Field(..., description="Source connector identifier")
+    to_connector_id: str = Field(..., description="Target connector identifier")
+    to_segment_id: str = Field(..., description="Target segment identifier")
+    final_heading: HeadingType = Field(
+        ..., description="Final direction on target segment"
+    )
+    labels: Annotated[
+        List[DestinationLabel], CompositeUniqueConstraint("value", "type")
+    ] = Field(..., min_length=1, description="Destination labels")
+    symbols: Optional[
+        Annotated[List[DestinationSignSymbol], UniqueItemsConstraint()]
+    ] = Field(None, description="Route symbols")
+    when: Optional[DestinationWhenClause] = Field(
+        None, description="Scoping conditions"
+    )
+
+
+class ProhibitedTransitionSequence(BaseModel):
+    """Sequence entry with connector and segment identifiers."""
+
+    connector_id: str = Field(..., description="Connector identifier")
+    segment_id: str = Field(..., description="Segment identifier")
+
+
+class ProhibitedTransitionRule(GeometricRangeScope):
+    """Prohibited transition (turn restriction) rule."""
+
+    sequence: Annotated[
+        List[ProhibitedTransitionSequence],
+        CompositeUniqueConstraint("connector_id", "segment_id"),
+    ] = Field(
+        ...,
+        min_length=1,
+        description="Sequence of connectors defining the prohibited path",
+    )
+    final_heading: HeadingType = Field(..., description="Required final heading")
+    when: Optional[ProhibitedTransitionWhenClause] = Field(
+        None, description="Scoping conditions"
+    )
+
+
+class RoadFlagRule(GeometricRangeScope):
+    """Road-specific flag rule with geometric scoping only."""
+
+    values: Annotated[List[RoadFlagType], UniqueItemsConstraint()] = Field(
+        ..., min_length=1, description="Road flag values"
+    )
+
+
+class RailFlagRule(GeometricRangeScope):
+    """Rail-specific flag rule with geometric scoping only."""
+
+    values: Annotated[List[RailFlagType], UniqueItemsConstraint()] = Field(
+        ..., min_length=1, description="Rail flag values"
+    )
+
+
+class WidthRule(GeometricRangeScope):
+    """Width rule with linear referencing."""
+
+    value: Union[int, float] = Field(..., description="Width value")
+
+
+class SurfaceRule(GeometricRangeScope):
+    """Surface material rule with linear referencing."""
+
+    value: RoadSurface = Field(..., description="Surface material")
+
+
+class LevelRule(GeometricRangeScope):
+    """Level/elevation rule with linear referencing."""
+
+    value: int = Field(..., description="Level/elevation value")
+
+
+class SubclassRule(GeometricRangeScope):
+    """Subclass rule with linear referencing."""
+
+    value: str = Field(..., description="Subclass value")
+
+
+class RouteReference(GeometricRangeScope):
+    """Route reference with linear referencing support."""
+
+    name: Optional[str] = Field(None, description="Route name")
+    network: Optional[str] = Field(None, description="Route network")
+    ref: Optional[str] = Field(None, description="Route reference number")
+    symbol: Optional[str] = Field(None, description="Route symbol URL")
+    wikidata: Optional[WikidataId] = Field(None, description="Wikidata identifier")

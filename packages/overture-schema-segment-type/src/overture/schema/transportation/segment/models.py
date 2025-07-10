@@ -4,7 +4,6 @@ from typing import Annotated, Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
-
 from overture.schema.core.base import (
     OvertureFeature,
     OvertureFeatureProperties,
@@ -17,44 +16,42 @@ from overture.schema.core.common import (
     ScopingConditions,
 )
 from overture.schema.transportation.common import (
+    AccessRestrictionRule as StrictAccessRestrictionRule,
+)
+from overture.schema.transportation.common import (
     ConnectorReference,
     RailClass,
     RoadClass,
     SegmentSubtype,
 )
-from overture.schema.transportation.rules import (
-    AccessRestrictionRule as StrictAccessRestrictionRule,
-)
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     DestinationRule as StrictDestinationRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     LevelRule as StrictLevelRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     ProhibitedTransitionRule as StrictProhibitedTransitionRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     RailFlagRule as StrictRailFlagRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     RoadFlagRule as StrictRoadFlagRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     RouteReference as StrictRouteReference,
 )
-
-# Import new strict rule types from transportation rules
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     SpeedLimitRule as StrictSpeedLimitRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     SubclassRule as StrictSubclassRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     SurfaceRule as StrictSurfaceRule,
 )
-from overture.schema.transportation.rules import (
+from overture.schema.transportation.common import (
     WidthRule as StrictWidthRule,
 )
 from overture.schema.validation import (

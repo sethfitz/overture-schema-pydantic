@@ -1,6 +1,6 @@
 """Connector feature models for Overture Maps transportation theme."""
 
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any, Dict
 
 from pydantic import Field
 
