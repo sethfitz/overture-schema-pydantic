@@ -19,7 +19,6 @@ import overture.schema.divisions.division_boundary.models  # noqa: F401
 import overture.schema.places.place.models  # noqa: F401
 import overture.schema.transportation.connector.models  # noqa: F401
 import overture.schema.transportation.segment.models  # noqa: F401
-import pytest
 import yaml
 from deepdiff import DeepDiff
 from overture.schema.core.base import (
@@ -264,61 +263,3 @@ def test_counterexample_validation(counterexample_file):
     assert not is_valid, (
         f"Counterexample should have failed validation: {counterexample_file}"
     )
-
-
-# Additional helper functions for disabled test handling
-
-
-def get_disabled_test_cases():
-    """Get all disabled test cases for reporting."""
-    project_root = Path(__file__).parent.parent.parent.parent
-
-    disabled_examples = []
-    disabled_counterexamples = []
-
-    # Examples
-    examples_dir = project_root / "reference" / "examples"
-    if examples_dir.exists():
-        example_files = list(walk_directory(examples_dir))
-        grouped_examples = group_files_by_directory(example_files, examples_dir)
-        example_test_cases = create_test_cases(
-            grouped_examples, examples_dir, is_counterexample=False
-        )
-        disabled_examples = [
-            (name, path) for name, path, disabled in example_test_cases if disabled
-        ]
-
-    # Counterexamples
-    counterexamples_dir = project_root / "reference" / "counterexamples"
-    if counterexamples_dir.exists():
-        counterexample_files = list(walk_directory(counterexamples_dir))
-        grouped_counterexamples = group_files_by_directory(
-            counterexample_files, counterexamples_dir
-        )
-        counterexample_test_cases = create_test_cases(
-            grouped_counterexamples, counterexamples_dir, is_counterexample=True
-        )
-        disabled_counterexamples = [
-            (name, path)
-            for name, path, disabled in counterexample_test_cases
-            if disabled
-        ]
-
-    return disabled_examples, disabled_counterexamples
-
-
-@pytest.mark.skip(reason="Disabled test files")
-class TestDisabledFiles:
-    """Tests for disabled files - these are skipped by default."""
-
-    def test_report_disabled_files(self):
-        """Report on disabled test files."""
-        disabled_examples, disabled_counterexamples = get_disabled_test_cases()
-
-        print(f"\nDisabled Examples ({len(disabled_examples)}):")
-        for name, _path in disabled_examples:
-            print(f"  - {name}")
-
-        print(f"\nDisabled Counterexamples ({len(disabled_counterexamples)}):")
-        for name, _path in disabled_counterexamples:
-            print(f"  - {name}")
