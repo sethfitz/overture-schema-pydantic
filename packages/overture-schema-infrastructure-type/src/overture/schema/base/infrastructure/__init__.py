@@ -1,8 +1,8 @@
 """Infrastructure type schemas for Overture Maps base theme."""
 
 from .models import (
-    InfrastructureClass,
     Infrastructure,
+    InfrastructureClass,
     InfrastructureSubtype,
     SurfaceMaterial,
 )

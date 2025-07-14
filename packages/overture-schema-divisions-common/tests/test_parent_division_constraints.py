@@ -3,14 +3,13 @@
 from enum import Enum
 
 import pytest
-from pydantic import BaseModel, ValidationError
-
 from overture.schema.divisions.common.validation import (
     ParentDivisionValidator,
     parent_division_required_unless,
 )
 from overture.schema.validation import ConstraintValidatedModel
 from overture.schema.validation.mixin import _constraint_registry
+from pydantic import BaseModel, ValidationError
 
 
 class PlaceType(str, Enum):

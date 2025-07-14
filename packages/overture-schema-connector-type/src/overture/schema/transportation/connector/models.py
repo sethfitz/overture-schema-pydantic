@@ -1,6 +1,6 @@
 """Connector feature models for Overture Maps transportation theme."""
 
-from typing import Annotated, Any, Dict
+from typing import Annotated
 
 from pydantic import Field
 
@@ -9,8 +9,8 @@ from overture.schema.core.base import (
     OvertureFeatureProperties,
     register_model,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
-    GeometryTypeConstraint,
     theme_literal,
     type_literal,
 )
@@ -32,8 +32,8 @@ class Connector(OvertureFeature):
     properties: ConnectorProperties = Field(
         ..., description="Connector feature properties"
     )
-    geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["Point"])] = Field(
-        ..., description="GeoJSON geometry (Point)"
+    geometry: Annotated[Geometry, GeometryTypeConstraint("Point")] = Field(
+        ..., description="Geometry (Point)"
     )
 
 

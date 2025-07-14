@@ -1,13 +1,13 @@
 """Building part feature models for Overture Maps buildings theme."""
 
-from typing import Annotated, Any, Dict
+from typing import Annotated
 
 from pydantic import Field
 
 from overture.schema.buildings.common import BaseBuildingProperties
 from overture.schema.core.base import OvertureFeature, register_model
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
-    GeometryTypeConstraint,
     type_literal,
 )
 
@@ -30,9 +30,9 @@ class BuildingPart(OvertureFeature):
     properties: BuildingPartProperties = Field(
         ..., description="Building part feature properties"
     )
-    geometry: Annotated[
-        Dict[str, Any], GeometryTypeConstraint(["Polygon", "MultiPolygon"])
-    ] = Field(..., description="GeoJSON geometry (Polygon or MultiPolygon)")
+    geometry: Annotated[Geometry, GeometryTypeConstraint("Polygon", "MultiPolygon")] = (
+        Field(..., description="Geometry (Polygon or MultiPolygon)")
+    )
 
 
 # Register Pydantic models when module is imported

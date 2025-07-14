@@ -1,6 +1,6 @@
 """Division models for Overture Maps divisions theme."""
 
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Dict, List, Optional
 
 from pydantic import Field
 
@@ -13,6 +13,7 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.divisions.common import (
     CapitalOfDivisionItem,
     DivisionClass,
@@ -25,7 +26,6 @@ from overture.schema.divisions.common import (
 from overture.schema.validation import (
     ConstraintValidatedModel,
     CountryCode,
-    GeometryTypeConstraint,
     MinItemsConstraint,
     NoWhitespaceString,
     RegionCode,
@@ -110,7 +110,7 @@ class Division(OvertureFeature, ConstraintValidatedModel):
     )
 
     # Use constraint-based validation for Point geometry
-    geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["Point"])] = Field(
+    geometry: Annotated[Geometry, GeometryTypeConstraint("Point")] = Field(
         ..., description="Point geometry for division location"
     )
 

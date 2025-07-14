@@ -1,7 +1,7 @@
 """Place feature models for Overture Maps places theme."""
 
 import re
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Dict, List, Optional
 
 from pydantic import AnyUrl, BaseModel, EmailStr, Field
 
@@ -15,8 +15,8 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
-    GeometryTypeConstraint,
     MinItemsConstraint,
     PatternConstraint,
     UniqueItemsConstraint,
@@ -141,8 +141,8 @@ class Place(OvertureFeature):
     """Place feature model."""
 
     properties: PlaceProperties = Field(..., description="Place feature properties")
-    geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["Point"])] = Field(
-        ..., description="GeoJSON geometry (Point)"
+    geometry: Annotated[Geometry, GeometryTypeConstraint("Point")] = Field(
+        ..., description="Geometry (Point)"
     )
 
 

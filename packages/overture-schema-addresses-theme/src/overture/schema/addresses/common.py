@@ -3,6 +3,7 @@
 from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field
+
 from overture.schema.validation.constraints import WhitespaceConstraint
 
 

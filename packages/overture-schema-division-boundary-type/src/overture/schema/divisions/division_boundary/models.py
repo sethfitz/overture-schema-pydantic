@@ -12,6 +12,7 @@ from overture.schema.core.base import (
 from overture.schema.core.common import (
     AdvancedSourceItem,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.divisions.common.models import (
     AreaBoundaryClass,
     Perspectives,
@@ -20,7 +21,6 @@ from overture.schema.divisions.common.models import (
 from overture.schema.validation import (
     ConstraintValidatedModel,
     CountryCode,
-    GeometryTypeConstraint,
     RegionCode,
     UniqueItemsConstraint,
     mutually_exclusive,
@@ -79,17 +79,15 @@ class DivisionBoundaryProperties(OvertureFeatureProperties, ConstraintValidatedM
     )
 
 
-class DivisionBoundary(
-    Annotated[
-        OvertureFeature,
-        GeometryTypeConstraint(["LineString", "MultiLineString"]),
-    ]
-):
+class DivisionBoundary(OvertureFeature):
     """Division boundary feature model."""
 
     properties: DivisionBoundaryProperties = Field(
         ..., description="Division boundary feature properties"
     )
+    geometry: Annotated[
+        Geometry, GeometryTypeConstraint("LineString", "MultiLineString")
+    ] = Field(..., description="Geometry (LineString or MultiLineString)")
 
 
 # Register the model

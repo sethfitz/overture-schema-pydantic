@@ -16,7 +16,6 @@ from overture.schema.core.common import (
     NamesContainer,
 )
 from overture.schema.validation import (
-    GeometryTypeConstraint,
     theme_literal,
     type_literal,
 )
@@ -123,22 +122,6 @@ class Infrastructure(OvertureFeature):
 
     properties: InfrastructureProperties = Field(
         ..., description="Infrastructure feature properties"
-    )
-    geometry: Annotated[
-        Dict[str, Any],
-        GeometryTypeConstraint(
-            [
-                "Point",
-                "LineString",
-                "Polygon",
-                "MultiPoint",
-                "MultiLineString",
-                "MultiPolygon",
-                "GeometryCollection",
-            ]
-        ),
-    ] = Field(
-        ..., description="Feature geometry - Infrastructure can have any geometry type"
     )
 
 

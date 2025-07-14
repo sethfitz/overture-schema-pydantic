@@ -323,16 +323,31 @@
   "description": "Address feature model.",
   "properties": {
     "geometry": {
-      "additionalProperties": true,
-      "description": "GeoJSON geometry (Point)",
+      "description": "Geometry (Point)",
       "properties": {
+        "bbox": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "type": "array"
+        },
+        "coordinates": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "type": "array"
+        },
         "type": {
-          "enum": [
-            "Point"
-          ],
+          "const": "Point",
           "type": "string"
         }
       },
+      "required": [
+        "type",
+        "coordinates"
+      ],
       "title": "Geometry",
       "type": "object"
     },

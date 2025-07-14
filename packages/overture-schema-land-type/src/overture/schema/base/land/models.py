@@ -15,8 +15,8 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
-    GeometryTypeConstraint,
     theme_literal,
     type_literal,
 )
@@ -119,9 +119,9 @@ class Land(OvertureFeature):
 
     properties: LandProperties = Field(..., description="Land feature properties")
     geometry: Annotated[
-        Dict[str, Any],
-        GeometryTypeConstraint(["Point", "LineString", "Polygon", "MultiPolygon"]),
-    ]
+        Geometry,
+        GeometryTypeConstraint("Point", "LineString", "Polygon", "MultiPolygon"),
+    ] = Field(..., description="Geometry (Point, LineString, Polygon, or MultiPolygon)")
 
 
 # Register Pydantic models when module is imported

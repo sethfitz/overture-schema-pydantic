@@ -43,7 +43,6 @@ from .constraints import (
     ConfidenceScoreConstraint,
     CountryCodeConstraint,
     CountryRequiredConstraint,
-    GeometryTypeConstraint,
     HexColorConstraint,
     ISO8601DateTimeConstraint,
     JSONPointerConstraint,
@@ -145,7 +144,6 @@ __all__ = [
     # Registry constraints
     "ThemeTypeCompatibilityConstraint",
     "CountryRequiredConstraint",
-    "GeometryTypeConstraint",
     # Constrained types
     "LanguageTag",
     "CountryCode",

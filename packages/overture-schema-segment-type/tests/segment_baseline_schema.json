@@ -372,13 +372,8 @@
       "description": "Destination signage rule with scoping via when clause.",
       "properties": {
         "final_heading": {
-          "description": "Final direction on target segment",
-          "enum": [
-            "forward",
-            "backward"
-          ],
-          "title": "Final Heading",
-          "type": "string"
+          "$ref": "#/$defs/HeadingType",
+          "description": "Final direction on target segment"
         },
         "from_connector_id": {
           "description": "Source connector identifier",
@@ -481,6 +476,15 @@
       },
       "title": "DestinationWhenClause",
       "type": "object"
+    },
+    "HeadingType": {
+      "description": "Heading type classification.",
+      "enum": [
+        "forward",
+        "backward"
+      ],
+      "title": "HeadingType",
+      "type": "string"
     },
     "LevelRule": {
       "additionalProperties": true,
@@ -731,13 +735,8 @@
           "title": "Between"
         },
         "final_heading": {
-          "description": "Required final heading",
-          "enum": [
-            "forward",
-            "backward"
-          ],
-          "title": "Final Heading",
-          "type": "string"
+          "$ref": "#/$defs/HeadingType",
+          "description": "Required final heading"
         },
         "sequence": {
           "description": "Sequence of connectors defining the prohibited path",
@@ -1126,6 +1125,8 @@
         "wikidata": {
           "anyOf": [
             {
+              "description": "Wikidata identifier (Q followed by digits)",
+              "pattern": "^Q\\d+$",
               "type": "string"
             },
             {
@@ -1876,16 +1877,35 @@
   "description": "Segment feature model.",
   "properties": {
     "geometry": {
-      "additionalProperties": true,
-      "description": "GeoJSON geometry (LineString)",
+      "description": "Geometry (LineString)",
       "properties": {
+        "bbox": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "type": "array"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "type": "array"
+          },
+          "minItems": 2,
+          "type": "array"
+        },
         "type": {
-          "enum": [
-            "LineString"
-          ],
+          "const": "LineString",
           "type": "string"
         }
       },
+      "required": [
+        "type",
+        "coordinates"
+      ],
       "title": "Geometry",
       "type": "object"
     },

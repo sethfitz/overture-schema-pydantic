@@ -13,6 +13,8 @@ from overture.schema.validation import (
 )
 from overture.schema.validation.types import ISO8601DateTime, JSONPointer
 
+from .geometry import Geometry
+
 # Registry for valid themes and feature types (extensible)
 _VALID_THEMES: set[str] = set()
 _VALID_FEATURE_TYPES: set[str] = set()
@@ -22,6 +24,7 @@ _THEME_TYPE_MAPPING: dict[str, set[str]] = {}
 
 # Global registry for Pydantic feature models
 _FEATURE_MODELS: dict[tuple[str, str], type[BaseModel]] = {}
+
 
 def register_theme(theme: str) -> None:
     """Register a valid theme."""
@@ -145,17 +148,8 @@ class OvertureFeature(BaseModel, ABC):
     type: Annotated[str, LiteralValueConstraint("Feature", "type")] = Field(
         "Feature", description="GeoJSON type"
     )
-    geometry: dict[str, Any] = Field(..., description="GeoJSON geometry")
+    geometry: Geometry = Field(..., description="Geometry")
     properties: OvertureFeatureProperties = Field(..., description="Feature properties")
-
-    @classmethod
-    def validate_geometry_structure(cls, v):
-        """Basic geometry structure validation."""
-        if not isinstance(v, dict):
-            raise ValueError("geometry must be an object")
-        if "type" not in v:
-            raise ValueError("geometry must have a 'type' property")
-        return v
 
 
 def register_model(

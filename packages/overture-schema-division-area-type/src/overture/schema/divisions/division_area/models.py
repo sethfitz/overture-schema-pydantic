@@ -1,6 +1,6 @@
 """Division area models for Overture Maps divisions theme."""
 
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, List, Optional
 
 from pydantic import Field
 
@@ -13,12 +13,12 @@ from overture.schema.core.common import (
     AdvancedSourceItem,
     NamesContainer,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.divisions.common.models import (
     AreaBoundaryClass,
     PlaceType,
 )
 from overture.schema.validation import (
-    GeometryTypeConstraint,
     MutuallyExclusiveConstraint,
     theme_literal,
     type_literal,
@@ -80,9 +80,9 @@ class DivisionArea(OvertureFeature):
     properties: DivisionAreaProperties = Field(
         ..., description="Division area feature properties"
     )
-    geometry: Annotated[
-        Dict[str, Any], GeometryTypeConstraint(["Polygon", "MultiPolygon"])
-    ] = Field(..., description="GeoJSON geometry (Polygon or MultiPolygon)")
+    geometry: Annotated[Geometry, GeometryTypeConstraint("Polygon", "MultiPolygon")] = (
+        Field(..., description="Geometry (Polygon or MultiPolygon)")
+    )
 
 
 # Register the model

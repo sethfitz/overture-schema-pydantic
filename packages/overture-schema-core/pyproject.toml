@@ -10,6 +10,7 @@ dependencies = [
     "pydantic>=2.0",
     "typing-extensions",
     "overture-schema-validation",
+    "shapely",
 ]
 
 [tool.uv.sources]
@@ -17,3 +18,8 @@ overture-schema-validation = { workspace = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/overture"]
+
+[dependency-groups]
+dev = [
+    "pytest-subtests>=0.14.2",
+]

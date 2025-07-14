@@ -1,6 +1,6 @@
 """Segment feature models for Overture Maps transportation theme."""
 
-from typing import Annotated, Any, Dict, List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -15,6 +15,7 @@ from overture.schema.core.common import (
     NamesContainer,
     ScopingConditions,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.transportation.common import (
     AccessRestrictionRule as StrictAccessRestrictionRule,
 )
@@ -57,7 +58,6 @@ from overture.schema.transportation.common import (
 from overture.schema.validation import (
     CompositeUniqueConstraint,
     ConstraintValidatedModel,
-    GeometryTypeConstraint,
     MinItemsConstraint,
     conditional_enum,
     required_if,
@@ -179,8 +179,8 @@ class Segment(OvertureFeature):
     """Segment feature model."""
 
     properties: SegmentProperties = Field(..., description="Segment feature properties")
-    geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["LineString"])] = Field(
-        ..., description="GeoJSON geometry (LineString)"
+    geometry: Annotated[Geometry, GeometryTypeConstraint("LineString")] = Field(
+        ..., description="Geometry (LineString)"
     )
 
 

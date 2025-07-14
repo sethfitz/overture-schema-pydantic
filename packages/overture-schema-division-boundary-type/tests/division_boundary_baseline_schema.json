@@ -381,10 +381,76 @@
   "description": "Division boundary feature model.",
   "properties": {
     "geometry": {
-      "additionalProperties": true,
-      "description": "GeoJSON geometry",
-      "title": "Geometry",
-      "type": "object"
+      "description": "Geometry (LineString or MultiLineString)",
+      "oneOf": [
+        {
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "type": "array"
+              },
+              "minItems": 2,
+              "type": "array"
+            },
+            "type": {
+              "const": "LineString",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "minItems": 2,
+                "type": "array"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "type": {
+              "const": "MultiLineString",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "type": "object"
+        }
+      ],
+      "title": "Geometry"
     },
     "id": {
       "description": "Feature identifier",

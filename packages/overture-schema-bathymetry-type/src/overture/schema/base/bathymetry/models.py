@@ -1,6 +1,6 @@
 """Bathymetry feature models for Overture Maps base theme."""
 
-from typing import Annotated, Any, Dict
+from typing import Annotated
 
 from pydantic import Field
 
@@ -9,8 +9,8 @@ from overture.schema.core.base import (
     OvertureFeatureProperties,
     register_model,
 )
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
-    GeometryTypeConstraint,
     theme_literal,
     type_literal,
 )
@@ -31,9 +31,9 @@ class Bathymetry(OvertureFeature):
     properties: BathymetryProperties = Field(
         ..., description="Bathymetry feature properties"
     )
-    geometry: Annotated[
-        Dict[str, Any], GeometryTypeConstraint(["Polygon", "MultiPolygon"])
-    ]
+    geometry: Annotated[Geometry, GeometryTypeConstraint("Polygon", "MultiPolygon")] = (
+        Field(..., description="Geometry (Polygon or MultiPolygon)")
+    )
 
 
 # Register Pydantic models when module is imported

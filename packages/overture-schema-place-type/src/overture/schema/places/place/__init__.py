@@ -4,11 +4,11 @@
 from overture.schema.core.base import add_theme_type_mapping
 
 from .models import (
+    Place,
     PlaceBrand,
     PlaceCategories,
     PlaceConfidence,
     PlaceContact,
-    Place,
     PlaceOperatingHours,
     PlaceProperties,
 )

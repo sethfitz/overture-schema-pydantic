@@ -1,8 +1,8 @@
 """Land type schemas for Overture Maps base theme."""
 
 from .models import (
-    LandClass,
     Land,
+    LandClass,
     LandSubtype,
 )
 

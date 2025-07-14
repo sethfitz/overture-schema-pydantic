@@ -730,16 +730,31 @@
   "description": "Division feature model.",
   "properties": {
     "geometry": {
-      "additionalProperties": true,
       "description": "Point geometry for division location",
       "properties": {
+        "bbox": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "type": "array"
+        },
+        "coordinates": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "type": "array"
+        },
         "type": {
-          "enum": [
-            "Point"
-          ],
+          "const": "Point",
           "type": "string"
         }
       },
+      "required": [
+        "type",
+        "coordinates"
+      ],
       "title": "Geometry",
       "type": "object"
     },

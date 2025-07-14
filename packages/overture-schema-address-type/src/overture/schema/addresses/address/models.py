@@ -1,6 +1,6 @@
 """Address feature models for Overture Maps addresses theme."""
 
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -12,9 +12,12 @@ from overture.schema.core.base import (
 from overture.schema.core.common import (
     AdvancedSourceItem,
 )
+from overture.schema.core.geometry import (
+    Geometry,
+    GeometryTypeConstraint,
+)
 from overture.schema.validation import (
     CountryCodeConstraint,
-    GeometryTypeConstraint,
     MaxItemsConstraint,
     MinItemsConstraint,
     WhitespaceConstraint,
@@ -88,8 +91,8 @@ class Address(OvertureFeature):
     """Address feature model."""
 
     properties: AddressProperties = Field(..., description="Address feature properties")
-    geometry: Annotated[Dict[str, Any], GeometryTypeConstraint(["Point"])] = Field(
-        ..., description="GeoJSON geometry (Point)"
+    geometry: Annotated[Geometry, GeometryTypeConstraint("Point")] = Field(
+        ..., description="Geometry (Point)"
     )
 
 
