@@ -7,6 +7,7 @@ from pydantic import (
     ValidationInfo,
 )
 from pydantic_core import InitErrorDetails, core_schema
+from shapely import wkb, wkt
 from shapely.geometry import mapping, shape
 from shapely.geometry.base import BaseGeometry
 
@@ -142,23 +143,54 @@ class Geometry:
         return cls(shape(value))
 
     @classmethod
+    def from_wkb(cls, value: bytes) -> "Geometry":
+        """Create a Geometry from Well-Known Binary (WKB) bytes."""
+        if not isinstance(value, bytes):
+            raise TypeError(
+                f"value must be bytes; but {repr(value)} has type {type(value).__name__}"
+            )
+
+        try:
+            geom = wkb.loads(value)
+            return cls(geom)
+        except Exception as e:
+            raise ValueError(f"invalid WKB data: {str(e)}") from e
+
+    @classmethod
+    def from_wkt(cls, value: str) -> "Geometry":
+        """Create a Geometry from Well-Known Text (WKT) string."""
+        if not isinstance(value, str):
+            raise TypeError(
+                f"value must be str; but {repr(value)} has type {type(value).__name__}"
+            )
+
+        try:
+            geom = wkt.loads(value)
+            return cls(geom)
+        except Exception as e:
+            raise ValueError(f"invalid WKT string: {str(e)}") from e
+
+    @classmethod
     def __get_pydantic_core_schema__(
         cls, _source_type: Any, _handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
         def validator(value: Any, info: ValidationInfo) -> Geometry:
             try:
-                # Handle Geometry object directly (pass-through)
-                if isinstance(value, cls):
-                    return value
                 # Handle Shapely geometry directly
-                elif isinstance(value, BaseGeometry):
+                if isinstance(value, BaseGeometry):
                     return cls(value)
                 # Handle GeoJSON dict
                 elif isinstance(value, dict):
                     return cls.from_geo_json(value)
+                # Handle WKB bytes
+                elif isinstance(value, bytes):
+                    return cls.from_wkb(value)
+                # Handle WKT string
+                elif isinstance(value, str):
+                    return cls.from_wkt(value)
                 else:
                     raise TypeError(
-                        f"Expected dict, BaseGeometry, or Geometry, got {type(value).__name__}"
+                        f"Expected dict, BaseGeometry, bytes, str, or Geometry, got {type(value).__name__}"
                     )
             except Exception as e:
                 context = info.context or {}
@@ -175,10 +207,15 @@ class Geometry:
                     ],
                 ) from e
 
+        def serialize_geometry(v, info):
+            if info and info.mode == "json":
+                return v.to_geo_json()
+            return v
+
         return core_schema.with_info_plain_validator_function(
             validator,
             serialization=core_schema.plain_serializer_function_ser_schema(
-                lambda v: v.to_geo_json()
+                serialize_geometry, info_arg=True
             ),
         )
 

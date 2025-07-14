@@ -166,7 +166,7 @@ def get_registered_model(theme: str, feature_type: str) -> type[BaseModel] | Non
     return _FEATURE_MODELS.get((theme, feature_type))
 
 
-def parse_feature(feature: dict[str, Any]) -> dict[str, Any]:
+def parse_feature(feature: dict[str, Any]) -> dict[str, Any] | None:
     """
     Parse and validate a feature, returning the parsed dictionary representation.
 
@@ -213,8 +213,8 @@ def parse_feature(feature: dict[str, Any]) -> dict[str, Any]:
             except Exception as e:
                 raise ValueError(f"Pydantic validation failed: {str(e)}") from e
 
-        # If no model is registered, return the original feature
-        return feature
+        # If no model is registered, return None (since it didn't parse)
+        return None
 
     except Exception as e:
         raise ValueError(str(e)) from e

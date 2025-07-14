@@ -24,6 +24,7 @@ from deepdiff import DeepDiff
 from overture.schema.core.base import (
     parse_feature,
 )
+from shapely.geometry import shape
 from yamlcore import CoreLoader
 
 
@@ -31,7 +32,59 @@ def load_feature(file_path: str) -> Dict[str, Any]:
     """Load a feature from JSON or YAML file."""
     with open(file_path, encoding="utf-8") as f:
         # use a YAML-1.2-compliant (which dropped support for yes/no boolean values) Loader
-        return yaml.load(f, Loader=CoreLoader)
+        feature = yaml.load(f, Loader=CoreLoader)
+
+        # # flatten GeoJSON feature to match GeoParquet structure
+        # feature.update(feature["properties"])
+        # del feature["properties"]
+        # del feature["type"]
+
+        return feature
+
+
+def create_shapely_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a variant of the feature with GeoJSON geometry converted to Shapely."""
+    shapely_feature = feature.copy()
+    if "geometry" in shapely_feature and shapely_feature["geometry"]:
+        try:
+            shapely_feature["geometry"] = shape(shapely_feature["geometry"])
+        except Exception as e:
+            # leave geometry as GeoJSON if conversion fails
+            print(f"Error converting geometry to Shapely: {e}")
+            pass
+    return shapely_feature
+
+
+def create_wkb_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a variant of the feature with geometry as WKB (for GeoParquet compatibility)."""
+    wkb_feature = feature.copy()
+    if "geometry" in wkb_feature and wkb_feature["geometry"]:
+        try:
+            # Convert GeoJSON -> Shapely -> WKB bytes
+            shapely_geom = shape(wkb_feature["geometry"])
+            wkb_bytes = shapely_geom.wkb
+            wkb_feature["geometry"] = wkb_bytes
+        except Exception as e:
+            # leave geometry as GeoJSON if conversion fails
+            print(f"Error converting geometry to WKB: {e}")
+            pass
+    return wkb_feature
+
+
+def create_wkt_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a variant of the feature with geometry as WKT string (for debugging)."""
+    wkt_feature = feature.copy()
+    if "geometry" in wkt_feature and wkt_feature["geometry"]:
+        try:
+            # Convert GeoJSON -> Shapely -> WKT string
+            shapely_geom = shape(wkt_feature["geometry"])
+            wkt_string = shapely_geom.wkt
+            wkt_feature["geometry"] = wkt_string
+        except Exception as e:
+            # leave geometry as GeoJSON if conversion fails
+            print(f"Error converting geometry to WKT: {e}")
+            pass
+    return wkt_feature
 
 
 def deep_compare_dicts(
@@ -226,40 +279,173 @@ def pytest_generate_tests(metafunc):
             metafunc.parametrize("counterexample_file", test_values, ids=test_ids)
 
 
-def test_example_validation(example_file):
-    """Test that examples pass validation and compare parsed result with original."""
+def test_example_validation_raw(example_file):
+    """Test that examples pass validation with raw GeoJSON input."""
     original_feature = load_feature(example_file)
+    test_feature = original_feature  # raw input variant
 
     is_valid = False
     error_msg = None
     try:
-        parsed_feature = parse_feature(original_feature)
+        parsed_feature = parse_feature(test_feature)
         is_valid = True
     except Exception as e:
         error_msg = e
 
-    assert is_valid, f"Example failed validation: {example_file}\nError: {error_msg}"
+    assert is_valid, (
+        f"Example failed validation (raw): {example_file}\nError: {error_msg}"
+    )
 
     # If validation passed and we have a parsed feature, compare with original
     if parsed_feature is not None:
         is_equal, diff_report = deep_compare_dicts(original_feature, parsed_feature)
         assert is_equal, (
-            f"Parsed feature differs from original: {example_file}\n"
+            f"Parsed feature differs from original (raw): {example_file}\n"
             f"Differences:\n{diff_report}"
         )
 
 
-def test_counterexample_validation(counterexample_file):
-    """Test that counterexamples fail validation."""
-    feature = load_feature(counterexample_file)
+def test_example_validation_shapely(example_file):
+    """Test that examples pass validation with Shapely geometry input."""
+    original_feature = load_feature(example_file)
+    test_feature = create_shapely_variant(original_feature)
+
+    is_valid = False
+    error_msg = None
+    try:
+        parsed_feature = parse_feature(test_feature)
+        is_valid = True
+    except Exception as e:
+        error_msg = e
+
+    assert is_valid, (
+        f"Example failed validation (shapely): {example_file}\nError: {error_msg}"
+    )
+
+    # If validation passed and we have a parsed feature, compare with original
+    if parsed_feature is not None:
+        is_equal, diff_report = deep_compare_dicts(original_feature, parsed_feature)
+        assert is_equal, (
+            f"Parsed feature differs from original (shapely): {example_file}\n"
+            f"Differences:\n{diff_report}"
+        )
+
+
+def test_counterexample_validation_raw(counterexample_file):
+    """Test that counterexamples fail validation with raw GeoJSON input."""
+    original_feature = load_feature(counterexample_file)
+    test_feature = original_feature  # raw input variant
 
     is_valid = False
     try:
-        parse_feature(feature)
+        parse_feature(test_feature)
         is_valid = True
-    except Exception as e:
+    except Exception:
         pass
 
     assert not is_valid, (
-        f"Counterexample should have failed validation: {counterexample_file}"
+        f"Counterexample should have failed validation (raw): {counterexample_file}"
+    )
+
+
+def test_counterexample_validation_shapely(counterexample_file):
+    """Test that counterexamples fail validation with Shapely geometry input."""
+    original_feature = load_feature(counterexample_file)
+    test_feature = create_shapely_variant(original_feature)
+
+    is_valid = False
+    try:
+        parse_feature(test_feature)
+        is_valid = True
+    except Exception:
+        pass
+
+    assert not is_valid, (
+        f"Counterexample should have failed validation (shapely): {counterexample_file}"
+    )
+
+
+def test_example_validation_wkb(example_file):
+    """Test that examples pass validation with WKB geometry input."""
+    original_feature = load_feature(example_file)
+    test_feature = create_wkb_variant(original_feature)
+
+    is_valid = False
+    error_msg = None
+    try:
+        parsed_feature = parse_feature(test_feature)
+        is_valid = True
+    except Exception as e:
+        error_msg = e
+
+    assert is_valid, (
+        f"Example failed validation (wkb): {example_file}\nError: {error_msg}"
+    )
+
+    # If validation passed and we have a parsed feature, compare with original
+    if parsed_feature is not None:
+        is_equal, diff_report = deep_compare_dicts(original_feature, parsed_feature)
+        assert is_equal, (
+            f"Parsed feature differs from original (wkb): {example_file}\n"
+            f"Differences:\n{diff_report}"
+        )
+
+
+def test_counterexample_validation_wkb(counterexample_file):
+    """Test that counterexamples fail validation with WKB geometry input."""
+    original_feature = load_feature(counterexample_file)
+    test_feature = create_wkb_variant(original_feature)
+
+    is_valid = False
+    try:
+        parse_feature(test_feature)
+        is_valid = True
+    except Exception:
+        pass
+
+    assert not is_valid, (
+        f"Counterexample should have failed validation (wkb): {counterexample_file}"
+    )
+
+
+def test_example_validation_wkt(example_file):
+    """Test that examples pass validation with WKT geometry input."""
+    original_feature = load_feature(example_file)
+    test_feature = create_wkt_variant(original_feature)
+
+    is_valid = False
+    error_msg = None
+    try:
+        parsed_feature = parse_feature(test_feature)
+        is_valid = True
+    except Exception as e:
+        error_msg = e
+
+    assert is_valid, (
+        f"Example failed validation (wkt): {example_file}\nError: {error_msg}"
+    )
+
+    # If validation passed and we have a parsed feature, compare with original
+    if parsed_feature is not None:
+        is_equal, diff_report = deep_compare_dicts(original_feature, parsed_feature)
+        assert is_equal, (
+            f"Parsed feature differs from original (wkt): {example_file}\n"
+            f"Differences:\n{diff_report}"
+        )
+
+
+def test_counterexample_validation_wkt(counterexample_file):
+    """Test that counterexamples fail validation with WKT geometry input."""
+    original_feature = load_feature(counterexample_file)
+    test_feature = create_wkt_variant(original_feature)
+
+    is_valid = False
+    try:
+        parse_feature(test_feature)
+        is_valid = True
+    except Exception:
+        pass
+
+    assert not is_valid, (
+        f"Counterexample should have failed validation (wkt): {counterexample_file}"
     )

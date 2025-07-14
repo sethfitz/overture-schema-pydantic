@@ -6,21 +6,21 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-# Import all model packages to trigger registration
+# Import model packages to trigger registration
 try:
-    import overture.schema.addresses.address.models
-    import overture.schema.base.bathymetry.models
-    import overture.schema.base.infrastructure.models
-    import overture.schema.base.land.models
-    import overture.schema.base.water.models
-    import overture.schema.buildings.building.models
-    import overture.schema.buildings.building_part.models
-    import overture.schema.divisions.division.models
-    import overture.schema.divisions.division_area.models
-    import overture.schema.divisions.division_boundary.models
-    import overture.schema.places.place.models
-    import overture.schema.transportation.connector.models
-    import overture.schema.transportation.segment.models
+    import overture.schema.addresses.address.models  # noqa: F401
+    import overture.schema.base.bathymetry.models  # noqa: F401
+    import overture.schema.base.infrastructure.models  # noqa: F401
+    import overture.schema.base.land.models  # noqa: F401
+    import overture.schema.base.water.models  # noqa: F401
+    import overture.schema.buildings.building.models  # noqa: F401
+    import overture.schema.buildings.building_part.models  # noqa: F401
+    import overture.schema.divisions.division.models  # noqa: F401
+    import overture.schema.divisions.division_area.models  # noqa: F401
+    import overture.schema.divisions.division_boundary.models  # noqa: F401
+    import overture.schema.places.place.models  # noqa: F401
+    import overture.schema.transportation.connector.models  # noqa: F401
+    import overture.schema.transportation.segment.models  # noqa: F401
 except ImportError as e:
     print(f"Warning: Could not import some model packages: {e}", file=sys.stderr)
 
