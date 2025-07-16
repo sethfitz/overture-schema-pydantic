@@ -3,8 +3,9 @@ Pytest-based test harness for validating Pydantic schemas against examples and c
 Similar to the TypeScript version but using pytest, with support for .disabled extensions.
 """
 
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Tuple
+from typing import Any
 
 import overture.schema.addresses.address.models  # noqa: F401
 import overture.schema.base.bathymetry.models  # noqa: F401
@@ -31,7 +32,7 @@ from shapely.geometry import shape
 from yamlcore import CoreLoader
 
 
-def load_feature(file_path: str) -> Dict[str, Any]:
+def load_feature(file_path: str) -> dict[str, Any]:
     """Load a feature from JSON or YAML file and return flattened/tabular format."""
     with open(file_path, encoding="utf-8") as f:
         # use a YAML-1.2-compliant (which dropped support for yes/no boolean values) Loader
@@ -39,7 +40,7 @@ def load_feature(file_path: str) -> Dict[str, Any]:
         return create_flat_variant(feature)
 
 
-def create_flat_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
+def create_flat_variant(feature: dict[str, Any]) -> dict[str, Any]:
     """Create a variant of the feature with flat/Parquet-style structure."""
     flat_feature = feature.copy()
 
@@ -55,7 +56,7 @@ def create_flat_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
     return flat_feature
 
 
-def create_shapely_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
+def create_shapely_variant(feature: dict[str, Any]) -> dict[str, Any]:
     """Create a variant of the feature with flat structure and Shapely geometry."""
     # Start with flattened feature (input should already be flat from load_feature)
     shapely_feature = feature.copy()
@@ -69,7 +70,7 @@ def create_shapely_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
     return shapely_feature
 
 
-def create_wkb_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
+def create_wkb_variant(feature: dict[str, Any]) -> dict[str, Any]:
     """Create a variant of the feature with flat structure and WKB geometry."""
     # Start with flattened feature (input should already be flat from load_feature)
     wkb_feature = feature.copy()
@@ -86,7 +87,7 @@ def create_wkb_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
     return wkb_feature
 
 
-def create_wkt_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
+def create_wkt_variant(feature: dict[str, Any]) -> dict[str, Any]:
     """Create a variant of the feature with flat structure and WKT geometry."""
     # Start with flattened feature (input should already be flat from load_feature)
     wkt_feature = feature.copy()
@@ -103,7 +104,7 @@ def create_wkt_variant(feature: Dict[str, Any]) -> Dict[str, Any]:
     return wkt_feature
 
 
-def convert_to_geojson_format(flattened_feature: Dict[str, Any]) -> Dict[str, Any]:
+def convert_to_geojson_format(flattened_feature: dict[str, Any]) -> dict[str, Any]:
     """Convert flattened feature to GeoJSON format for comparison."""
     return {
         "type": "Feature",
@@ -116,8 +117,8 @@ def convert_to_geojson_format(flattened_feature: Dict[str, Any]) -> Dict[str, An
 
 
 def deep_compare_dicts(
-    original: Dict[str, Any], parsed: Dict[str, Any]
-) -> Tuple[bool, str]:
+    original: dict[str, Any], parsed: dict[str, Any]
+) -> tuple[bool, str]:
     """
     Perform deep comparison between original and parsed dictionaries.
     Returns (is_equal, differences_report).
@@ -168,7 +169,7 @@ def walk_directory(directory: Path) -> Generator[Path, None, None]:
             yield file_path
 
 
-def group_files_by_directory(files: List[Path], base_dir: Path) -> Dict[str, Any]:
+def group_files_by_directory(files: list[Path], base_dir: Path) -> dict[str, Any]:
     """Group files by their directory structure."""
     groups = {}
 
@@ -202,12 +203,12 @@ def group_files_by_directory(files: List[Path], base_dir: Path) -> Dict[str, Any
 
 
 def create_test_cases(
-    group: Dict[str, Any], base_dir: Path, is_counterexample: bool = False
-) -> List[Tuple[str, str, bool]]:
+    group: dict[str, Any], base_dir: Path, is_counterexample: bool = False
+) -> list[tuple[str, str, bool]]:
     """Create test cases from grouped files."""
     test_cases = []
 
-    def collect_files(g: Dict[str, Any], prefix: str = ""):
+    def collect_files(g: dict[str, Any], prefix: str = ""):
         for name, value in g.items():
             if isinstance(value, list):
                 # Files in this directory

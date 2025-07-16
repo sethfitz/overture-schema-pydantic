@@ -1,7 +1,5 @@
 """Base schema classes for Overture Maps features."""
 
-from __future__ import annotations
-
 from abc import ABC
 from typing import Annotated, Any
 

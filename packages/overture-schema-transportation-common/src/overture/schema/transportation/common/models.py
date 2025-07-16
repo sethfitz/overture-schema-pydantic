@@ -1,7 +1,7 @@
 """Common transportation theme structures and enums."""
 
 from enum import Enum
-from typing import Annotated, List, Optional, Union
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
@@ -181,19 +181,19 @@ class DestinationWhenClause(HeadingScope):
 class SpeedLimitRule(GeometricRangeScope, ConstraintValidatedModel):
     """Speed limit rule with scoping via when clause."""
 
-    max_speed: Optional[Speed] = Field(None, description="Maximum speed limit")
-    min_speed: Optional[Speed] = Field(None, description="Minimum speed limit")
-    is_max_speed_variable: Optional[bool] = Field(
+    max_speed: Speed | None = Field(None, description="Maximum speed limit")
+    min_speed: Speed | None = Field(None, description="Minimum speed limit")
+    is_max_speed_variable: bool | None = Field(
         None, description="Whether maximum speed is variable"
     )
-    when: Optional[SpeedLimitWhenClause] = Field(None, description="Scoping conditions")
+    when: SpeedLimitWhenClause | None = Field(None, description="Scoping conditions")
 
 
 class AccessRestrictionRule(GeometricRangeScope):
     """Access restriction rule with scoping via when clause."""
 
     access_type: AccessType = Field(..., description="Access type")
-    when: Optional[AccessRestrictionWhenClause] = Field(
+    when: AccessRestrictionWhenClause | None = Field(
         None, description="Scoping conditions"
     )
 
@@ -233,12 +233,10 @@ class DestinationRule(BaseModel):
         ..., description="Final direction on target segment"
     )
     labels: Annotated[
-        List[DestinationLabel], CompositeUniqueConstraint("value", "type")
+        list[DestinationLabel], CompositeUniqueConstraint("value", "type")
     ] = Field(..., min_length=1, description="Destination labels")
-    symbols: Optional[
-        Annotated[List[DestinationSignSymbol], UniqueItemsConstraint()]
-    ] = Field(None, description="Route symbols")
-    when: Optional[DestinationWhenClause] = Field(
+    symbols: Annotated[list[DestinationSignSymbol], UniqueItemsConstraint()] | None = Field(None, description="Route symbols")
+    when: DestinationWhenClause | None = Field(
         None, description="Scoping conditions"
     )
 
@@ -254,7 +252,7 @@ class ProhibitedTransitionRule(GeometricRangeScope):
     """Prohibited transition (turn restriction) rule."""
 
     sequence: Annotated[
-        List[ProhibitedTransitionSequence],
+        list[ProhibitedTransitionSequence],
         CompositeUniqueConstraint("connector_id", "segment_id"),
     ] = Field(
         ...,
@@ -262,7 +260,7 @@ class ProhibitedTransitionRule(GeometricRangeScope):
         description="Sequence of connectors defining the prohibited path",
     )
     final_heading: HeadingType = Field(..., description="Required final heading")
-    when: Optional[ProhibitedTransitionWhenClause] = Field(
+    when: ProhibitedTransitionWhenClause | None = Field(
         None, description="Scoping conditions"
     )
 
@@ -270,7 +268,7 @@ class ProhibitedTransitionRule(GeometricRangeScope):
 class RoadFlagRule(GeometricRangeScope):
     """Road-specific flag rule with geometric scoping only."""
 
-    values: Annotated[List[RoadFlagType], UniqueItemsConstraint()] = Field(
+    values: Annotated[list[RoadFlagType], UniqueItemsConstraint()] = Field(
         ..., min_length=1, description="Road flag values"
     )
 
@@ -278,7 +276,7 @@ class RoadFlagRule(GeometricRangeScope):
 class RailFlagRule(GeometricRangeScope):
     """Rail-specific flag rule with geometric scoping only."""
 
-    values: Annotated[List[RailFlagType], UniqueItemsConstraint()] = Field(
+    values: Annotated[list[RailFlagType], UniqueItemsConstraint()] = Field(
         ..., min_length=1, description="Rail flag values"
     )
 
@@ -286,7 +284,7 @@ class RailFlagRule(GeometricRangeScope):
 class WidthRule(GeometricRangeScope):
     """Width rule with linear referencing."""
 
-    value: Union[int, float] = Field(..., description="Width value")
+    value: int | float = Field(..., description="Width value")
 
 
 class SurfaceRule(GeometricRangeScope):
@@ -310,8 +308,8 @@ class SubclassRule(GeometricRangeScope):
 class RouteReference(GeometricRangeScope):
     """Route reference with linear referencing support."""
 
-    name: Optional[str] = Field(None, description="Route name")
-    network: Optional[str] = Field(None, description="Route network")
-    ref: Optional[str] = Field(None, description="Route reference number")
-    symbol: Optional[str] = Field(None, description="Route symbol URL")
-    wikidata: Optional[WikidataId] = Field(None, description="Wikidata identifier")
+    name: str | None = Field(None, description="Route name")
+    network: str | None = Field(None, description="Route network")
+    ref: str | None = Field(None, description="Route reference number")
+    symbol: str | None = Field(None, description="Route symbol URL")
+    wikidata: WikidataId | None = Field(None, description="Wikidata identifier")

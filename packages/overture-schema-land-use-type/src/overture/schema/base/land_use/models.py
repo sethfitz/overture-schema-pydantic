@@ -1,7 +1,7 @@
 """LandUse feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any
 
 from pydantic import Field
 
@@ -176,17 +176,17 @@ class LandUse(OvertureFeature):
     )
 
     # Optional level field (from levelContainer)
-    level: Optional[int] = Field(None, description="Z-order level")
+    level: int | None = Field(None, description="Z-order level")
 
     # Optional elevation and surface (from base defs)
-    elevation: Optional[float] = Field(None, description="Elevation in meters")
-    surface: Optional[SurfaceMaterial] = Field(None, description="Surface material")
+    elevation: float | None = Field(None, description="Elevation in meters")
+    surface: SurfaceMaterial | None = Field(None, description="Surface material")
 
     # Optional complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
+    names: NamesContainer | None = Field(None, description="Multilingual names")
 
     # Source tags from OpenStreetMap (from osmPropertiesContainer)
-    source_tags: Optional[Dict[str, Any]] = Field(
+    source_tags: dict[str, Any] | None = Field(
         None, description="Source tags from data providers"
     )
 

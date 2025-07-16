@@ -1,7 +1,6 @@
 """Common structures and enums shared across building types."""
 
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -175,26 +174,26 @@ class RoofOrientation(str, Enum):
 class BuildingPart(BaseModel):
     """Building part information."""
 
-    facade_color: Optional[str] = Field(None, description="Facade color")
-    facade_material: Optional[str] = Field(None, description="Facade material")
-    roof_color: Optional[str] = Field(None, description="Roof color")
-    roof_material: Optional[str] = Field(None, description="Roof material")
-    roof_shape: Optional[str] = Field(None, description="Roof shape")
+    facade_color: str | None = Field(None, description="Facade color")
+    facade_material: str | None = Field(None, description="Facade material")
+    roof_color: str | None = Field(None, description="Roof color")
+    roof_material: str | None = Field(None, description="Roof material")
+    roof_shape: str | None = Field(None, description="Roof shape")
 
 
 class PhysicalProperties(BaseModel):
     """Physical properties of buildings."""
 
-    height: Optional[float] = Field(None, ge=0, description="Building height in meters")
-    num_floors: Optional[int] = Field(None, ge=0, description="Number of floors")
-    num_floors_underground: Optional[int] = Field(
+    height: float | None = Field(None, ge=0, description="Building height in meters")
+    num_floors: int | None = Field(None, ge=0, description="Number of floors")
+    num_floors_underground: int | None = Field(
         None, ge=0, description="Number of underground floors"
     )
-    facade_color: Optional[str] = Field(None, description="Primary facade color")
-    facade_material: Optional[str] = Field(None, description="Primary facade material")
-    roof_color: Optional[str] = Field(None, description="Primary roof color")
-    roof_material: Optional[str] = Field(None, description="Primary roof material")
-    roof_shape: Optional[str] = Field(None, description="Primary roof shape")
+    facade_color: str | None = Field(None, description="Primary facade color")
+    facade_material: str | None = Field(None, description="Primary facade material")
+    roof_color: str | None = Field(None, description="Primary roof color")
+    roof_material: str | None = Field(None, description="Primary roof material")
+    roof_shape: str | None = Field(None, description="Primary roof shape")
 
 
 class ConfidenceLevel(str, Enum):

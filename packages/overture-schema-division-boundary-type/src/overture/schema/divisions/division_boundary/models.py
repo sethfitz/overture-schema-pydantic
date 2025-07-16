@@ -1,6 +1,6 @@
 """Division boundary models for Overture Maps divisions theme."""
 
-from typing import Annotated, List, Optional
+from typing import Annotated
 
 from pydantic import Field
 
@@ -42,30 +42,30 @@ class DivisionBoundary(OvertureFeature, ConstraintValidatedModel):
     class_: AreaBoundaryClass = Field(
         ..., alias="class", description="Boundary class (land/maritime)"
     )
-    division_ids: Annotated[List[str], UniqueItemsConstraint()] = Field(
+    division_ids: Annotated[list[str], UniqueItemsConstraint()] = Field(
         ..., min_length=2, max_length=2, description="Two division IDs (left/right)"
     )
 
     # Geographic context
-    country: Optional[CountryCode] = Field(
+    country: CountryCode | None = Field(
         None,
         description="ISO 3166-1 alpha-2 country code (not for country boundaries)",
     )
-    region: Optional[RegionCode] = Field(None, description="ISO 3166-2 region code")
+    region: RegionCode | None = Field(None, description="ISO 3166-2 region code")
 
     # Territorial designation (exclusive or) - strict boolean validation
-    is_land: Optional[bool] = Field(
+    is_land: bool | None = Field(
         None, description="Land boundary designation", strict=True
     )
-    is_territorial: Optional[bool] = Field(
+    is_territorial: bool | None = Field(
         None, description="Territorial boundary designation", strict=True
     )
 
     # Dispute status
-    is_disputed: Optional[bool] = Field(None, description="Boundary is disputed")
+    is_disputed: bool | None = Field(None, description="Boundary is disputed")
 
     # Political and social context
-    perspectives: Optional[Perspectives] = Field(
+    perspectives: Perspectives | None = Field(
         None, description="Political perspectives"
     )
 

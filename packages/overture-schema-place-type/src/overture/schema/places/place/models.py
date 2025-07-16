@@ -1,7 +1,7 @@
 """Place feature models for Overture Maps places theme."""
 
 import re
-from typing import Annotated, Dict, List, Optional
+from typing import Annotated
 
 from pydantic import AnyUrl, BaseModel, EmailStr, Field
 
@@ -33,28 +33,26 @@ class PlaceCategories(BaseModel):
     """Place categories with primary and alternate classification."""
 
     primary: CategoryPattern = Field(..., description="Primary category (required)")
-    alternate: Optional[
-        Annotated[List[CategoryPattern], UniqueItemsConstraint(), MinItemsConstraint(1)]
-    ] = Field(None, description="Alternate categories")
+    alternate: Annotated[list[CategoryPattern], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Alternate categories")
 
 
 class PlaceBrand(BaseModel):
     """Brand information for places."""
 
     names: NamesContainer = Field(..., description="Multilingual brand names")
-    wikidata: Optional[WikidataId] = Field(None, description="Wikidata identifier")
+    wikidata: WikidataId | None = Field(None, description="Wikidata identifier")
 
 
 class PlaceContact(BaseModel):
     """Contact information for places."""
 
-    phone: Optional[PhoneNumber] = Field(
+    phone: PhoneNumber | None = Field(
         None,
         description="Phone number in international format",
     )
-    email: Optional[EmailStr] = Field(None, description="Email address")
-    website: Optional[AnyUrl] = Field(None, description="Website URL")
-    social_media: Optional[Dict[str, AnyUrl]] = Field(
+    email: EmailStr | None = Field(None, description="Email address")
+    website: AnyUrl | None = Field(None, description="Website URL")
+    social_media: dict[str, AnyUrl] | None = Field(
         None, description="Social media profiles"
     )
 
@@ -73,22 +71,22 @@ HoursFormat = Annotated[
 class PlaceOperatingHours(BaseModel):
     """Operating hours for places."""
 
-    monday: Optional[HoursFormat] = Field(None, description="Monday hours")
-    tuesday: Optional[HoursFormat] = Field(None, description="Tuesday hours")
-    wednesday: Optional[HoursFormat] = Field(None, description="Wednesday hours")
-    thursday: Optional[HoursFormat] = Field(None, description="Thursday hours")
-    friday: Optional[HoursFormat] = Field(None, description="Friday hours")
-    saturday: Optional[HoursFormat] = Field(None, description="Saturday hours")
-    sunday: Optional[HoursFormat] = Field(None, description="Sunday hours")
+    monday: HoursFormat | None = Field(None, description="Monday hours")
+    tuesday: HoursFormat | None = Field(None, description="Tuesday hours")
+    wednesday: HoursFormat | None = Field(None, description="Wednesday hours")
+    thursday: HoursFormat | None = Field(None, description="Thursday hours")
+    friday: HoursFormat | None = Field(None, description="Friday hours")
+    saturday: HoursFormat | None = Field(None, description="Saturday hours")
+    sunday: HoursFormat | None = Field(None, description="Sunday hours")
 
 
 class PlaceConfidence(BaseModel):
     """Confidence scores for place data."""
 
-    overall: Optional[ConfidenceScore] = Field(None, description="Overall confidence")
-    location: Optional[ConfidenceScore] = Field(None, description="Location confidence")
-    name: Optional[ConfidenceScore] = Field(None, description="Name confidence")
-    categories: Optional[ConfidenceScore] = Field(
+    overall: ConfidenceScore | None = Field(None, description="Overall confidence")
+    location: ConfidenceScore | None = Field(None, description="Location confidence")
+    name: ConfidenceScore | None = Field(None, description="Name confidence")
+    categories: ConfidenceScore | None = Field(
         None, description="Categories confidence"
     )
 
@@ -101,31 +99,23 @@ class Place(OvertureFeature):
     type: type_literal("place") = Field("place", description="Feature type")
 
     # Optional properties
-    categories: Optional[PlaceCategories] = Field(None, description="Place categories")
+    categories: PlaceCategories | None = Field(None, description="Place categories")
 
     # Optional complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-    brand: Optional[PlaceBrand] = Field(None, description="Brand information")
-    addresses: Optional[Annotated[List[AddressContainer], MinItemsConstraint(1)]] = (
+    names: NamesContainer | None = Field(None, description="Multilingual names")
+    brand: PlaceBrand | None = Field(None, description="Brand information")
+    addresses: Annotated[list[AddressContainer], MinItemsConstraint(1)] | None = (
         Field(None, description="Place addresses")
     )
 
     # Contact information
-    websites: Optional[
-        Annotated[List[str], UniqueItemsConstraint(), MinItemsConstraint(1)]
-    ] = Field(None, description="Website URLs")
-    socials: Optional[
-        Annotated[List[str], UniqueItemsConstraint(), MinItemsConstraint(1)]
-    ] = Field(None, description="Social media URLs")
-    emails: Optional[
-        Annotated[List[EmailStr], UniqueItemsConstraint(), MinItemsConstraint(1)]
-    ] = Field(None, description="Email addresses")
-    phones: Optional[
-        Annotated[List[PhoneNumber], UniqueItemsConstraint(), MinItemsConstraint(1)]
-    ] = Field(None, description="Phone numbers")
+    websites: Annotated[list[str], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Website URLs")
+    socials: Annotated[list[str], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Social media URLs")
+    emails: Annotated[list[EmailStr], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Email addresses")
+    phones: Annotated[list[PhoneNumber], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Phone numbers")
 
     # Quality indicators
-    confidence: Optional[ConfidenceScore] = Field(
+    confidence: ConfidenceScore | None = Field(
         None, description="Confidence score (0.0-1.0)"
     )
 

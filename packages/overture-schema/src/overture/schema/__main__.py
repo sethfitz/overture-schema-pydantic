@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Import model packages to trigger registration
 try:
@@ -27,7 +27,7 @@ except ImportError as e:
 from overture.schema.core.base import _FEATURE_MODELS
 
 
-def generate_json_schemas() -> Dict[str, Any]:
+def generate_json_schemas() -> dict[str, Any]:
     """Generate JSON schemas for all registered Pydantic models."""
     schemas = {}
 
@@ -44,7 +44,7 @@ def generate_json_schemas() -> Dict[str, Any]:
     return schemas
 
 
-def generate_specific_schema(theme: str, feature_type: str) -> Optional[Dict[str, Any]]:
+def generate_specific_schema(theme: str, feature_type: str) -> dict[str, Any] | None:
     """Generate JSON schema for a specific theme-type combination."""
     if (theme, feature_type) not in _FEATURE_MODELS:
         return None

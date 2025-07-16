@@ -1,6 +1,6 @@
 """Division area models for Overture Maps divisions theme."""
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import Field
 
@@ -53,20 +53,20 @@ class DivisionArea(
     country: str = Field(
         ..., pattern=r"^[A-Z]{2}$", description="ISO 3166-1 alpha-2 country code"
     )
-    region: Optional[str] = Field(
+    region: str | None = Field(
         None, pattern=r"^[A-Z]{2}-[A-Z0-9]{1,3}$", description="ISO 3166-2 region code"
     )
 
     # Territorial designation (exclusive or) - strict boolean validation
-    is_land: Optional[bool] = Field(
+    is_land: bool | None = Field(
         None, description="Land area designation", strict=True
     )
-    is_territorial: Optional[bool] = Field(
+    is_territorial: bool | None = Field(
         None, description="Territorial area designation", strict=True
     )
 
     # Complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
+    names: NamesContainer | None = Field(None, description="Multilingual names")
 
     # Geometry
     geometry: Annotated[Geometry, GeometryTypeConstraint("Polygon", "MultiPolygon")] = (

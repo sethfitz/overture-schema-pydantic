@@ -1,7 +1,7 @@
 """Land feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any
 
 from pydantic import Field
 
@@ -95,16 +95,16 @@ class Land(OvertureFeature):
     class_: LandClass = Field(..., alias="class", description="Land class")
 
     # Optional properties
-    elevation: Optional[int] = Field(
+    elevation: int | None = Field(
         None, le=9000, description="Elevation above sea level in meters"
     )
-    surface: Optional[SurfaceMaterial] = Field(None, description="Surface material")
+    surface: SurfaceMaterial | None = Field(None, description="Surface material")
 
     # Complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
+    names: NamesContainer | None = Field(None, description="Multilingual names")
 
     # Source tags from OpenStreetMap
-    source_tags: Optional[Dict[str, Any]] = Field(
+    source_tags: dict[str, Any] | None = Field(
         None, description="Source tags from data providers"
     )
 

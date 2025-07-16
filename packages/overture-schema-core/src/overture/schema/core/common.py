@@ -1,7 +1,7 @@
 """Common container structures for Overture Maps features."""
 
 from enum import Enum
-from typing import Annotated, Dict, List, Literal, Optional
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -39,7 +39,7 @@ class NamePerspectives(BaseModel):
     """Political perspectives for names."""
 
     mode: PerspectiveMode = Field(..., description="Perspective mode")
-    countries: Annotated[List[CountryCode], MinItemsConstraint(1)] = Field(
+    countries: Annotated[list[CountryCode], MinItemsConstraint(1)] = Field(
         ..., description="ISO 3166-1 alpha-2 country codes"
     )
 
@@ -49,16 +49,16 @@ class NameRule(BaseModel):
 
     variant: NameVariant = Field(..., description="Name variant type")
     value: TrimmedString = Field(..., min_length=1, description="Name value")
-    language: Optional[LanguageTag] = Field(
+    language: LanguageTag | None = Field(
         None, description="IETF BCP-47 language tag"
     )
-    perspectives: Optional[NamePerspectives] = Field(
+    perspectives: NamePerspectives | None = Field(
         None, description="Political perspectives"
     )
-    between: Optional[LinearReferenceRange] = Field(
+    between: LinearReferenceRange | None = Field(
         None, description="Linear referencing range"
     )
-    side: Optional[Literal["left", "right"]] = Field(
+    side: Literal["left", "right"] | None = Field(
         None, description="Side specification"
     )
 
@@ -67,10 +67,10 @@ class NamesContainer(ExtensibleBaseModel):
     """Multilingual names container."""
 
     primary: TrimmedString = Field(..., min_length=1, description="Primary name")
-    common: Optional[Dict[LanguageTag, TrimmedString]] = Field(
+    common: dict[LanguageTag, TrimmedString] | None = Field(
         None, description="Common names by language"
     )
-    rules: Optional[List[NameRule]] = Field(None, description="Name rules")
+    rules: list[NameRule] | None = Field(None, description="Name rules")
 
 
 class LinearReferenceRangeContainer(BaseModel):
@@ -82,31 +82,31 @@ class LinearReferenceRangeContainer(BaseModel):
 class AddressLevel(BaseModel):
     """Address level with optional value."""
 
-    value: Optional[str] = Field(None, description="Address level value")
+    value: str | None = Field(None, description="Address level value")
 
 
 class AddressContainer(ExtensibleBaseModel):
     """Address container with flexible admin levels."""
 
-    freeform: Optional[str] = Field(None, description="Freeform address string")
-    locality: Optional[str] = Field(None, description="Locality name")
-    postcode: Optional[str] = Field(None, description="Postal code")
-    region: Optional[RegionCode] = Field(
+    freeform: str | None = Field(None, description="Freeform address string")
+    locality: str | None = Field(None, description="Locality name")
+    postcode: str | None = Field(None, description="Postal code")
+    region: RegionCode | None = Field(
         None, description="ISO 3166-2 subdivision code"
     )
-    country: Optional[CountryCode] = Field(
+    country: CountryCode | None = Field(
         None, description="ISO 3166-1 alpha-2 country code"
     )
-    address_levels: Optional[List[AddressLevel]] = Field(
+    address_levels: list[AddressLevel] | None = Field(
         None, min_length=1, max_length=5, description="Address levels (1-5)"
     )
-    postal_city: Optional[str] = Field(None, description="Postal city if different")
+    postal_city: str | None = Field(None, description="Postal city if different")
 
 
 # Linear Referencing Types and Containers
 
 LinearlyReferencedPosition = float
-LinearlyReferencedRange = List[LinearlyReferencedPosition]
+LinearlyReferencedRange = list[LinearlyReferencedPosition]
 
 
 class TravelMode(str, Enum):
@@ -190,7 +190,7 @@ class VehicleConstraint(BaseModel):
     dimension: VehicleDimension = Field(..., description="Vehicle dimension")
     comparison: VehicleComparison = Field(..., description="Comparison operator")
     value: float = Field(..., description="Constraint value")
-    unit: Optional[str] = Field(None, description="Unit of measurement")
+    unit: str | None = Field(None, description="Unit of measurement")
 
 
 class GeometricRangeScope(ExtensibleBaseModel):
@@ -217,7 +217,7 @@ class GeometricRangeScope(ExtensibleBaseModel):
         ```
     """
 
-    between: Optional[LinearReferenceRange] = Field(
+    between: LinearReferenceRange | None = Field(
         None,
         description="Linear referencing range [start, end] where 0=start, 1=end of feature",
     )
@@ -250,7 +250,7 @@ class TemporalScope(BaseModel):
     See: https://wiki.openstreetmap.org/wiki/Key:opening_hours
     """
 
-    during: Optional[str] = Field(
+    during: str | None = Field(
         None,
         description="Time periods in OSM opening hours format (e.g., 'Mo-Fr 08:00-17:00')",
     )
@@ -281,7 +281,7 @@ class HeadingScope(BaseModel):
         ```
     """
 
-    heading: Optional[Literal["forward", "backward"]] = Field(
+    heading: Literal["forward", "backward"] | None = Field(
         None,
         description="Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
     )
@@ -312,7 +312,7 @@ class TravelModeScope(BaseModel):
         ```
     """
 
-    mode: Optional[Annotated[List[TravelMode], MinItemsConstraint(1)]] = Field(
+    mode: Annotated[list[TravelMode], MinItemsConstraint(1)] | None = Field(
         None,
         description="Transportation modes affected by this rule (car, foot, bike, etc.)",
     )
@@ -343,7 +343,7 @@ class PurposeOfUseScope(BaseModel):
         ```
     """
 
-    using: Optional[Annotated[List[PurposeOfUse], MinItemsConstraint(1)]] = Field(
+    using: Annotated[list[PurposeOfUse], MinItemsConstraint(1)] | None = Field(
         None,
         description="Purpose of travel (to_deliver, at_destination, for_through_traffic, etc.)",
     )
@@ -374,7 +374,7 @@ class RecognizedStatusScope(BaseModel):
         ```
     """
 
-    recognized: Optional[Annotated[List[RecognizedStatus], MinItemsConstraint(1)]] = (
+    recognized: Annotated[list[RecognizedStatus], MinItemsConstraint(1)] | None = (
         Field(
             None,
             description="Legal or social recognition status (as_private, as_employee, as_public, etc.)",
@@ -419,7 +419,7 @@ class VehicleScope(BaseModel):
         ```
     """
 
-    vehicle: Optional[Annotated[List[VehicleConstraint], MinItemsConstraint(1)]] = (
+    vehicle: Annotated[list[VehicleConstraint], MinItemsConstraint(1)] | None = (
         Field(
             None,
             description="Physical vehicle constraints (weight, height, width, length limits)",

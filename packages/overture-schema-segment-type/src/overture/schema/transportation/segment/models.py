@@ -1,6 +1,6 @@
 """Segment feature models for Overture Maps transportation theme."""
 
-from typing import Annotated, List, Literal, Optional
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -70,17 +70,17 @@ class LevelRule(GeometricRangeScope):
     value: int = Field(
         ..., description="Level value (0=ground, positive=above, negative=below)"
     )
-    when: Optional[ScopingConditions] = Field(None, description="Scoping conditions")
+    when: ScopingConditions | None = Field(None, description="Scoping conditions")
 
 
 class RailFlags(BaseModel):
     """Rail-specific boolean flags."""
 
-    is_bridge: Optional[bool] = Field(None, description="Is bridge")
-    is_tunnel: Optional[bool] = Field(None, description="Is tunnel")
-    is_seasonal: Optional[bool] = Field(None, description="Is seasonal")
-    is_construction: Optional[bool] = Field(None, description="Under construction")
-    service: Optional[Literal["yard", "siding", "spur", "crossover"]] = Field(
+    is_bridge: bool | None = Field(None, description="Is bridge")
+    is_tunnel: bool | None = Field(None, description="Is tunnel")
+    is_seasonal: bool | None = Field(None, description="Is seasonal")
+    is_construction: bool | None = Field(None, description="Under construction")
+    service: Literal["yard", "siding", "spur", "crossover"] | None = Field(
         None, description="Rail service type"
     )
 
@@ -108,62 +108,58 @@ class Segment(OvertureFeature, ConstraintValidatedModel):
     subtype: SegmentSubtype = Field(..., description="Transportation segment subtype")
 
     # Optional complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
+    names: NamesContainer | None = Field(None, description="Multilingual names")
 
     # Optional basic properties
-    level: Optional[int] = Field(None, description="Z-order level")
+    level: int | None = Field(None, description="Z-order level")
 
     # Connector references
-    connectors: Optional[
-        Annotated[
-            List[ConnectorReference], CompositeUniqueConstraint("connector_id", "at")
-        ]
-    ] = Field(None, description="Connector references")
+    connectors: Annotated[list[ConnectorReference], CompositeUniqueConstraint("connector_id", "at")] | None = Field(None, description="Connector references")
 
     # Route references (strict typed with linear referencing)
-    routes: Optional[List[StrictRouteReference]] = Field(
+    routes: list[StrictRouteReference] | None = Field(
         None, description="Route references"
     )
 
     # Subtype-specific classification (conditional required)
-    class_: Optional[str] = Field(None, alias="class", description="Segment class")
-    subclass: Optional[str] = Field(None, description="Segment subclass")
+    class_: str | None = Field(None, alias="class", description="Segment class")
+    subclass: str | None = Field(None, description="Segment subclass")
 
     # Subclass rules
-    subclass_rules: Optional[List[StrictSubclassRule]] = Field(
+    subclass_rules: list[StrictSubclassRule] | None = Field(
         None, description="Subclass rules"
     )
 
     # Advanced linear referencing properties (strict typed)
-    speed_limits: Optional[List[StrictSpeedLimitRule]] = Field(
+    speed_limits: list[StrictSpeedLimitRule] | None = Field(
         None, description="Speed limit rules"
     )
-    access_restrictions: Optional[List[StrictAccessRestrictionRule]] = Field(
+    access_restrictions: list[StrictAccessRestrictionRule] | None = Field(
         None, description="Access restriction rules"
     )
-    road_surface: Optional[List[StrictSurfaceRule]] = Field(
+    road_surface: list[StrictSurfaceRule] | None = Field(
         None, description="Road surface rules"
     )
-    level_rules: Optional[List[StrictLevelRule]] = Field(
+    level_rules: list[StrictLevelRule] | None = Field(
         None, description="Level/elevation rules"
     )
-    width_rules: Optional[Annotated[List[StrictWidthRule], MinItemsConstraint(1)]] = (
+    width_rules: Annotated[list[StrictWidthRule], MinItemsConstraint(1)] | None = (
         Field(None, description="Width rules")
     )
 
     # Subtype-specific flags (strict typed)
-    road_flags: Optional[List[StrictRoadFlagRule]] = Field(
+    road_flags: list[StrictRoadFlagRule] | None = Field(
         None, description="Road-specific flags"
     )
-    rail_flags: Optional[List[StrictRailFlagRule]] = Field(
+    rail_flags: list[StrictRailFlagRule] | None = Field(
         None, description="Rail-specific flags"
     )
 
     # Advanced transportation features (strict typed)
-    destinations: Optional[List[StrictDestinationRule]] = Field(
+    destinations: list[StrictDestinationRule] | None = Field(
         None, description="Destination labels"
     )
-    prohibited_transitions: Optional[List[StrictProhibitedTransitionRule]] = Field(
+    prohibited_transitions: list[StrictProhibitedTransitionRule] | None = Field(
         None, description="Turn restrictions"
     )
 

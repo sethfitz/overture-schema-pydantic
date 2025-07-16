@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import (
     GetCoreSchemaHandler,
@@ -291,8 +291,8 @@ _MULTI_POLYGON_COORDINATES_JSON_SCHEMA = {
 
 def geometry_json_schema(
     geometry_type: str,
-    coordinates: Optional[dict[str, Any]] = None,
-    geometries: Optional[dict[str, Any]] = None,
+    coordinates: dict[str, Any] | None = None,
+    geometries: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     properties = {
         "type": {

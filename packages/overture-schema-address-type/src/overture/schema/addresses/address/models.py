@@ -1,6 +1,6 @@
 """Address feature models for Overture Maps addresses theme."""
 
-from typing import Annotated, List, Optional
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
@@ -25,7 +25,7 @@ from overture.schema.validation import (
 class AddressLevel(BaseModel):
     """Single administrative level in address hierarchy."""
 
-    value: Optional[Annotated[str, WhitespaceConstraint()]] = Field(
+    value: Annotated[str, WhitespaceConstraint()] | None = Field(
         None,
         min_length=1,
         description="Administrative level value (no leading/trailing whitespace)",
@@ -44,34 +44,34 @@ class Address(OvertureFeature):
         ..., description="ISO 3166-1 alpha-2 country code"
     )
     address_levels: Annotated[
-        List[AddressLevel], MinItemsConstraint(1), MaxItemsConstraint(5)
+        list[AddressLevel], MinItemsConstraint(1), MaxItemsConstraint(5)
     ] = Field(
         ...,
         description="Administrative levels (1-5), ordered highest first",
     )
 
     # Optional address components
-    postcode: Optional[Annotated[str, WhitespaceConstraint()]] = Field(
+    postcode: Annotated[str, WhitespaceConstraint()] | None = Field(
         None,
         min_length=1,
         description="Postal/ZIP code (no leading/trailing whitespace)",
     )
-    street: Optional[Annotated[str, WhitespaceConstraint()]] = Field(
+    street: Annotated[str, WhitespaceConstraint()] | None = Field(
         None,
         min_length=1,
         description="Street name (no leading/trailing whitespace)",
     )
-    number: Optional[Annotated[str, WhitespaceConstraint()]] = Field(
+    number: Annotated[str, WhitespaceConstraint()] | None = Field(
         None,
         min_length=1,
         description="House/building number (no leading/trailing whitespace)",
     )
-    unit: Optional[Annotated[str, WhitespaceConstraint()]] = Field(
+    unit: Annotated[str, WhitespaceConstraint()] | None = Field(
         None,
         min_length=1,
         description="Suite/apartment/floor number (no leading/trailing whitespace)",
     )
-    postal_city: Optional[Annotated[str, WhitespaceConstraint()]] = Field(
+    postal_city: Annotated[str, WhitespaceConstraint()] | None = Field(
         None,
         min_length=1,
         description="Alternative city name for mailing (no leading/trailing whitespace)",

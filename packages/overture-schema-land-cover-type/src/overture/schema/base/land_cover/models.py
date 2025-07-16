@@ -1,7 +1,7 @@
 """LandCover feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import Field
 
@@ -46,15 +46,15 @@ class LandCover(OvertureFeature):
     subtype: LandCoverSubtype = Field(..., description="Type of surface represented")
 
     # Optional level field (from levelContainer)
-    level: Optional[int] = Field(None, description="Z-order level")
+    level: int | None = Field(None, description="Z-order level")
 
     # Optional cartography container
-    cartography: Optional[CartographyContainer] = Field(
+    cartography: CartographyContainer | None = Field(
         None, description="Cartographic display hints"
     )
 
     # Optional complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
+    names: NamesContainer | None = Field(None, description="Multilingual names")
 
     # Geometry constraints - Polygon or MultiPolygon
     geometry: Annotated[Geometry, GeometryTypeConstraint("Polygon", "MultiPolygon")] = (

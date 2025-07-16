@@ -1,7 +1,7 @@
 """Water feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any
 
 from pydantic import Field
 
@@ -88,21 +88,21 @@ class Water(OvertureFeature):
     class_: WaterClass = Field(..., alias="class", description="Water class")
 
     # Optional properties
-    is_salt: Optional[bool] = Field(None, description="Is it salt water or not")
-    is_intermittent: Optional[bool] = Field(
+    is_salt: bool | None = Field(None, description="Is it salt water or not")
+    is_intermittent: bool | None = Field(
         None, description="Is it intermittent water or not"
     )
 
     # Complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
+    names: NamesContainer | None = Field(None, description="Multilingual names")
 
     # Source tags from OpenStreetMap
-    source_tags: Optional[Dict[str, Any]] = Field(
+    source_tags: dict[str, Any] | None = Field(
         None, description="Source tags from data providers"
     )
 
     # External identifiers
-    wikidata: Optional[str] = Field(None, description="Wikidata identifier")
+    wikidata: str | None = Field(None, description="Wikidata identifier")
 
     geometry: Annotated[
         Geometry,

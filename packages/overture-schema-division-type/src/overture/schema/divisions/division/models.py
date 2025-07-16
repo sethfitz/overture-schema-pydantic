@@ -1,6 +1,6 @@
 """Division models for Overture Maps divisions theme."""
 
-from typing import Annotated, Dict, List, Optional
+from typing import Annotated
 
 from pydantic import Field
 
@@ -47,9 +47,9 @@ class Division(OvertureFeature, ConstraintValidatedModel):
 
     # Administrative hierarchy - each hierarchy must have unique items and at least one item
     hierarchies: Annotated[
-        List[
+        list[
             Annotated[
-                List[HierarchyItem], MinItemsConstraint(1), UniqueItemsConstraint()
+                list[HierarchyItem], MinItemsConstraint(1), UniqueItemsConstraint()
             ]
         ],
         MinItemsConstraint(1),
@@ -57,45 +57,39 @@ class Division(OvertureFeature, ConstraintValidatedModel):
 
     # Geographic context
     country: CountryCode = Field(..., description="ISO 3166-1 alpha-2 country code")
-    region: Optional[RegionCode] = Field(None, description="ISO 3166-2 region code")
+    region: RegionCode | None = Field(None, description="ISO 3166-2 region code")
 
     # Relationships
-    parent_division_id: Optional[NoWhitespaceString] = Field(
+    parent_division_id: NoWhitespaceString | None = Field(
         None, min_length=1, description="Parent division identifier"
     )
-    capital_division_ids: Optional[
-        Annotated[List[NoWhitespaceString], UniqueItemsConstraint()]
-    ] = Field(None, min_length=1, description="Capital division identifiers")
-    capital_of_divisions: Optional[
-        Annotated[
-            List[CapitalOfDivisionItem], MinItemsConstraint(1), UniqueItemsConstraint()
-        ]
-    ] = Field(None, description="Divisions this is capital of")
+    capital_division_ids: Annotated[list[NoWhitespaceString], UniqueItemsConstraint()] | None = Field(None, min_length=1, description="Capital division identifiers")
+    capital_of_divisions: Annotated[list[CapitalOfDivisionItem], MinItemsConstraint(1), UniqueItemsConstraint()] | None = Field(None, description="Divisions this is capital of")
 
     # Political and social context
-    perspectives: Optional[Perspectives] = Field(
+    perspectives: Perspectives | None = Field(
         None, description="Political perspectives"
     )
-    norms: Optional[Norms] = Field(None, description="Local norms")
+    norms: Norms | None = Field(None, description="Local norms")
 
     # Localization
-    local_type: Optional[Dict[str, str]] = Field(
+    local_type: dict[str, str] | None = Field(
         None, description="Localized subtype name"
     )
 
     # Population and ranking
-    population: Optional[int] = Field(None, ge=0, description="Population count")
-    prominence: Optional[float] = Field(
+    population: int | None = Field(None, ge=0, description="Population count")
+    prominence: float | None = Field(
         None, ge=0.0, le=1.0, description="Prominence score (0.0-1.0)"
     )
 
     # Optional classification
-    class_: Optional[DivisionClass] = Field(
+    class_: DivisionClass | None = Field(
         None, alias="class", description="Division class designation"
     )
 
     # Complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
+    names: NamesContainer | None = Field(None, description="Multilingual names")
     cartography: CartographyContainer | None = Field(
         None, description="Cartographic display hints"
     )

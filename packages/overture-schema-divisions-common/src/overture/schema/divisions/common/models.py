@@ -1,7 +1,7 @@
 """Common divisions theme structures and enums."""
 
 from enum import Enum
-from typing import Annotated, List, Optional
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
@@ -60,7 +60,7 @@ class Perspectives(BaseModel):
     """Political perspectives container."""
 
     mode: PerspectiveMode = Field(..., description="Perspective validation mode")
-    countries: Annotated[List[CountryCode], UniqueItemsConstraint()] = Field(
+    countries: Annotated[list[CountryCode], UniqueItemsConstraint()] = Field(
         ..., min_length=1, description="ISO 3166-1 alpha-2 country codes"
     )
 
@@ -107,7 +107,7 @@ class CapitalOfDivisionItem(BaseModel):
 class Norms(BaseModel):
     """Local norms and standards."""
 
-    driving_side: Optional[Side] = Field(
+    driving_side: Side | None = Field(
         None, description="Driving side (inheritable from parent)"
     )
 
