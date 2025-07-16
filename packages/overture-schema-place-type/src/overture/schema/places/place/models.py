@@ -7,12 +7,10 @@ from pydantic import AnyUrl, BaseModel, EmailStr, Field
 
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.common import (
     AddressContainer,
-    AdvancedSourceItem,
     NamesContainer,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
@@ -95,8 +93,8 @@ class PlaceConfidence(BaseModel):
     )
 
 
-class PlaceProperties(OvertureFeatureProperties):
-    """Properties specific to place features."""
+class Place(OvertureFeature):
+    """Place feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("places") = Field("places", description="Feature theme")
@@ -110,11 +108,6 @@ class PlaceProperties(OvertureFeatureProperties):
     brand: Optional[PlaceBrand] = Field(None, description="Brand information")
     addresses: Optional[Annotated[List[AddressContainer], MinItemsConstraint(1)]] = (
         Field(None, description="Place addresses")
-    )
-
-    # Override sources to use advanced source items
-    sources: Optional[Annotated[List[AdvancedSourceItem], MinItemsConstraint(1)]] = (
-        Field(None, description="Advanced source information")
     )
 
     # Contact information
@@ -136,11 +129,7 @@ class PlaceProperties(OvertureFeatureProperties):
         None, description="Confidence score (0.0-1.0)"
     )
 
-
-class Place(OvertureFeature):
-    """Place feature model."""
-
-    properties: PlaceProperties = Field(..., description="Place feature properties")
+    # Geometry
     geometry: Annotated[Geometry, GeometryTypeConstraint("Point")] = Field(
         ..., description="Geometry (Point)"
     )

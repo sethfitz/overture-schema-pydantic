@@ -1,18 +1,16 @@
 """Land feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, Optional
 
 from pydantic import Field
 
 from overture.schema.base.common import SurfaceMaterial
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.common import (
-    AdvancedSourceItem,
     NamesContainer,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
@@ -87,8 +85,8 @@ class LandClass(str, Enum):
     WOOD = "wood"
 
 
-class LandProperties(OvertureFeatureProperties):
-    """Properties specific to land features."""
+class Land(OvertureFeature):
+    """Land feature model."""
 
     # Required properties
     theme: Annotated[str, theme_literal("base")] = "base"
@@ -104,20 +102,12 @@ class LandProperties(OvertureFeatureProperties):
 
     # Complex containers
     names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
-    )
 
     # Source tags from OpenStreetMap
     source_tags: Optional[Dict[str, Any]] = Field(
         None, description="Source tags from data providers"
     )
 
-
-class Land(OvertureFeature):
-    """Land feature model."""
-
-    properties: LandProperties = Field(..., description="Land feature properties")
     geometry: Annotated[
         Geometry,
         GeometryTypeConstraint("Point", "LineString", "Polygon", "MultiPolygon"),

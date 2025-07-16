@@ -1,155 +1,5 @@
 {
   "$defs": {
-    "AdvancedSourceItem": {
-      "description": "Advanced source information with linear referencing support.",
-      "properties": {
-        "between": {
-          "anyOf": [
-            {
-              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
-              "items": {
-                "maximum": 1.0,
-                "minimum": 0.0,
-                "type": "number"
-              },
-              "maxItems": 2,
-              "minItems": 2,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Linear referencing range",
-          "title": "Between"
-        },
-        "confidence": {
-          "anyOf": [
-            {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Confidence value for ML-derived data",
-          "title": "Confidence"
-        },
-        "dataset": {
-          "description": "Source dataset identifier",
-          "title": "Dataset",
-          "type": "string"
-        },
-        "property": {
-          "description": "JSON Pointer to the property",
-          "title": "Property",
-          "type": "string"
-        },
-        "record_id": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Specific record within dataset",
-          "title": "Record Id"
-        },
-        "update_time": {
-          "anyOf": [
-            {
-              "description": "ISO 8601 datetime",
-              "format": "date-time",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "When this property was last updated (ISO 8601)",
-          "title": "Update Time"
-        }
-      },
-      "required": [
-        "property",
-        "dataset"
-      ],
-      "title": "AdvancedSourceItem",
-      "type": "object"
-    },
-    "CartographyContainer": {
-      "description": "Cartographic hints for optimal map display.",
-      "properties": {
-        "max_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Maximum recommended zoom level",
-          "title": "Max Zoom"
-        },
-        "min_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Minimum recommended zoom level",
-          "title": "Min Zoom"
-        },
-        "prominence": {
-          "anyOf": [
-            {
-              "maximum": 100,
-              "minimum": 1,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Feature significance/importance",
-          "title": "Prominence"
-        },
-        "sort_key": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Drawing order (lower = on top)",
-          "title": "Sort Key"
-        }
-      },
-      "title": "CartographyContainer",
-      "type": "object"
-    },
     "LandClass": {
       "description": "Land class classification.",
       "enum": [
@@ -198,124 +48,6 @@
       ],
       "title": "LandClass",
       "type": "string"
-    },
-    "LandProperties": {
-      "additionalProperties": true,
-      "description": "Properties specific to land features.",
-      "properties": {
-        "cartography": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CartographyContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Cartographic display hints"
-        },
-        "class": {
-          "$ref": "#/$defs/LandClass",
-          "description": "Land class"
-        },
-        "elevation": {
-          "anyOf": [
-            {
-              "maximum": 9000,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Elevation above sea level in meters",
-          "title": "Elevation"
-        },
-        "names": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/NamesContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Multilingual names"
-        },
-        "source_tags": {
-          "anyOf": [
-            {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Source tags from data providers",
-          "title": "Source Tags"
-        },
-        "sources": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/AdvancedSourceItem"
-              },
-              "minItems": 1,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Advanced source information",
-          "title": "Sources"
-        },
-        "subtype": {
-          "$ref": "#/$defs/LandSubtype",
-          "description": "Land subtype"
-        },
-        "surface": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/SurfaceMaterial"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Surface material"
-        },
-        "theme": {
-          "default": "base",
-          "title": "Theme",
-          "type": "string"
-        },
-        "type": {
-          "default": "land",
-          "title": "Type",
-          "type": "string"
-        },
-        "version": {
-          "description": "Feature version number",
-          "minimum": 0,
-          "title": "Version",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "version",
-        "subtype",
-        "class"
-      ],
-      "title": "LandProperties",
-      "type": "object"
     },
     "LandSubtype": {
       "description": "Land subtype classification.",
@@ -523,6 +255,91 @@
       "title": "PerspectiveMode",
       "type": "string"
     },
+    "SourceItem": {
+      "description": "Source information for a specific property with optional linear referencing.",
+      "properties": {
+        "between": {
+          "anyOf": [
+            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
+              "items": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear referencing range",
+          "title": "Between"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "title": "Confidence"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id"
+        },
+        "update_time": {
+          "anyOf": [
+            {
+              "description": "ISO 8601 datetime",
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When this property was last updated",
+          "title": "Update Time"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
+    },
     "SurfaceMaterial": {
       "description": "Surface material enum used by infrastructure and land features.",
       "enum": [
@@ -555,8 +372,27 @@
       "type": "string"
     }
   },
+  "additionalProperties": true,
   "description": "Land feature model.",
   "properties": {
+    "class": {
+      "$ref": "#/$defs/LandClass",
+      "description": "Land class"
+    },
+    "elevation": {
+      "anyOf": [
+        {
+          "maximum": 9000,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Elevation above sea level in meters",
+      "title": "Elevation"
+    },
     "geometry": {
       "description": "Geometry (Point, LineString, Polygon, or MultiPolygon)",
       "oneOf": [
@@ -701,22 +537,88 @@
       "title": "Id",
       "type": "string"
     },
-    "properties": {
-      "$ref": "#/$defs/LandProperties",
-      "description": "Land feature properties"
+    "names": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NamesContainer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Multilingual names"
+    },
+    "source_tags": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source tags from data providers",
+      "title": "Source Tags"
+    },
+    "sources": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source information",
+      "title": "Sources"
+    },
+    "subtype": {
+      "$ref": "#/$defs/LandSubtype",
+      "description": "Land subtype"
+    },
+    "surface": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SurfaceMaterial"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Surface material"
+    },
+    "theme": {
+      "default": "base",
+      "title": "Theme",
+      "type": "string"
     },
     "type": {
-      "const": "Feature",
-      "default": "Feature",
-      "description": "GeoJSON type",
+      "default": "land",
       "title": "Type",
       "type": "string"
+    },
+    "version": {
+      "description": "Feature version number",
+      "minimum": 0,
+      "title": "Version",
+      "type": "integer"
     }
   },
   "required": [
     "id",
     "geometry",
-    "properties"
+    "version",
+    "subtype",
+    "class"
   ],
   "title": "Land",
   "type": "object"

@@ -2,7 +2,6 @@
 
 # Re-export everything from the buildings-common package for backward compatibility
 from overture.schema.buildings.common import (
-    BaseBuildingProperties,
     BuildingClass,
     BuildingPart,
     BuildingSubtype,
@@ -24,5 +23,4 @@ __all__ = [
     "BuildingPart",
     "PhysicalProperties",
     "ConfidenceLevel",
-    "BaseBuildingProperties",
 ]

@@ -86,9 +86,7 @@ class GeometryTypeConstraint:
         if len(self.allowed_types) == 1:
             return _GEOMETRY_JSON_SCHEMA[self.allowed_types[0]]
         else:
-            allowed_schemas = tuple(
-                _GEOMETRY_JSON_SCHEMA[x] for x in self.allowed_types
-            )
+            allowed_schemas = [_GEOMETRY_JSON_SCHEMA[x] for x in self.allowed_types]
             return {
                 "oneOf": allowed_schemas,
             }
@@ -344,14 +342,14 @@ _MULTI_POLYGON_GEOMETRY_JSON_SCHEMA = geometry_json_schema(
 _GEOMETRY_COLLECTION_JSON_SCHEMA = geometry_json_schema(
     "GeometryCollection",
     geometries={
-        "oneOf": (
+        "oneOf": [
             _LINE_STRING_GEOMETRY_JSON_SCHEMA,
             _POINT_GEOMETRY_JSON_SCHEMA,
             _POLYGON_GEOMETRY_JSON_SCHEMA,
             _MULTI_LINE_STRING_GEOMETRY_JSON_SCHEMA,
             _MULTI_POINT_GEOMETRY_JSON_SCHEMA,
             _MULTI_POLYGON_GEOMETRY_JSON_SCHEMA,
-        )
+        ]
     },
 )
 

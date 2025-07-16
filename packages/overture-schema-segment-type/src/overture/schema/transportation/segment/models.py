@@ -6,11 +6,9 @@ from pydantic import BaseModel, Field
 
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.common import (
-    AdvancedSourceItem,
     GeometricRangeScope,
     NamesContainer,
     ScopingConditions,
@@ -97,8 +95,8 @@ class RailFlags(BaseModel):
         "rail": [e.value for e in RailClass],
     },
 )
-class SegmentProperties(ConstraintValidatedModel, OvertureFeatureProperties):
-    """Properties specific to segment features."""
+class Segment(OvertureFeature, ConstraintValidatedModel):
+    """Segment feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("transportation") = Field(
@@ -111,11 +109,6 @@ class SegmentProperties(ConstraintValidatedModel, OvertureFeatureProperties):
 
     # Optional complex containers
     names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-
-    # Override sources to use advanced source items
-    sources: Optional[Annotated[List[AdvancedSourceItem], MinItemsConstraint(1)]] = (
-        Field(None, description="Advanced source information")
-    )
 
     # Optional basic properties
     level: Optional[int] = Field(None, description="Z-order level")
@@ -174,11 +167,6 @@ class SegmentProperties(ConstraintValidatedModel, OvertureFeatureProperties):
         None, description="Turn restrictions"
     )
 
-
-class Segment(OvertureFeature):
-    """Segment feature model."""
-
-    properties: SegmentProperties = Field(..., description="Segment feature properties")
     geometry: Annotated[Geometry, GeometryTypeConstraint("LineString")] = Field(
         ..., description="Geometry (LineString)"
     )

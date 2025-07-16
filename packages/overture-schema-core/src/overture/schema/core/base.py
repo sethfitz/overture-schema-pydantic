@@ -5,13 +5,16 @@ from __future__ import annotations
 from abc import ABC
 from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_serializer, model_validator
 
 from overture.schema.validation import (
-    LiteralValueConstraint,
     MinItemsConstraint,
 )
-from overture.schema.validation.types import ISO8601DateTime, JSONPointer
+from overture.schema.validation.types import (
+    ISO8601DateTime,
+    JSONPointer,
+    LinearReferenceRange,
+)
 
 from .geometry import Geometry
 
@@ -81,8 +84,8 @@ def validate_theme_type_compatibility(theme: str, feature_type: str) -> bool:
     return feature_type in _THEME_TYPE_MAPPING[theme]
 
 
-class SourcePropertyItem(BaseModel):
-    """Source information for a specific property."""
+class SourceItem(BaseModel):
+    """Source information for a specific property with optional linear referencing."""
 
     property: JSONPointer = Field(..., description="JSON Pointer to the property")
     dataset: str = Field(..., description="Source dataset identifier")
@@ -92,6 +95,9 @@ class SourcePropertyItem(BaseModel):
     )
     confidence: float | None = Field(
         None, ge=0, le=1, description="Confidence value for ML-derived data"
+    )
+    between: LinearReferenceRange | None = Field(
+        None, description="Linear referencing range"
     )
 
 
@@ -127,29 +133,36 @@ class ExtensibleBaseModel(BaseModel):
         return self
 
 
-class OvertureFeatureProperties(ExtensibleBaseModel):
-    """Base properties for all Overture features."""
+class OvertureFeature(ExtensibleBaseModel, ABC):
+    """Base class for all Overture features."""
 
+    id: str = Field(..., min_length=1, description="Feature identifier")
+    geometry: Geometry = Field(..., description="Geometry")
     theme: str = Field(..., description="Top-level Overture theme")
     type: str = Field(..., description="Specific feature type within theme")
     version: int = Field(..., ge=0, description="Feature version number")
-    sources: Annotated[list[SourcePropertyItem], MinItemsConstraint(1)] | None = Field(
+    sources: Annotated[list[SourceItem], MinItemsConstraint(1)] | None = Field(
         None, description="Source information"
     )
-    cartography: CartographyContainer | None = Field(
-        None, description="Cartographic display hints"
-    )
 
+    @model_serializer(mode="wrap")
+    def serialize_model(self, serializer, info):
+        """Serialize to flattened structure for Python, GeoJSON for JSON."""
+        # Get the default serialization
+        data = serializer(self)
 
-class OvertureFeature(BaseModel, ABC):
-    """Base class for all Overture features (GeoJSON Feature structure)."""
-
-    id: str = Field(..., min_length=1, description="Feature identifier")
-    type: Annotated[str, LiteralValueConstraint("Feature", "type")] = Field(
-        "Feature", description="GeoJSON type"
-    )
-    geometry: Geometry = Field(..., description="Geometry")
-    properties: OvertureFeatureProperties = Field(..., description="Feature properties")
+        # Check the serialization mode/context
+        if info.mode == "json":
+            # Transform to GeoJSON structure for JSON output
+            return {
+                "type": "Feature",
+                "id": data.pop("id"),
+                "geometry": data.pop("geometry"),
+                "properties": data,  # All remaining fields go into properties
+            }
+        else:
+            # Return flattened structure for Python output
+            return data
 
 
 def register_model(
@@ -166,33 +179,50 @@ def get_registered_model(theme: str, feature_type: str) -> type[BaseModel] | Non
     return _FEATURE_MODELS.get((theme, feature_type))
 
 
-def parse_feature(feature: dict[str, Any]) -> dict[str, Any] | None:
+def parse_feature(feature: dict[str, Any], mode: str = "json") -> dict[str, Any] | None:
     """
-    Parse and validate a feature, returning the parsed dictionary representation.
+    Parse and validate a feature, returning the parsed representation in specified mode.
 
-    This function validates the feature and returns the dictionary representation
-    of the parsed Pydantic model, which can be compared with the original.
+    Args:
+        feature: Feature data (GeoJSON or flattened format)
+        mode: Output mode - "json" for GeoJSON format, "python" for flattened format
+
+    Returns:
+        Parsed feature in the specified format
+
+    Supports both GeoJSON format (with nested properties) and flattened format.
     """
     try:
         # Basic structure validation
         if not isinstance(feature, dict):
             raise ValueError("Feature must be an object")
 
-        if feature.get("type") != "Feature":
-            raise ValueError("Feature type must be 'Feature'")
+        # Detect format and normalize to flattened structure
+        if "properties" in feature and feature.get("type") == "Feature":
+            # GeoJSON format - flatten it
+            flattened_feature = {
+                "id": feature["id"],
+                "geometry": feature["geometry"],
+                **feature["properties"],  # Flatten properties into top level
+            }
+        else:
+            # Already flattened format
+            flattened_feature = feature.copy()
 
-        if "properties" not in feature:
-            raise ValueError("Feature must have properties")
+        theme = flattened_feature.get("theme")
+        feature_type = flattened_feature.get("type")
 
-        properties = feature["properties"]
-        theme = properties.get("theme")
-        feature_type = properties.get("type")
+        # Basic required field validation
+        if not theme:
+            raise ValueError("Missing required field: theme")
+        if not feature_type:
+            raise ValueError("Missing required field: type")
 
         # Check if theme and feature type are registered
-        if theme and not validate_theme(theme):
+        if not validate_theme(theme):
             raise ValueError(f"Unknown theme: {theme}")
 
-        if feature_type and not validate_feature_type(feature_type):
+        if not validate_feature_type(feature_type):
             raise ValueError(f"Unknown feature type: {feature_type}")
 
         # Try theme-type compatibility validation first
@@ -205,16 +235,19 @@ def parse_feature(feature: dict[str, Any]) -> dict[str, Any] | None:
         model_class = get_registered_model(theme, feature_type)
         if model_class:
             try:
-                # Parse with Pydantic model and return as dict
-                parsed_model = model_class.model_validate(feature)
+                # Parse with Pydantic model using flattened structure
+                parsed_model = model_class.model_validate(flattened_feature)
+                # Return in requested mode
                 return parsed_model.model_dump(
-                    exclude_none=True, mode="json", by_alias=True
+                    exclude_none=True, mode=mode, by_alias=True
                 )
             except Exception as e:
                 raise ValueError(f"Pydantic validation failed: {str(e)}") from e
 
-        # If no model is registered, return None (since it didn't parse)
-        return None
+        # If no model is registered, it's an error
+        raise ValueError(
+            f"No registered model found for theme='{theme}', type='{feature_type}'"
+        )
 
     except Exception as e:
         raise ValueError(str(e)) from e

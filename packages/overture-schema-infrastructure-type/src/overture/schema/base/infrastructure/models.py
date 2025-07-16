@@ -1,18 +1,16 @@
 """Infrastructure feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, Optional
 
 from pydantic import Field
 
 from overture.schema.base.common import SurfaceMaterial
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.common import (
-    AdvancedSourceItem,
     NamesContainer,
 )
 from overture.schema.validation import (
@@ -84,8 +82,8 @@ class InfrastructureClass(str, Enum):
     # Add more classes as needed - this is a subset for now
 
 
-class InfrastructureProperties(OvertureFeatureProperties):
-    """Properties specific to infrastructure features."""
+class Infrastructure(OvertureFeature):
+    """Infrastructure feature model."""
 
     # Required properties with constraint-based validation
     theme: Annotated[str, theme_literal("base")] = Field(
@@ -107,21 +105,10 @@ class InfrastructureProperties(OvertureFeatureProperties):
 
     # Complex containers
     names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
-    )
 
     # Source tags from OpenStreetMap
     source_tags: Optional[Dict[str, Any]] = Field(
         None, description="Source tags from data providers"
-    )
-
-
-class Infrastructure(OvertureFeature):
-    """Infrastructure feature model."""
-
-    properties: InfrastructureProperties = Field(
-        ..., description="Infrastructure feature properties"
     )
 
 

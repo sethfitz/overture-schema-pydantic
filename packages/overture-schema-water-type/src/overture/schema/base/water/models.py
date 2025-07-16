@@ -1,17 +1,15 @@
 """Water feature models for Overture Maps base theme."""
 
 from enum import Enum
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, Optional
 
 from pydantic import Field
 
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.common import (
-    AdvancedSourceItem,
     NamesContainer,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
@@ -78,8 +76,8 @@ class WaterClass(str, Enum):
     WATERFALL = "waterfall"
 
 
-class WaterProperties(OvertureFeatureProperties):
-    """Properties specific to water features."""
+class Water(OvertureFeature):
+    """Water feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("base") = Field("base", description="Feature theme")
@@ -97,9 +95,6 @@ class WaterProperties(OvertureFeatureProperties):
 
     # Complex containers
     names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
-    )
 
     # Source tags from OpenStreetMap
     source_tags: Optional[Dict[str, Any]] = Field(
@@ -109,11 +104,6 @@ class WaterProperties(OvertureFeatureProperties):
     # External identifiers
     wikidata: Optional[str] = Field(None, description="Wikidata identifier")
 
-
-class Water(OvertureFeature):
-    """Water feature model."""
-
-    properties: WaterProperties = Field(..., description="Water feature properties")
     geometry: Annotated[
         Geometry,
         GeometryTypeConstraint("Point", "LineString", "Polygon", "MultiPolygon"),

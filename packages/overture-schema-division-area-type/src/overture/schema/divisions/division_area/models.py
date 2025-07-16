@@ -1,16 +1,14 @@
 """Division area models for Overture Maps divisions theme."""
 
-from typing import Annotated, List, Optional
+from typing import Annotated, Optional
 
 from pydantic import Field
 
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.common import (
-    AdvancedSourceItem,
     NamesContainer,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
@@ -25,13 +23,13 @@ from overture.schema.validation import (
 )
 
 
-class DivisionAreaProperties(
+class DivisionArea(
     Annotated[
-        OvertureFeatureProperties,
+        OvertureFeature,
         MutuallyExclusiveConstraint("is_land", "is_territorial"),
     ]
 ):
-    """Properties specific to division area features."""
+    """Division area feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("divisions") = Field("divisions", description="Feature theme")
@@ -69,17 +67,8 @@ class DivisionAreaProperties(
 
     # Complex containers
     names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
-    )
 
-
-class DivisionArea(OvertureFeature):
-    """Division area feature model."""
-
-    properties: DivisionAreaProperties = Field(
-        ..., description="Division area feature properties"
-    )
+    # Geometry
     geometry: Annotated[Geometry, GeometryTypeConstraint("Polygon", "MultiPolygon")] = (
         Field(..., description="Geometry (Polygon or MultiPolygon)")
     )

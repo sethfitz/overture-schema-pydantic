@@ -6,7 +6,6 @@ from pydantic import Field
 
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
@@ -16,8 +15,8 @@ from overture.schema.validation import (
 )
 
 
-class ConnectorProperties(OvertureFeatureProperties):
-    """Properties specific to connector features."""
+class Connector(OvertureFeature):
+    """Connector feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("transportation") = Field(
@@ -25,13 +24,6 @@ class ConnectorProperties(OvertureFeatureProperties):
     )
     type: type_literal("connector") = Field("connector", description="Feature type")
 
-
-class Connector(OvertureFeature):
-    """Connector feature model."""
-
-    properties: ConnectorProperties = Field(
-        ..., description="Connector feature properties"
-    )
     geometry: Annotated[Geometry, GeometryTypeConstraint("Point")] = Field(
         ..., description="Geometry (Point)"
     )

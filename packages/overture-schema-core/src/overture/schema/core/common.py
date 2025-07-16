@@ -10,8 +10,6 @@ from overture.schema.validation import (
 )
 from overture.schema.validation.types import (
     CountryCode,
-    ISO8601DateTime,
-    JSONPointer,
     LanguageTag,
     LinearReferenceRange,
     RegionCode,
@@ -79,23 +77,6 @@ class LinearReferenceRangeContainer(BaseModel):
     """Linear reference range container for geometric scoping."""
 
     between: LinearReferenceRange = Field(..., description="Range between 0.0 and 1.0")
-
-
-class AdvancedSourceItem(BaseModel):
-    """Advanced source information with linear referencing support."""
-
-    property: JSONPointer = Field(..., description="JSON Pointer to the property")
-    dataset: str = Field(..., description="Source dataset identifier")
-    record_id: Optional[str] = Field(None, description="Specific record within dataset")
-    update_time: Optional[ISO8601DateTime] = Field(
-        None, description="When this property was last updated (ISO 8601)"
-    )
-    confidence: Optional[float] = Field(
-        None, ge=0, le=1, description="Confidence value for ML-derived data"
-    )
-    between: Optional[LinearReferenceRange] = Field(
-        None, description="Linear referencing range"
-    )
 
 
 class AddressLevel(BaseModel):

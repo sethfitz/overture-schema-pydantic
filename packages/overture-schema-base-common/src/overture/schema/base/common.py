@@ -1,12 +1,6 @@
 """Common structures and enums shared across base theme types."""
 
 from enum import Enum
-from typing import List, Optional
-
-from pydantic import Field
-
-from overture.schema.core.base import OvertureFeatureProperties
-from overture.schema.validation import theme_literal
 
 
 class SurfaceMaterial(str, Enum):
@@ -38,46 +32,6 @@ class SurfaceMaterial(str, Enum):
     WOODCHIPS = "woodchips"
 
 
-class BaseGeometryType(str, Enum):
-    """Supported geometry types for base theme features."""
-
-    POINT = "Point"
-    LINESTRING = "LineString"
-    POLYGON = "Polygon"
-    MULTIPOINT = "MultiPoint"
-    MULTILINESTRING = "MultiLineString"
-    MULTIPOLYGON = "MultiPolygon"
-
-
-class BaseThemeProperties(OvertureFeatureProperties):
-    """Base properties for all base theme features."""
-
-    # Override theme with constraint-based validation
-    theme: theme_literal("base") = Field("base", description="Feature theme")
-
-    # Common surface property that can be used by infrastructure and land
-    surface: Optional[SurfaceMaterial] = None
-
-
-def create_geometry_validator(valid_types: List[str]):
-    """Factory function to create geometry validators for specific geometry types."""
-
-    def validate_geometry_type(cls, v):
-        """Validate geometry type matches expected types."""
-        # Call parent validation first
-        super(cls, cls).validate_geometry_structure(v)
-
-        geom_type = v.get("type")
-        if geom_type not in valid_types:
-            return ValueError(f"Geometry must be one of {valid_types}, got {geom_type}")
-        return v
-
-    return validate_geometry_type
-
-
 __all__ = [
     "SurfaceMaterial",
-    "BaseGeometryType",
-    "BaseThemeProperties",
-    "create_geometry_validator",
 ]

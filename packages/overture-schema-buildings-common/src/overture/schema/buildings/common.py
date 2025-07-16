@@ -1,17 +1,9 @@
 """Common structures and enums shared across building types."""
 
 from enum import Enum
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
-
-from overture.schema.core.base import OvertureFeatureProperties
-from overture.schema.core.common import (
-    AddressContainer,
-    AdvancedSourceItem,
-    NamesContainer,
-)
-from overture.schema.validation import HexColor, theme_literal
 
 
 class BuildingSubtype(str, Enum):
@@ -213,70 +205,6 @@ class ConfidenceLevel(str, Enum):
     HIGH = "high"
 
 
-class BaseBuildingProperties(OvertureFeatureProperties):
-    """Base properties shared by all building types."""
-
-    # Override theme with constraint-based validation
-    theme: theme_literal("buildings") = Field("buildings", description="Feature theme")
-
-    # Required properties
-    subtype: Optional[BuildingSubtype] = Field(None, description="Building subtype")
-
-    # Optional complex containers
-    names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-    address: Optional[AddressContainer] = Field(None, description="Address information")
-
-    # Override sources to use advanced source items
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
-    )
-
-    # Optional numeric properties
-    height: Optional[float] = Field(
-        None, gt=0, description="Height of the building in meters"
-    )
-    num_floors: Optional[int] = Field(
-        None, gt=0, description="Number of above-ground floors"
-    )
-    num_floors_underground: Optional[int] = Field(
-        None, gt=0, description="Number of below-ground floors"
-    )
-    min_height: Optional[float] = Field(
-        None, description="Building bottom height in meters"
-    )
-    min_floor: Optional[int] = Field(
-        None, gt=0, description="Start floor if building is floating"
-    )
-    roof_height: Optional[float] = Field(None, description="Roof height in meters")
-    roof_direction: Optional[float] = Field(
-        None, ge=0, lt=360, description="Roof bearing in degrees"
-    )
-    level: Optional[int] = Field(None, description="Z-order level")
-
-    # Optional boolean properties
-    has_parts: Optional[bool] = Field(None, description="Building has parts")
-    is_underground: Optional[bool] = Field(
-        None, description="Entire building is below ground"
-    )
-
-    # Optional classification properties
-    building_class: Optional[BuildingClass] = Field(
-        None, alias="class", description="Building class"
-    )
-    facade_material: Optional[FacadeMaterial] = Field(
-        None, description="Facade material"
-    )
-    roof_material: Optional[RoofMaterial] = Field(None, description="Roof material")
-    roof_shape: Optional[RoofShape] = Field(None, description="Roof shape")
-    roof_orientation: Optional[RoofOrientation] = Field(
-        None, description="Roof orientation"
-    )
-
-    # Optional color properties (hexadecimal strings)
-    facade_color: Optional[HexColor] = Field(None, description="Facade color (hex)")
-    roof_color: Optional[HexColor] = Field(None, description="Roof color (hex)")
-
-
 __all__ = [
     "BuildingSubtype",
     "BuildingClass",
@@ -287,5 +215,4 @@ __all__ = [
     "BuildingPart",
     "PhysicalProperties",
     "ConfidenceLevel",
-    "BaseBuildingProperties",
 ]

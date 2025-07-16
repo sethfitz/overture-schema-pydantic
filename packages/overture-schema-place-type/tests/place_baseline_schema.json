@@ -128,156 +128,6 @@
       "title": "AddressLevel",
       "type": "object"
     },
-    "AdvancedSourceItem": {
-      "description": "Advanced source information with linear referencing support.",
-      "properties": {
-        "between": {
-          "anyOf": [
-            {
-              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
-              "items": {
-                "maximum": 1.0,
-                "minimum": 0.0,
-                "type": "number"
-              },
-              "maxItems": 2,
-              "minItems": 2,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Linear referencing range",
-          "title": "Between"
-        },
-        "confidence": {
-          "anyOf": [
-            {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Confidence value for ML-derived data",
-          "title": "Confidence"
-        },
-        "dataset": {
-          "description": "Source dataset identifier",
-          "title": "Dataset",
-          "type": "string"
-        },
-        "property": {
-          "description": "JSON Pointer to the property",
-          "title": "Property",
-          "type": "string"
-        },
-        "record_id": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Specific record within dataset",
-          "title": "Record Id"
-        },
-        "update_time": {
-          "anyOf": [
-            {
-              "description": "ISO 8601 datetime",
-              "format": "date-time",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "When this property was last updated (ISO 8601)",
-          "title": "Update Time"
-        }
-      },
-      "required": [
-        "property",
-        "dataset"
-      ],
-      "title": "AdvancedSourceItem",
-      "type": "object"
-    },
-    "CartographyContainer": {
-      "description": "Cartographic hints for optimal map display.",
-      "properties": {
-        "max_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Maximum recommended zoom level",
-          "title": "Max Zoom"
-        },
-        "min_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Minimum recommended zoom level",
-          "title": "Min Zoom"
-        },
-        "prominence": {
-          "anyOf": [
-            {
-              "maximum": 100,
-              "minimum": 1,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Feature significance/importance",
-          "title": "Prominence"
-        },
-        "sort_key": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Drawing order (lower = on top)",
-          "title": "Sort Key"
-        }
-      },
-      "title": "CartographyContainer",
-      "type": "object"
-    },
     "NamePerspectives": {
       "description": "Political perspectives for names.",
       "properties": {
@@ -529,17 +379,20 @@
       "title": "PlaceCategories",
       "type": "object"
     },
-    "PlaceProperties": {
-      "additionalProperties": true,
-      "description": "Properties specific to place features.",
+    "SourceItem": {
+      "description": "Source information for a specific property with optional linear referencing.",
       "properties": {
-        "addresses": {
+        "between": {
           "anyOf": [
             {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
               "items": {
-                "$ref": "#/$defs/AddressContainer"
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
               },
-              "minItems": 1,
+              "maxItems": 2,
+              "minItems": 2,
               "type": "array"
             },
             {
@@ -547,51 +400,14 @@
             }
           ],
           "default": null,
-          "description": "Place addresses",
-          "title": "Addresses"
-        },
-        "brand": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PlaceBrand"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Brand information"
-        },
-        "cartography": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CartographyContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Cartographic display hints"
-        },
-        "categories": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PlaceCategories"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Place categories"
+          "description": "Linear referencing range",
+          "title": "Between"
         },
         "confidence": {
           "anyOf": [
             {
-              "description": "Confidence score between 0.0 and 1.0",
-              "maximum": 1.0,
-              "minimum": 0.0,
+              "maximum": 1,
+              "minimum": 0,
               "type": "number"
             },
             {
@@ -599,143 +415,135 @@
             }
           ],
           "default": null,
-          "description": "Confidence score (0.0-1.0)",
+          "description": "Confidence value for ML-derived data",
           "title": "Confidence"
         },
-        "emails": {
-          "anyOf": [
-            {
-              "items": {
-                "format": "email",
-                "type": "string"
-              },
-              "minItems": 1,
-              "type": "array",
-              "uniqueItems": true
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Email addresses",
-          "title": "Emails"
-        },
-        "names": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/NamesContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Multilingual names"
-        },
-        "phones": {
-          "anyOf": [
-            {
-              "items": {
-                "description": "International phone number (+ followed by country code and number)",
-                "pattern": "^\\+\\d{1,3}[\\s\\-\\(\\)0-9]+$",
-                "type": "string"
-              },
-              "minItems": 1,
-              "type": "array",
-              "uniqueItems": true
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Phone numbers",
-          "title": "Phones"
-        },
-        "socials": {
-          "anyOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "minItems": 1,
-              "type": "array",
-              "uniqueItems": true
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Social media URLs",
-          "title": "Socials"
-        },
-        "sources": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/AdvancedSourceItem"
-              },
-              "minItems": 1,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Advanced source information",
-          "title": "Sources"
-        },
-        "theme": {
-          "const": "places",
-          "default": "places",
-          "description": "Feature theme",
-          "title": "Theme",
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
           "type": "string"
         },
-        "type": {
-          "const": "place",
-          "default": "place",
-          "description": "Feature type",
-          "title": "Type",
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
           "type": "string"
         },
-        "version": {
-          "description": "Feature version number",
-          "minimum": 0,
-          "title": "Version",
-          "type": "integer"
-        },
-        "websites": {
+        "record_id": {
           "anyOf": [
             {
-              "items": {
-                "type": "string"
-              },
-              "minItems": 1,
-              "type": "array",
-              "uniqueItems": true
+              "type": "string"
             },
             {
               "type": "null"
             }
           ],
           "default": null,
-          "description": "Website URLs",
-          "title": "Websites"
+          "description": "Specific record within dataset",
+          "title": "Record Id"
+        },
+        "update_time": {
+          "anyOf": [
+            {
+              "description": "ISO 8601 datetime",
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When this property was last updated",
+          "title": "Update Time"
         }
       },
       "required": [
-        "version"
+        "property",
+        "dataset"
       ],
-      "title": "PlaceProperties",
+      "title": "SourceItem",
       "type": "object"
     }
   },
+  "additionalProperties": true,
   "description": "Place feature model.",
   "properties": {
+    "addresses": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/AddressContainer"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Place addresses",
+      "title": "Addresses"
+    },
+    "brand": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlaceBrand"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Brand information"
+    },
+    "categories": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlaceCategories"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Place categories"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Confidence score (0.0-1.0)",
+      "title": "Confidence"
+    },
+    "emails": {
+      "anyOf": [
+        {
+          "items": {
+            "format": "email",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Email addresses",
+      "title": "Emails"
+    },
     "geometry": {
       "description": "Geometry (Point)",
       "properties": {
@@ -771,22 +579,116 @@
       "title": "Id",
       "type": "string"
     },
-    "properties": {
-      "$ref": "#/$defs/PlaceProperties",
-      "description": "Place feature properties"
+    "names": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NamesContainer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Multilingual names"
+    },
+    "phones": {
+      "anyOf": [
+        {
+          "items": {
+            "description": "International phone number (+ followed by country code and number)",
+            "pattern": "^\\+\\d{1,3}[\\s\\-\\(\\)0-9]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Phone numbers",
+      "title": "Phones"
+    },
+    "socials": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Social media URLs",
+      "title": "Socials"
+    },
+    "sources": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source information",
+      "title": "Sources"
+    },
+    "theme": {
+      "const": "places",
+      "default": "places",
+      "description": "Feature theme",
+      "title": "Theme",
+      "type": "string"
     },
     "type": {
-      "const": "Feature",
-      "default": "Feature",
-      "description": "GeoJSON type",
+      "const": "place",
+      "default": "place",
+      "description": "Feature type",
       "title": "Type",
       "type": "string"
+    },
+    "version": {
+      "description": "Feature version number",
+      "minimum": 0,
+      "title": "Version",
+      "type": "integer"
+    },
+    "websites": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Website URLs",
+      "title": "Websites"
     }
   },
   "required": [
     "id",
     "geometry",
-    "properties"
+    "version"
   ],
   "title": "Place",
   "type": "object"

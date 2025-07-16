@@ -6,11 +6,7 @@ from pydantic import Field
 
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
-)
-from overture.schema.core.common import (
-    AdvancedSourceItem,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.divisions.common.models import (
@@ -32,8 +28,8 @@ from overture.schema.validation import (
 
 @mutually_exclusive("is_land", "is_territorial")
 @not_required_if("subtype", PlaceType.COUNTRY, ["country"])
-class DivisionBoundaryProperties(OvertureFeatureProperties, ConstraintValidatedModel):
-    """Properties specific to division boundary features."""
+class DivisionBoundary(OvertureFeature, ConstraintValidatedModel):
+    """Division boundary feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("divisions") = Field("divisions", description="Feature theme")
@@ -73,18 +69,6 @@ class DivisionBoundaryProperties(OvertureFeatureProperties, ConstraintValidatedM
         None, description="Political perspectives"
     )
 
-    # Complex containers
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
-    )
-
-
-class DivisionBoundary(OvertureFeature):
-    """Division boundary feature model."""
-
-    properties: DivisionBoundaryProperties = Field(
-        ..., description="Division boundary feature properties"
-    )
     geometry: Annotated[
         Geometry, GeometryTypeConstraint("LineString", "MultiLineString")
     ] = Field(..., description="Geometry (LineString or MultiLineString)")

@@ -6,11 +6,7 @@ from pydantic import BaseModel, Field
 
 from overture.schema.core.base import (
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
-)
-from overture.schema.core.common import (
-    AdvancedSourceItem,
 )
 from overture.schema.core.geometry import (
     Geometry,
@@ -36,8 +32,8 @@ class AddressLevel(BaseModel):
     )
 
 
-class AddressProperties(OvertureFeatureProperties):
-    """Properties specific to address features."""
+class Address(OvertureFeature):
+    """Address feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("addresses") = Field("addresses", description="Feature theme")
@@ -81,16 +77,7 @@ class AddressProperties(OvertureFeatureProperties):
         description="Alternative city name for mailing (no leading/trailing whitespace)",
     )
 
-    # Sources
-    sources: Optional[Annotated[List[AdvancedSourceItem], MinItemsConstraint(1)]] = (
-        Field(None, description="Advanced source information")
-    )
-
-
-class Address(OvertureFeature):
-    """Address feature model."""
-
-    properties: AddressProperties = Field(..., description="Address feature properties")
+    # Geometry
     geometry: Annotated[Geometry, GeometryTypeConstraint("Point")] = Field(
         ..., description="Geometry (Point)"
     )

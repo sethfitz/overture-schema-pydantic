@@ -26,7 +26,9 @@ members = [
     "overture-schema-divisions-common",
     "overture-schema-divisions-theme",
     "overture-schema-infrastructure-type",
+    "overture-schema-land-cover-type",
     "overture-schema-land-type",
+    "overture-schema-land-use-type",
     "overture-schema-place-type",
     "overture-schema-places-theme",
     "overture-schema-segment-type",
@@ -890,9 +892,71 @@ dev = [
 ]
 
 [[package]]
+name = "overture-schema-land-cover-type"
+version = "0.1.0"
+source = { editable = "packages/overture-schema-land-cover-type" }
+dependencies = [
+    { name = "overture-schema-base-common" },
+    { name = "overture-schema-core" },
+    { name = "pydantic" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "overture-schema-base-common", editable = "packages/overture-schema-base-common" },
+    { name = "overture-schema-core", editable = "packages/overture-schema-core" },
+    { name = "pydantic", specifier = ">=2.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
+
+[[package]]
 name = "overture-schema-land-type"
 version = "0.1.0"
 source = { editable = "packages/overture-schema-land-type" }
+dependencies = [
+    { name = "overture-schema-base-common" },
+    { name = "overture-schema-core" },
+    { name = "pydantic" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "overture-schema-base-common", editable = "packages/overture-schema-base-common" },
+    { name = "overture-schema-core", editable = "packages/overture-schema-core" },
+    { name = "pydantic", specifier = ">=2.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ruff" },
+]
+
+[[package]]
+name = "overture-schema-land-use-type"
+version = "0.1.0"
+source = { editable = "packages/overture-schema-land-use-type" }
 dependencies = [
     { name = "overture-schema-base-common" },
     { name = "overture-schema-core" },

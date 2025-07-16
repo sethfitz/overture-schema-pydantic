@@ -128,91 +128,6 @@
       "title": "AddressLevel",
       "type": "object"
     },
-    "AdvancedSourceItem": {
-      "description": "Advanced source information with linear referencing support.",
-      "properties": {
-        "between": {
-          "anyOf": [
-            {
-              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
-              "items": {
-                "maximum": 1.0,
-                "minimum": 0.0,
-                "type": "number"
-              },
-              "maxItems": 2,
-              "minItems": 2,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Linear referencing range",
-          "title": "Between"
-        },
-        "confidence": {
-          "anyOf": [
-            {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Confidence value for ML-derived data",
-          "title": "Confidence"
-        },
-        "dataset": {
-          "description": "Source dataset identifier",
-          "title": "Dataset",
-          "type": "string"
-        },
-        "property": {
-          "description": "JSON Pointer to the property",
-          "title": "Property",
-          "type": "string"
-        },
-        "record_id": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Specific record within dataset",
-          "title": "Record Id"
-        },
-        "update_time": {
-          "anyOf": [
-            {
-              "description": "ISO 8601 datetime",
-              "format": "date-time",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "When this property was last updated (ISO 8601)",
-          "title": "Update Time"
-        }
-      },
-      "required": [
-        "property",
-        "dataset"
-      ],
-      "title": "AdvancedSourceItem",
-      "type": "object"
-    },
     "BuildingClass": {
       "description": "Building class classification (84 total values).",
       "enum": [
@@ -302,335 +217,6 @@
       "title": "BuildingClass",
       "type": "string"
     },
-    "BuildingPartProperties": {
-      "additionalProperties": true,
-      "description": "Properties specific to building_part features.",
-      "properties": {
-        "address": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/AddressContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Address information"
-        },
-        "building_id": {
-          "description": "Parent building ID",
-          "minLength": 1,
-          "title": "Building Id",
-          "type": "string"
-        },
-        "cartography": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CartographyContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Cartographic display hints"
-        },
-        "class": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/BuildingClass"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Building class"
-        },
-        "facade_color": {
-          "anyOf": [
-            {
-              "description": "Hexadecimal color code in format #RRGGBB",
-              "pattern": "^#[0-9A-Fa-f]{6}$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Facade color (hex)",
-          "title": "Facade Color"
-        },
-        "facade_material": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FacadeMaterial"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Facade material"
-        },
-        "has_parts": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Building has parts",
-          "title": "Has Parts"
-        },
-        "height": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Height of the building in meters",
-          "title": "Height"
-        },
-        "is_underground": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Entire building is below ground",
-          "title": "Is Underground"
-        },
-        "level": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Z-order level",
-          "title": "Level"
-        },
-        "min_floor": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Start floor if building is floating",
-          "title": "Min Floor"
-        },
-        "min_height": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Building bottom height in meters",
-          "title": "Min Height"
-        },
-        "names": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/NamesContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Multilingual names"
-        },
-        "num_floors": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Number of above-ground floors",
-          "title": "Num Floors"
-        },
-        "num_floors_underground": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Number of below-ground floors",
-          "title": "Num Floors Underground"
-        },
-        "roof_color": {
-          "anyOf": [
-            {
-              "description": "Hexadecimal color code in format #RRGGBB",
-              "pattern": "^#[0-9A-Fa-f]{6}$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Roof color (hex)",
-          "title": "Roof Color"
-        },
-        "roof_direction": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 360,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Roof bearing in degrees",
-          "title": "Roof Direction"
-        },
-        "roof_height": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Roof height in meters",
-          "title": "Roof Height"
-        },
-        "roof_material": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/RoofMaterial"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Roof material"
-        },
-        "roof_orientation": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/RoofOrientation"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Roof orientation"
-        },
-        "roof_shape": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/RoofShape"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Roof shape"
-        },
-        "sources": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/AdvancedSourceItem"
-              },
-              "minItems": 1,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Advanced source information",
-          "title": "Sources"
-        },
-        "subtype": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/BuildingSubtype"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Building subtype"
-        },
-        "theme": {
-          "const": "buildings",
-          "default": "buildings",
-          "description": "Feature theme",
-          "title": "Theme",
-          "type": "string"
-        },
-        "type": {
-          "const": "building_part",
-          "default": "building_part",
-          "description": "Feature type",
-          "title": "Type",
-          "type": "string"
-        },
-        "version": {
-          "description": "Feature version number",
-          "minimum": 0,
-          "title": "Version",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "version",
-        "building_id"
-      ],
-      "title": "BuildingPartProperties",
-      "type": "object"
-    },
     "BuildingSubtype": {
       "description": "Building subtype classification.",
       "enum": [
@@ -650,71 +236,6 @@
       ],
       "title": "BuildingSubtype",
       "type": "string"
-    },
-    "CartographyContainer": {
-      "description": "Cartographic hints for optimal map display.",
-      "properties": {
-        "max_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Maximum recommended zoom level",
-          "title": "Max Zoom"
-        },
-        "min_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Minimum recommended zoom level",
-          "title": "Min Zoom"
-        },
-        "prominence": {
-          "anyOf": [
-            {
-              "maximum": 100,
-              "minimum": 1,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Feature significance/importance",
-          "title": "Prominence"
-        },
-        "sort_key": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Drawing order (lower = on top)",
-          "title": "Sort Key"
-        }
-      },
-      "title": "CartographyContainer",
-      "type": "object"
     },
     "FacadeMaterial": {
       "description": "Building facade material classification.",
@@ -970,10 +491,153 @@
       ],
       "title": "RoofShape",
       "type": "string"
+    },
+    "SourceItem": {
+      "description": "Source information for a specific property with optional linear referencing.",
+      "properties": {
+        "between": {
+          "anyOf": [
+            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
+              "items": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear referencing range",
+          "title": "Between"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "title": "Confidence"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id"
+        },
+        "update_time": {
+          "anyOf": [
+            {
+              "description": "ISO 8601 datetime",
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When this property was last updated",
+          "title": "Update Time"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
     }
   },
+  "additionalProperties": true,
   "description": "Building part feature model.",
   "properties": {
+    "address": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AddressContainer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Address information"
+    },
+    "building_id": {
+      "description": "Parent building ID",
+      "minLength": 1,
+      "title": "Building Id",
+      "type": "string"
+    },
+    "class": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BuildingClass"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Building class"
+    },
+    "facade_color": {
+      "anyOf": [
+        {
+          "description": "Hexadecimal color code in format #RRGGBB",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Facade color (hex)",
+      "title": "Facade Color"
+    },
+    "facade_material": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FacadeMaterial"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Facade material"
+    },
     "geometry": {
       "description": "Geometry (Polygon or MultiPolygon)",
       "oneOf": [
@@ -1054,28 +718,266 @@
       ],
       "title": "Geometry"
     },
+    "has_parts": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Building has parts",
+      "title": "Has Parts"
+    },
+    "height": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Height of the building in meters",
+      "title": "Height"
+    },
     "id": {
       "description": "Feature identifier",
       "minLength": 1,
       "title": "Id",
       "type": "string"
     },
-    "properties": {
-      "$ref": "#/$defs/BuildingPartProperties",
-      "description": "Building part feature properties"
+    "is_underground": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Entire building is below ground",
+      "title": "Is Underground"
+    },
+    "level": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Z-order level",
+      "title": "Level"
+    },
+    "min_floor": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Start floor if building is floating",
+      "title": "Min Floor"
+    },
+    "min_height": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Building bottom height in meters",
+      "title": "Min Height"
+    },
+    "names": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NamesContainer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Multilingual names"
+    },
+    "num_floors": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number of above-ground floors",
+      "title": "Num Floors"
+    },
+    "num_floors_underground": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Number of below-ground floors",
+      "title": "Num Floors Underground"
+    },
+    "roof_color": {
+      "anyOf": [
+        {
+          "description": "Hexadecimal color code in format #RRGGBB",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Roof color (hex)",
+      "title": "Roof Color"
+    },
+    "roof_direction": {
+      "anyOf": [
+        {
+          "exclusiveMaximum": 360,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Roof bearing in degrees",
+      "title": "Roof Direction"
+    },
+    "roof_height": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Roof height in meters",
+      "title": "Roof Height"
+    },
+    "roof_material": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RoofMaterial"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Roof material"
+    },
+    "roof_orientation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RoofOrientation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Roof orientation"
+    },
+    "roof_shape": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RoofShape"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Roof shape"
+    },
+    "sources": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source information",
+      "title": "Sources"
+    },
+    "subtype": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BuildingSubtype"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Building subtype"
+    },
+    "theme": {
+      "const": "buildings",
+      "default": "buildings",
+      "description": "Feature theme",
+      "title": "Theme",
+      "type": "string"
     },
     "type": {
-      "const": "Feature",
-      "default": "Feature",
-      "description": "GeoJSON type",
+      "const": "building_part",
+      "default": "building_part",
+      "description": "Feature type",
       "title": "Type",
       "type": "string"
+    },
+    "version": {
+      "description": "Feature version number",
+      "minimum": 0,
+      "title": "Version",
+      "type": "integer"
     }
   },
   "required": [
     "id",
     "geometry",
-    "properties"
+    "version",
+    "building_id"
   ],
   "title": "BuildingPart",
   "type": "object"

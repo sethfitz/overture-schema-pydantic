@@ -1,93 +1,19 @@
 {
   "$defs": {
-    "CartographyContainer": {
-      "description": "Cartographic hints for optimal map display.",
+    "SourceItem": {
+      "description": "Source information for a specific property with optional linear referencing.",
       "properties": {
-        "max_zoom": {
+        "between": {
           "anyOf": [
             {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Maximum recommended zoom level",
-          "title": "Max Zoom"
-        },
-        "min_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Minimum recommended zoom level",
-          "title": "Min Zoom"
-        },
-        "prominence": {
-          "anyOf": [
-            {
-              "maximum": 100,
-              "minimum": 1,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Feature significance/importance",
-          "title": "Prominence"
-        },
-        "sort_key": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Drawing order (lower = on top)",
-          "title": "Sort Key"
-        }
-      },
-      "title": "CartographyContainer",
-      "type": "object"
-    },
-    "ConnectorProperties": {
-      "additionalProperties": true,
-      "description": "Properties specific to connector features.",
-      "properties": {
-        "cartography": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CartographyContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Cartographic display hints"
-        },
-        "sources": {
-          "anyOf": [
-            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
               "items": {
-                "$ref": "#/$defs/SourcePropertyItem"
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
               },
-              "minItems": 1,
+              "maxItems": 2,
+              "minItems": 2,
               "type": "array"
             },
             {
@@ -95,39 +21,9 @@
             }
           ],
           "default": null,
-          "description": "Source information",
-          "title": "Sources"
+          "description": "Linear referencing range",
+          "title": "Between"
         },
-        "theme": {
-          "const": "transportation",
-          "default": "transportation",
-          "description": "Feature theme",
-          "title": "Theme",
-          "type": "string"
-        },
-        "type": {
-          "const": "connector",
-          "default": "connector",
-          "description": "Feature type",
-          "title": "Type",
-          "type": "string"
-        },
-        "version": {
-          "description": "Feature version number",
-          "minimum": 0,
-          "title": "Version",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "version"
-      ],
-      "title": "ConnectorProperties",
-      "type": "object"
-    },
-    "SourcePropertyItem": {
-      "description": "Source information for a specific property.",
-      "properties": {
         "confidence": {
           "anyOf": [
             {
@@ -186,10 +82,11 @@
         "property",
         "dataset"
       ],
-      "title": "SourcePropertyItem",
+      "title": "SourceItem",
       "type": "object"
     }
   },
+  "additionalProperties": true,
   "description": "Connector feature model.",
   "properties": {
     "geometry": {
@@ -227,22 +124,48 @@
       "title": "Id",
       "type": "string"
     },
-    "properties": {
-      "$ref": "#/$defs/ConnectorProperties",
-      "description": "Connector feature properties"
+    "sources": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source information",
+      "title": "Sources"
+    },
+    "theme": {
+      "const": "transportation",
+      "default": "transportation",
+      "description": "Feature theme",
+      "title": "Theme",
+      "type": "string"
     },
     "type": {
-      "const": "Feature",
-      "default": "Feature",
-      "description": "GeoJSON type",
+      "const": "connector",
+      "default": "connector",
+      "description": "Feature type",
       "title": "Type",
       "type": "string"
+    },
+    "version": {
+      "description": "Feature version number",
+      "minimum": 0,
+      "title": "Version",
+      "type": "integer"
     }
   },
   "required": [
     "id",
     "geometry",
-    "properties"
+    "version"
   ],
   "title": "Connector",
   "type": "object"

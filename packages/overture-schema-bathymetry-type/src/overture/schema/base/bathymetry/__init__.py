@@ -1,5 +1,5 @@
 """Bathymetry feature models for Overture Maps base theme."""
 
-from .models import Bathymetry, BathymetryProperties
+from .models import Bathymetry
 
-__all__ = ["Bathymetry", "BathymetryProperties"]
+__all__ = ["Bathymetry"]

@@ -163,156 +163,6 @@
       "title": "AccessType",
       "type": "string"
     },
-    "AdvancedSourceItem": {
-      "description": "Advanced source information with linear referencing support.",
-      "properties": {
-        "between": {
-          "anyOf": [
-            {
-              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
-              "items": {
-                "maximum": 1.0,
-                "minimum": 0.0,
-                "type": "number"
-              },
-              "maxItems": 2,
-              "minItems": 2,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Linear referencing range",
-          "title": "Between"
-        },
-        "confidence": {
-          "anyOf": [
-            {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Confidence value for ML-derived data",
-          "title": "Confidence"
-        },
-        "dataset": {
-          "description": "Source dataset identifier",
-          "title": "Dataset",
-          "type": "string"
-        },
-        "property": {
-          "description": "JSON Pointer to the property",
-          "title": "Property",
-          "type": "string"
-        },
-        "record_id": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Specific record within dataset",
-          "title": "Record Id"
-        },
-        "update_time": {
-          "anyOf": [
-            {
-              "description": "ISO 8601 datetime",
-              "format": "date-time",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "When this property was last updated (ISO 8601)",
-          "title": "Update Time"
-        }
-      },
-      "required": [
-        "property",
-        "dataset"
-      ],
-      "title": "AdvancedSourceItem",
-      "type": "object"
-    },
-    "CartographyContainer": {
-      "description": "Cartographic hints for optimal map display.",
-      "properties": {
-        "max_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Maximum recommended zoom level",
-          "title": "Max Zoom"
-        },
-        "min_zoom": {
-          "anyOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Minimum recommended zoom level",
-          "title": "Min Zoom"
-        },
-        "prominence": {
-          "anyOf": [
-            {
-              "maximum": 100,
-              "minimum": 1,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Feature significance/importance",
-          "title": "Prominence"
-        },
-        "sort_key": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Drawing order (lower = on top)",
-          "title": "Sort Key"
-        }
-      },
-      "title": "CartographyContainer",
-      "type": "object"
-    },
     "ConnectorReference": {
       "description": "Reference to a connector with position information.",
       "properties": {
@@ -1141,317 +991,6 @@
       "title": "RouteReference",
       "type": "object"
     },
-    "SegmentProperties": {
-      "additionalProperties": true,
-      "description": "Properties specific to segment features.",
-      "properties": {
-        "access_restrictions": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/AccessRestrictionRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Access restriction rules",
-          "title": "Access Restrictions"
-        },
-        "cartography": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CartographyContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Cartographic display hints"
-        },
-        "class": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Segment class",
-          "title": "Class"
-        },
-        "connectors": {
-          "anyOf": [
-            {
-              "description": "Items must be unique based on (connector_id, at)",
-              "items": {
-                "$ref": "#/$defs/ConnectorReference"
-              },
-              "type": "array",
-              "uniqueItems": true
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Connector references",
-          "title": "Connectors"
-        },
-        "destinations": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/DestinationRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Destination labels",
-          "title": "Destinations"
-        },
-        "level": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Z-order level",
-          "title": "Level"
-        },
-        "level_rules": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/LevelRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Level/elevation rules",
-          "title": "Level Rules"
-        },
-        "names": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/NamesContainer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Multilingual names"
-        },
-        "prohibited_transitions": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/ProhibitedTransitionRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Turn restrictions",
-          "title": "Prohibited Transitions"
-        },
-        "rail_flags": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/RailFlagRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Rail-specific flags",
-          "title": "Rail Flags"
-        },
-        "road_flags": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/RoadFlagRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Road-specific flags",
-          "title": "Road Flags"
-        },
-        "road_surface": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/SurfaceRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Road surface rules",
-          "title": "Road Surface"
-        },
-        "routes": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/RouteReference"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Route references",
-          "title": "Routes"
-        },
-        "sources": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/AdvancedSourceItem"
-              },
-              "minItems": 1,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Advanced source information",
-          "title": "Sources"
-        },
-        "speed_limits": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/SpeedLimitRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Speed limit rules",
-          "title": "Speed Limits"
-        },
-        "subclass": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Segment subclass",
-          "title": "Subclass"
-        },
-        "subclass_rules": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/SubclassRule"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Subclass rules",
-          "title": "Subclass Rules"
-        },
-        "subtype": {
-          "$ref": "#/$defs/SegmentSubtype",
-          "description": "Transportation segment subtype"
-        },
-        "theme": {
-          "const": "transportation",
-          "default": "transportation",
-          "description": "Feature theme",
-          "title": "Theme",
-          "type": "string"
-        },
-        "type": {
-          "const": "segment",
-          "default": "segment",
-          "description": "Feature type",
-          "title": "Type",
-          "type": "string"
-        },
-        "version": {
-          "description": "Feature version number",
-          "minimum": 0,
-          "title": "Version",
-          "type": "integer"
-        },
-        "width_rules": {
-          "anyOf": [
-            {
-              "items": {
-                "$ref": "#/$defs/WidthRule"
-              },
-              "minItems": 1,
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Width rules",
-          "title": "Width Rules"
-        }
-      },
-      "required": [
-        "version",
-        "subtype"
-      ],
-      "title": "SegmentProperties",
-      "type": "object"
-    },
     "SegmentSubtype": {
       "description": "Transportation segment subtype classification.",
       "enum": [
@@ -1461,6 +1000,91 @@
       ],
       "title": "SegmentSubtype",
       "type": "string"
+    },
+    "SourceItem": {
+      "description": "Source information for a specific property with optional linear referencing.",
+      "properties": {
+        "between": {
+          "anyOf": [
+            {
+              "description": "Linear reference range [start, end] where 0.0 <= start < end <= 1.0",
+              "items": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear referencing range",
+          "title": "Between"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "title": "Confidence"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id"
+        },
+        "update_time": {
+          "anyOf": [
+            {
+              "description": "ISO 8601 datetime",
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When this property was last updated",
+          "title": "Update Time"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
     },
     "Speed": {
       "description": "Speed value with unit.",
@@ -1874,8 +1498,72 @@
       "type": "object"
     }
   },
+  "additionalProperties": true,
   "description": "Segment feature model.",
   "properties": {
+    "access_restrictions": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/AccessRestrictionRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Access restriction rules",
+      "title": "Access Restrictions"
+    },
+    "class": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Segment class",
+      "title": "Class"
+    },
+    "connectors": {
+      "anyOf": [
+        {
+          "description": "Items must be unique based on (connector_id, at)",
+          "items": {
+            "$ref": "#/$defs/ConnectorReference"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Connector references",
+      "title": "Connectors"
+    },
+    "destinations": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/DestinationRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Destination labels",
+      "title": "Destinations"
+    },
     "geometry": {
       "description": "Geometry (LineString)",
       "properties": {
@@ -1915,22 +1603,236 @@
       "title": "Id",
       "type": "string"
     },
-    "properties": {
-      "$ref": "#/$defs/SegmentProperties",
-      "description": "Segment feature properties"
+    "level": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Z-order level",
+      "title": "Level"
+    },
+    "level_rules": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/LevelRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Level/elevation rules",
+      "title": "Level Rules"
+    },
+    "names": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NamesContainer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Multilingual names"
+    },
+    "prohibited_transitions": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ProhibitedTransitionRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Turn restrictions",
+      "title": "Prohibited Transitions"
+    },
+    "rail_flags": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/RailFlagRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Rail-specific flags",
+      "title": "Rail Flags"
+    },
+    "road_flags": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/RoadFlagRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Road-specific flags",
+      "title": "Road Flags"
+    },
+    "road_surface": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SurfaceRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Road surface rules",
+      "title": "Road Surface"
+    },
+    "routes": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/RouteReference"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Route references",
+      "title": "Routes"
+    },
+    "sources": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Source information",
+      "title": "Sources"
+    },
+    "speed_limits": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SpeedLimitRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Speed limit rules",
+      "title": "Speed Limits"
+    },
+    "subclass": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Segment subclass",
+      "title": "Subclass"
+    },
+    "subclass_rules": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/SubclassRule"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Subclass rules",
+      "title": "Subclass Rules"
+    },
+    "subtype": {
+      "$ref": "#/$defs/SegmentSubtype",
+      "description": "Transportation segment subtype"
+    },
+    "theme": {
+      "const": "transportation",
+      "default": "transportation",
+      "description": "Feature theme",
+      "title": "Theme",
+      "type": "string"
     },
     "type": {
-      "const": "Feature",
-      "default": "Feature",
-      "description": "GeoJSON type",
+      "const": "segment",
+      "default": "segment",
+      "description": "Feature type",
       "title": "Type",
       "type": "string"
+    },
+    "version": {
+      "description": "Feature version number",
+      "minimum": 0,
+      "title": "Version",
+      "type": "integer"
+    },
+    "width_rules": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/WidthRule"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Width rules",
+      "title": "Width Rules"
     }
   },
   "required": [
     "id",
     "geometry",
-    "properties"
+    "version",
+    "subtype"
   ],
   "title": "Segment",
   "type": "object"

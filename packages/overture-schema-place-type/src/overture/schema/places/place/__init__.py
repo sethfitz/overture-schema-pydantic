@@ -10,14 +10,12 @@ from .models import (
     PlaceConfidence,
     PlaceContact,
     PlaceOperatingHours,
-    PlaceProperties,
 )
 
 add_theme_type_mapping("places", "place")
 
 __all__ = [
     "Place",
-    "PlaceProperties",
     "PlaceCategories",
     "PlaceBrand",
     "PlaceContact",

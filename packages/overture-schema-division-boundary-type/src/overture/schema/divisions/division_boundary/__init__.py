@@ -3,8 +3,8 @@
 # Register theme-type mappings for strict validation
 from overture.schema.core.base import add_theme_type_mapping
 
-from .models import DivisionBoundary, DivisionBoundaryProperties
+from .models import DivisionBoundary
 
 add_theme_type_mapping("divisions", "division_boundary")
 
-__all__ = ["DivisionBoundary", "DivisionBoundaryProperties"]
+__all__ = ["DivisionBoundary"]

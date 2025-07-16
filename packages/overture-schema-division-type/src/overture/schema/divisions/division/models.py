@@ -5,12 +5,11 @@ from typing import Annotated, Dict, List, Optional
 from pydantic import Field
 
 from overture.schema.core.base import (
+    CartographyContainer,
     OvertureFeature,
-    OvertureFeatureProperties,
     register_model,
 )
 from overture.schema.core.common import (
-    AdvancedSourceItem,
     NamesContainer,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
@@ -35,8 +34,9 @@ from overture.schema.validation import (
 )
 
 
-class DivisionProperties(OvertureFeatureProperties):
-    """Properties specific to division features."""
+@parent_division_required_unless("subtype", PlaceType.COUNTRY)
+class Division(OvertureFeature, ConstraintValidatedModel):
+    """Division feature model."""
 
     # Override theme and type with constraint-based validation
     theme: theme_literal("divisions") = Field("divisions", description="Feature theme")
@@ -96,17 +96,8 @@ class DivisionProperties(OvertureFeatureProperties):
 
     # Complex containers
     names: Optional[NamesContainer] = Field(None, description="Multilingual names")
-    sources: Optional[List[AdvancedSourceItem]] = Field(
-        None, min_length=1, description="Advanced source information"
-    )
-
-
-@parent_division_required_unless("subtype", PlaceType.COUNTRY)
-class Division(OvertureFeature, ConstraintValidatedModel):
-    """Division feature model."""
-
-    properties: DivisionProperties = Field(
-        ..., description="Division feature properties"
+    cartography: CartographyContainer | None = Field(
+        None, description="Cartographic display hints"
     )
 
     # Use constraint-based validation for Point geometry
