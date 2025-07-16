@@ -1,5 +1,5 @@
 # Dynamically find packages with tests
-PACKAGES_WITH_TESTS := $(shell find packages -name tests -type d | cut -d'/' -f2)
+PACKAGES_WITH_TESTS := $(shell find packages -maxdepth 2 -name tests -type d | cut -d'/' -f2 | sort -u)
 TEST_TARGETS := $(addprefix test-, $(PACKAGES_WITH_TESTS))
 
 .PHONY: test test-all $(TEST_TARGETS)
