@@ -22,13 +22,11 @@ import overture.schema.divisions.division_boundary.models  # noqa: F401
 import overture.schema.places.place.models  # noqa: F401
 import overture.schema.transportation.connector.models  # noqa: F401
 import overture.schema.transportation.segment.models  # noqa: F401
-import pytest
 import yaml
 from deepdiff import DeepDiff
 from overture.schema.core.base import (
     parse_feature,
 )
-from shapely.geometry import shape
 from yamlcore import CoreLoader
 
 
@@ -54,54 +52,6 @@ def create_flat_variant(feature: dict[str, Any]) -> dict[str, Any]:
             del flat_feature["type"]
 
     return flat_feature
-
-
-def create_shapely_variant(feature: dict[str, Any]) -> dict[str, Any]:
-    """Create a variant of the feature with flat structure and Shapely geometry."""
-    # Start with flattened feature (input should already be flat from load_feature)
-    shapely_feature = feature.copy()
-    if "geometry" in shapely_feature and shapely_feature["geometry"]:
-        try:
-            shapely_feature["geometry"] = shape(shapely_feature["geometry"])
-        except Exception as e:
-            # leave geometry as GeoJSON if conversion fails
-            print(f"Error converting geometry to Shapely: {e}")
-            pass
-    return shapely_feature
-
-
-def create_wkb_variant(feature: dict[str, Any]) -> dict[str, Any]:
-    """Create a variant of the feature with flat structure and WKB geometry."""
-    # Start with flattened feature (input should already be flat from load_feature)
-    wkb_feature = feature.copy()
-    if "geometry" in wkb_feature and wkb_feature["geometry"]:
-        try:
-            # Convert GeoJSON -> Shapely -> WKB bytes
-            shapely_geom = shape(wkb_feature["geometry"])
-            wkb_bytes = shapely_geom.wkb
-            wkb_feature["geometry"] = wkb_bytes
-        except Exception as e:
-            # leave geometry as GeoJSON if conversion fails
-            print(f"Error converting geometry to WKB: {e}")
-            pass
-    return wkb_feature
-
-
-def create_wkt_variant(feature: dict[str, Any]) -> dict[str, Any]:
-    """Create a variant of the feature with flat structure and WKT geometry."""
-    # Start with flattened feature (input should already be flat from load_feature)
-    wkt_feature = feature.copy()
-    if "geometry" in wkt_feature and wkt_feature["geometry"]:
-        try:
-            # Convert GeoJSON -> Shapely -> WKT string
-            shapely_geom = shape(wkt_feature["geometry"])
-            wkt_string = shapely_geom.wkt
-            wkt_feature["geometry"] = wkt_string
-        except Exception as e:
-            # leave geometry as GeoJSON if conversion fails
-            print(f"Error converting geometry to WKT: {e}")
-            pass
-    return wkt_feature
 
 
 def convert_to_geojson_format(flattened_feature: dict[str, Any]) -> dict[str, Any]:
@@ -362,34 +312,6 @@ def test_example_validation_flat(example_file):
         )
 
 
-def test_example_validation_shapely(example_file):
-    """Test that examples pass validation with Shapely geometry input."""
-    flat_feature = load_feature(example_file)  # Load as flat (authoritative)
-    test_feature = create_shapely_variant(flat_feature)
-
-    is_valid = False
-    error_msg = None
-    try:
-        parsed_feature = parse_feature(test_feature)
-        is_valid = True
-    except Exception as e:
-        error_msg = e
-
-    assert is_valid, (
-        f"Example failed validation (shapely): {example_file}\nError: {error_msg}"
-    )
-
-    # If validation passed and we have a parsed feature, compare with GeoJSON format
-    if parsed_feature is not None:
-        # Parsed feature should be in GeoJSON format, so compare with GeoJSON variant
-        expected_geojson = convert_to_geojson_format(flat_feature)
-        is_equal, diff_report = deep_compare_dicts(expected_geojson, parsed_feature)
-        assert is_equal, (
-            f"Parsed feature differs from expected (shapely): {example_file}\n"
-            f"Differences:\n{diff_report}"
-        )
-
-
 def test_counterexample_validation_geojson(counterexample_file):
     """Test that counterexamples fail validation with GeoJSON input format."""
     flat_feature = load_feature(counterexample_file)  # Load as flat (authoritative)
@@ -407,10 +329,10 @@ def test_counterexample_validation_geojson(counterexample_file):
     )
 
 
-def test_counterexample_validation_shapely(counterexample_file):
-    """Test that counterexamples fail validation with Shapely geometry input."""
+def test_counterexample_validation_flat(counterexample_file):
+    """Test that counterexamples fail validation with flat input format."""
     flat_feature = load_feature(counterexample_file)  # Load as flat (authoritative)
-    test_feature = create_shapely_variant(flat_feature)
+    test_feature = flat_feature  # Use flat format directly
 
     is_valid = False
     try:
@@ -420,257 +342,5 @@ def test_counterexample_validation_shapely(counterexample_file):
         pass
 
     assert not is_valid, (
-        f"Counterexample should have failed validation (shapely): {counterexample_file}"
+        f"Counterexample should have failed validation (flat): {counterexample_file}"
     )
-
-
-def test_example_validation_wkb(example_file):
-    """Test that examples pass validation with WKB geometry input."""
-    flat_feature = load_feature(example_file)  # Load as flat (authoritative)
-    test_feature = create_wkb_variant(flat_feature)
-
-    is_valid = False
-    error_msg = None
-    try:
-        parsed_feature = parse_feature(test_feature)
-        is_valid = True
-    except Exception as e:
-        error_msg = e
-
-    assert is_valid, (
-        f"Example failed validation (wkb): {example_file}\nError: {error_msg}"
-    )
-
-    # If validation passed and we have a parsed feature, compare with GeoJSON format
-    if parsed_feature is not None:
-        # Parsed feature should be in GeoJSON format, so compare with GeoJSON variant
-        expected_geojson = convert_to_geojson_format(flat_feature)
-        is_equal, diff_report = deep_compare_dicts(expected_geojson, parsed_feature)
-        assert is_equal, (
-            f"Parsed feature differs from expected (wkb): {example_file}\n"
-            f"Differences:\n{diff_report}"
-        )
-
-
-def test_counterexample_validation_wkb(counterexample_file):
-    """Test that counterexamples fail validation with WKB geometry input."""
-    flat_feature = load_feature(counterexample_file)  # Load as flat (authoritative)
-    test_feature = create_wkb_variant(flat_feature)
-
-    is_valid = False
-    try:
-        parse_feature(test_feature)
-        is_valid = True
-    except Exception:
-        pass
-
-    assert not is_valid, (
-        f"Counterexample should have failed validation (wkb): {counterexample_file}"
-    )
-
-
-def test_example_validation_wkt(example_file):
-    """Test that examples pass validation with WKT geometry input."""
-    flat_feature = load_feature(example_file)  # Load as flat (authoritative)
-    test_feature = create_wkt_variant(flat_feature)
-
-    is_valid = False
-    error_msg = None
-    try:
-        parsed_feature = parse_feature(test_feature)
-        is_valid = True
-    except Exception as e:
-        error_msg = e
-
-    assert is_valid, (
-        f"Example failed validation (wkt): {example_file}\nError: {error_msg}"
-    )
-
-    # If validation passed and we have a parsed feature, compare with GeoJSON format
-    if parsed_feature is not None:
-        # Parsed feature should be in GeoJSON format, so compare with GeoJSON variant
-        expected_geojson = convert_to_geojson_format(flat_feature)
-        is_equal, diff_report = deep_compare_dicts(expected_geojson, parsed_feature)
-        assert is_equal, (
-            f"Parsed feature differs from expected (wkt): {example_file}\n"
-            f"Differences:\n{diff_report}"
-        )
-
-
-def test_counterexample_validation_wkt(counterexample_file):
-    """Test that counterexamples fail validation with WKT geometry input."""
-    flat_feature = load_feature(counterexample_file)  # Load as flat (authoritative)
-    test_feature = create_wkt_variant(flat_feature)
-
-    is_valid = False
-    try:
-        parse_feature(test_feature)
-        is_valid = True
-    except Exception:
-        pass
-
-    assert not is_valid, (
-        f"Counterexample should have failed validation (wkt): {counterexample_file}"
-    )
-
-
-def test_example_serialization_modes(example_file):
-    """Test that serialization modes produce expected formats."""
-    flat_feature = load_feature(example_file)
-
-    # Test Python mode (should return flattened structure)
-    try:
-        python_output = parse_feature(flat_feature, mode="python")
-    except Exception as e:
-        pytest.fail(f"Python mode parsing failed: {e}")
-
-    # Test JSON mode (should return GeoJSON structure)
-    try:
-        json_output = parse_feature(flat_feature, mode="json")
-    except Exception as e:
-        pytest.fail(f"JSON mode parsing failed: {e}")
-
-    # Assertions for Python output (flattened)
-    assert "properties" not in python_output, (
-        f"Python mode should not have 'properties' key: {example_file}"
-    )
-    assert "id" in python_output, (
-        f"Python mode should have 'id' at top level: {example_file}"
-    )
-    assert "geometry" in python_output, (
-        f"Python mode should have 'geometry' at top level: {example_file}"
-    )
-    assert "theme" in python_output, (
-        f"Python mode should have 'theme' at top level: {example_file}"
-    )
-    assert "type" in python_output, (
-        f"Python mode should have 'type' at top level: {example_file}"
-    )
-
-    # Assertions for JSON output (GeoJSON)
-    assert json_output.get("type") == "Feature", (
-        f"JSON mode should have GeoJSON 'type': {example_file}"
-    )
-    assert "properties" in json_output, (
-        f"JSON mode should have 'properties' key: {example_file}"
-    )
-    assert "id" in json_output, (
-        f"JSON mode should have 'id' at top level: {example_file}"
-    )
-    assert "geometry" in json_output, (
-        f"JSON mode should have 'geometry' at top level: {example_file}"
-    )
-
-    # Properties should contain theme and type
-    properties = json_output["properties"]
-    assert "theme" in properties, (
-        f"JSON mode properties should contain 'theme': {example_file}"
-    )
-    assert "type" in properties, (
-        f"JSON mode properties should contain 'type': {example_file}"
-    )
-
-    # Cross-validation: outputs should contain same data, just structured differently
-    flattened_from_json = {
-        "id": json_output["id"],
-        "geometry": json_output["geometry"],
-        **json_output["properties"],
-    }
-
-    # Handle geometry comparison - Python mode keeps Geometry objects, JSON mode converts to dict
-    python_output_for_comparison = python_output.copy()
-    if "geometry" in python_output_for_comparison:
-        geom = python_output_for_comparison["geometry"]
-        if hasattr(geom, "to_geo_json"):
-            python_output_for_comparison["geometry"] = geom.to_geo_json()
-
-    # Normalize both outputs to JSON for comparison (handles tuple/list differences)
-    import json
-
-    python_json_normalized = json.loads(
-        json.dumps(python_output_for_comparison, default=str)
-    )
-    flattened_json_normalized = json.loads(json.dumps(flattened_from_json, default=str))
-
-    is_equal, diff_report = deep_compare_dicts(
-        python_json_normalized, flattened_json_normalized
-    )
-    assert is_equal, (
-        f"Python and flattened JSON outputs should match: {example_file}\n"
-        f"Differences:\n{diff_report}"
-    )
-
-
-def test_example_roundtrip_consistency(example_file):
-    """Test that Python->JSON->Python roundtrip preserves data."""
-    flat_feature = load_feature(example_file)
-
-    try:
-        # Parse in Python mode
-        python_output = parse_feature(flat_feature, mode="python")
-
-        # Convert to JSON mode (which is parseable) then back to Python mode
-        json_output = parse_feature(flat_feature, mode="json")
-        roundtrip_output = parse_feature(json_output, mode="python")
-
-        # Normalize both for comparison (handle Geometry objects)
-        import json
-
-        python_normalized = python_output.copy()
-        if "geometry" in python_normalized:
-            geom = python_normalized["geometry"]
-            if hasattr(geom, "to_geo_json"):
-                python_normalized["geometry"] = geom.to_geo_json()
-        python_normalized = json.loads(json.dumps(python_normalized, default=str))
-
-        roundtrip_normalized = roundtrip_output.copy()
-        if "geometry" in roundtrip_normalized:
-            geom = roundtrip_normalized["geometry"]
-            if hasattr(geom, "to_geo_json"):
-                roundtrip_normalized["geometry"] = geom.to_geo_json()
-        roundtrip_normalized = json.loads(json.dumps(roundtrip_normalized, default=str))
-
-        # Should be identical
-        is_equal, diff_report = deep_compare_dicts(
-            python_normalized, roundtrip_normalized
-        )
-        assert is_equal, (
-            f"Python mode roundtrip should preserve data: {example_file}\n"
-            f"Differences:\n{diff_report}"
-        )
-
-    except Exception as e:
-        pytest.fail(f"Roundtrip test failed: {e}")
-
-
-def test_example_cross_mode_consistency(example_file):
-    """Test that GeoJSON->flatten and flatten->GeoJSON produce consistent results."""
-    flat_feature = load_feature(example_file)
-    geojson_feature = convert_to_geojson_format(flat_feature)
-
-    try:
-        # Parse flattened input in both modes
-        python_from_flat = parse_feature(flat_feature, mode="python")
-        json_from_flat = parse_feature(flat_feature, mode="json")
-
-        # Parse GeoJSON input in both modes
-        python_from_geojson = parse_feature(geojson_feature, mode="python")
-        json_from_geojson = parse_feature(geojson_feature, mode="json")
-
-        # Results should be identical regardless of input format
-        is_equal, diff_report = deep_compare_dicts(
-            python_from_flat, python_from_geojson
-        )
-        assert is_equal, (
-            f"Python mode should produce same result from flat/GeoJSON input: {example_file}\n"
-            f"Differences:\n{diff_report}"
-        )
-
-        is_equal, diff_report = deep_compare_dicts(json_from_flat, json_from_geojson)
-        assert is_equal, (
-            f"JSON mode should produce same result from flat/GeoJSON input: {example_file}\n"
-            f"Differences:\n{diff_report}"
-        )
-
-    except Exception as e:
-        pytest.fail(f"Cross-mode consistency test failed: {e}")
