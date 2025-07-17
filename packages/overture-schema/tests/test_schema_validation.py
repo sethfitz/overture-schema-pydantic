@@ -107,8 +107,12 @@ def deep_compare_dicts(
 
 
 def walk_directory(directory: Path) -> Generator[Path, None, None]:
-    """Walk directory and yield all relevant files."""
+    """Walk directory and yield all relevant files, skipping directories ending with .disabled."""
     for file_path in directory.rglob("*"):
+        # Skip files in directories that end with .disabled
+        if any(part.endswith(".disabled") for part in file_path.parts[:-1]):
+            continue
+
         if file_path.is_file() and file_path.suffix in {
             ".json",
             ".geojson",
