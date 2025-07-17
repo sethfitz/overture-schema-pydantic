@@ -1,13 +1,12 @@
 [project]
 name = "overture-schema-base-theme"
 version = "0.1.0"
-description = "Overture Maps base theme shared structures and models (bathymetry, infrastructure, land_cover)"
+description = "Overture Maps base theme shared structures and models (bathymetry, infrastructure, land, land_cover)"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     "overture-schema-base-common",
-    "overture-schema-land-type",
     "overture-schema-water-type",
     "overture-schema-validation",
     "pydantic>=2.0",
@@ -23,7 +22,6 @@ dev = [
 [tool.uv.sources]
 overture-schema-core = { workspace = true }
 overture-schema-base-common = { workspace = true }
-overture-schema-land-type = { workspace = true }
 overture-schema-water-type = { workspace = true }
 overture-schema-validation = { workspace = true }
 
