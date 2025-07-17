@@ -1,7 +1,7 @@
-"""Re-export common places structures from the place-type package."""
+"""Re-export common places structures from the local place module."""
 
-# Re-export everything from the place type package for backward compatibility
-from overture.schema.places.place import (
+# Re-export everything from the local place module
+from .place.models import (
     PlaceBrand,
     PlaceCategories,
     PlaceConfidence,

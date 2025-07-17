@@ -1,19 +1,26 @@
 [project]
 name = "overture-schema-places-theme"
 version = "0.1.0"
-description = "Overture Maps places theme shared structures"
+description = "Overture Maps places theme with place type models"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
-    "overture-schema-place-type",
+    "overture-schema-validation",
     "pydantic>=2.0",
+    "pydantic[email]",
 ]
 
 [tool.uv.sources]
 overture-schema-core = { workspace = true }
-overture-schema-place-type = { workspace = true }
+overture-schema-validation = { workspace = true }
 
+[dependency-groups]
+dev = [
+    "pytest>=7.0",
+    "ruff",
+    "mypy",
+]
 
 [build-system]
 requires = ["hatchling"]
