@@ -4,12 +4,10 @@ from .models import (
     Infrastructure,
     InfrastructureClass,
     InfrastructureSubtype,
-    SurfaceMaterial,
 )
 
 __all__ = [
     "Infrastructure",
     "InfrastructureSubtype",
     "InfrastructureClass",
-    "SurfaceMaterial",
 ]
