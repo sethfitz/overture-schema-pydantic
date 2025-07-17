@@ -5,10 +5,10 @@ from typing import Annotated
 from pydantic import Field
 
 from overture.schema.core.base import (
-    CartographyContainer,
     OvertureFeature,
     register_model,
 )
+from overture.schema.core.cartography import CartographyContainer
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
     theme_literal,
