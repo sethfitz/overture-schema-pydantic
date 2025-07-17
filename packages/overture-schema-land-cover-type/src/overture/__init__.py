@@ -1,1 +1,0 @@
-# Overture schema namespace package
