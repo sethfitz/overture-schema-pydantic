@@ -1,13 +1,12 @@
 [project]
 name = "overture-schema-transportation-theme"
 version = "0.1.0"
-description = "Overture Maps transportation theme shared structures"
+description = "Overture Maps transportation theme shared structures and connector type"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     "overture-schema-transportation-common",
-    "overture-schema-connector-type",
     "overture-schema-segment-type",
     "pydantic>=2.0",
 ]
@@ -15,7 +14,6 @@ dependencies = [
 [tool.uv.sources]
 overture-schema-core = { workspace = true }
 overture-schema-transportation-common = { workspace = true }
-overture-schema-connector-type = { workspace = true }
 overture-schema-segment-type = { workspace = true }
 
 
