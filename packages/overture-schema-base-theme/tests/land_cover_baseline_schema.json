@@ -1,0 +1,439 @@
+{
+  "$defs": {
+    "CartographyContainer": {
+      "additionalProperties": false,
+      "description": "Cartographic hints for optimal map display.",
+      "properties": {
+        "max_zoom": {
+          "default": null,
+          "description": "Maximum recommended zoom level",
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Max Zoom",
+          "type": "integer"
+        },
+        "min_zoom": {
+          "default": null,
+          "description": "Minimum recommended zoom level",
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Min Zoom",
+          "type": "integer"
+        },
+        "prominence": {
+          "default": null,
+          "description": "Feature significance/importance",
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Prominence",
+          "type": "integer"
+        },
+        "sort_key": {
+          "default": null,
+          "description": "Drawing order (lower = on top)",
+          "title": "Sort Key",
+          "type": "integer"
+        }
+      },
+      "title": "CartographyContainer",
+      "type": "object"
+    },
+    "LandCoverSubtype": {
+      "description": "Subtypes for land_cover features representing Earth's natural surfaces.",
+      "enum": [
+        "barren",
+        "crop",
+        "forest",
+        "grass",
+        "mangrove",
+        "moss",
+        "shrub",
+        "snow",
+        "urban",
+        "wetland"
+      ],
+      "title": "LandCoverSubtype",
+      "type": "string"
+    },
+    "NameRule": {
+      "additionalProperties": false,
+      "description": "Name rule with variant and language specification.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "language": {
+          "default": null,
+          "description": "IETF BCP-47 language tag",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$",
+          "title": "Language",
+          "type": "string"
+        },
+        "perspectives": {
+          "$ref": "#/$defs/Perspectives",
+          "default": null,
+          "description": "Political perspectives"
+        },
+        "side": {
+          "default": null,
+          "description": "Side specification",
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "value": {
+          "description": "Name value",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Value",
+          "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/NameVariant",
+          "description": "Name variant type"
+        }
+      },
+      "required": [
+        "value",
+        "variant"
+      ],
+      "title": "NameRule",
+      "type": "object"
+    },
+    "NameVariant": {
+      "description": "Name variant types.",
+      "enum": [
+        "common",
+        "official",
+        "alternate",
+        "short"
+      ],
+      "title": "NameVariant",
+      "type": "string"
+    },
+    "NamesContainer": {
+      "additionalProperties": false,
+      "description": "Multilingual names container.",
+      "properties": {
+        "common": {
+          "additionalProperties": false,
+          "default": null,
+          "description": "Common names by language",
+          "patternProperties": {
+            "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$": {
+              "description": "String with no leading/trailing whitespace",
+              "pattern": "^(\\S.*)?\\S$",
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "description": "IETF BCP-47 language tag"
+          },
+          "title": "Common",
+          "type": "object"
+        },
+        "primary": {
+          "description": "Primary name",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Primary",
+          "type": "string"
+        },
+        "rules": {
+          "default": null,
+          "description": "Name rules",
+          "items": {
+            "$ref": "#/$defs/NameRule"
+          },
+          "title": "Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "title": "NamesContainer",
+      "type": "object"
+    },
+    "PerspectiveMode": {
+      "description": "Perspective mode for disputed names.",
+      "enum": [
+        "accepted_by",
+        "disputed_by"
+      ],
+      "title": "PerspectiveMode",
+      "type": "string"
+    },
+    "Perspectives": {
+      "additionalProperties": false,
+      "description": "Political perspectives container.",
+      "properties": {
+        "countries": {
+          "description": "ISO 3166-1 alpha-2 country codes",
+          "items": {
+            "description": "ISO 3166-1 alpha-2 country code",
+            "maxLength": 2,
+            "minLength": 2,
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Countries",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mode": {
+          "$ref": "#/$defs/PerspectiveMode",
+          "description": "Perspective mode"
+        }
+      },
+      "required": [
+        "mode",
+        "countries"
+      ],
+      "title": "Perspectives",
+      "type": "object"
+    },
+    "SourceItem": {
+      "additionalProperties": false,
+      "description": "Source information for a specific property.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "confidence": {
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "update_time": {
+          "default": null,
+          "description": "When this property was last updated",
+          "format": "date-time",
+          "title": "Update Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "LandCover feature model representing Earth's natural surfaces.",
+  "patternProperties": {
+    "^ext_.*$": {
+      "description": "Additional top-level properties must be prefixed with `ext_`."
+    }
+  },
+  "properties": {
+    "geometry": {
+      "description": "Geometry (Polygon or MultiPolygon)",
+      "oneOf": [
+        {
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "items": {
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "minItems": 4,
+                  "type": "array"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "type": {
+              "const": "MultiPolygon",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "minItems": 4,
+                "type": "array"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "type": {
+              "const": "Polygon",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "type": "object"
+        }
+      ],
+      "title": "Geometry"
+    },
+    "id": {
+      "description": "Feature identifier",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "properties": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "cartography": {
+          "$ref": "#/$defs/CartographyContainer",
+          "default": null,
+          "description": "Cartographic display hints"
+        },
+        "level": {
+          "default": null,
+          "description": "Z-order level",
+          "title": "Level",
+          "type": "integer"
+        },
+        "names": {
+          "$ref": "#/$defs/NamesContainer",
+          "default": null,
+          "description": "Multilingual names"
+        },
+        "sources": {
+          "default": null,
+          "description": "Source information",
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "subtype": {
+          "$ref": "#/$defs/LandCoverSubtype",
+          "description": "Type of surface represented"
+        },
+        "theme": {
+          "const": "base",
+          "description": "Feature theme",
+          "title": "Theme",
+          "type": "string"
+        },
+        "type": {
+          "const": "land_cover",
+          "description": "Feature type",
+          "title": "Type",
+          "type": "string"
+        },
+        "version": {
+          "description": "Feature version number",
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "theme",
+        "type",
+        "version",
+        "subtype"
+      ],
+      "type": "object",
+      "unevaluatedProperties": false
+    },
+    "type": {
+      "const": "Feature",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "geometry",
+    "properties",
+    "type"
+  ],
+  "title": "LandCover",
+  "type": "object"
+}

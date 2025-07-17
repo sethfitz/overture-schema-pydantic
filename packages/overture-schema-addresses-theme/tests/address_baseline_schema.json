@@ -1,0 +1,236 @@
+{
+  "$defs": {
+    "AddressLevel": {
+      "additionalProperties": false,
+      "description": "Single administrative level in address hierarchy.",
+      "properties": {
+        "value": {
+          "default": null,
+          "description": "Administrative level value (no leading/trailing whitespace)",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "title": "AddressLevel",
+      "type": "object"
+    },
+    "SourceItem": {
+      "additionalProperties": false,
+      "description": "Source information for a specific property.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "confidence": {
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "update_time": {
+          "default": null,
+          "description": "When this property was last updated",
+          "format": "date-time",
+          "title": "Update Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Address feature model.",
+  "patternProperties": {
+    "^ext_.*$": {
+      "description": "Additional top-level properties must be prefixed with `ext_`."
+    }
+  },
+  "properties": {
+    "geometry": {
+      "description": "Geometry (Point)",
+      "properties": {
+        "bbox": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "type": "array"
+        },
+        "coordinates": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "type": "array"
+        },
+        "type": {
+          "const": "Point",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Geometry",
+      "type": "object"
+    },
+    "id": {
+      "description": "Feature identifier",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "properties": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "address_levels": {
+          "description": "Administrative levels (1-5), ordered highest first",
+          "items": {
+            "$ref": "#/$defs/AddressLevel"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "title": "Address Levels",
+          "type": "array"
+        },
+        "country": {
+          "description": "ISO 3166-1 alpha-2 country code",
+          "maxLength": 2,
+          "minLength": 2,
+          "pattern": "^[A-Z]{2}$",
+          "title": "Country",
+          "type": "string"
+        },
+        "number": {
+          "default": null,
+          "description": "House/building number (no leading/trailing whitespace)",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Number",
+          "type": "string"
+        },
+        "postal_city": {
+          "default": null,
+          "description": "Alternative city name for mailing (no leading/trailing whitespace)",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Postal City",
+          "type": "string"
+        },
+        "postcode": {
+          "default": null,
+          "description": "Postal/ZIP code (no leading/trailing whitespace)",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Postcode",
+          "type": "string"
+        },
+        "sources": {
+          "default": null,
+          "description": "Source information",
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "street": {
+          "default": null,
+          "description": "Street name (no leading/trailing whitespace)",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Street",
+          "type": "string"
+        },
+        "theme": {
+          "const": "addresses",
+          "description": "Feature theme",
+          "title": "Theme",
+          "type": "string"
+        },
+        "type": {
+          "const": "address",
+          "description": "Feature type",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "default": null,
+          "description": "Suite/apartment/floor number (no leading/trailing whitespace)",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Unit",
+          "type": "string"
+        },
+        "version": {
+          "description": "Feature version number",
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "theme",
+        "type",
+        "version",
+        "address_levels",
+        "country"
+      ],
+      "type": "object",
+      "unevaluatedProperties": false
+    },
+    "type": {
+      "const": "Feature",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "geometry",
+    "properties",
+    "type"
+  ],
+  "title": "Address",
+  "type": "object"
+}

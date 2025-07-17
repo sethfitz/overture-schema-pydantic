@@ -1,0 +1,748 @@
+{
+  "$defs": {
+    "AddressContainer": {
+      "additionalProperties": false,
+      "description": "Address container with flexible admin levels.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "address_levels": {
+          "default": null,
+          "description": "Address levels (1-5)",
+          "items": {
+            "$ref": "#/$defs/AddressLevel"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "title": "Address Levels",
+          "type": "array"
+        },
+        "country": {
+          "default": null,
+          "description": "ISO 3166-1 alpha-2 country code",
+          "maxLength": 2,
+          "minLength": 2,
+          "pattern": "^[A-Z]{2}$",
+          "title": "Country",
+          "type": "string"
+        },
+        "freeform": {
+          "default": null,
+          "description": "Freeform address string",
+          "title": "Freeform",
+          "type": "string"
+        },
+        "locality": {
+          "default": null,
+          "description": "Locality name",
+          "title": "Locality",
+          "type": "string"
+        },
+        "postal_city": {
+          "default": null,
+          "description": "Postal city if different",
+          "title": "Postal City",
+          "type": "string"
+        },
+        "postcode": {
+          "default": null,
+          "description": "Postal code",
+          "title": "Postcode",
+          "type": "string"
+        },
+        "region": {
+          "default": null,
+          "description": "ISO 3166-2 subdivision code",
+          "maxLength": 6,
+          "minLength": 4,
+          "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$",
+          "title": "Region",
+          "type": "string"
+        }
+      },
+      "title": "AddressContainer",
+      "type": "object"
+    },
+    "AddressLevel": {
+      "additionalProperties": false,
+      "description": "Address level with optional value.",
+      "properties": {
+        "value": {
+          "default": null,
+          "description": "Address level value",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "title": "AddressLevel",
+      "type": "object"
+    },
+    "BuildingClass": {
+      "description": "Building classification.",
+      "enum": [
+        "agricultural",
+        "allotment_house",
+        "apartments",
+        "barn",
+        "beach_hut",
+        "boathouse",
+        "bridge_structure",
+        "bungalow",
+        "bunker",
+        "cabin",
+        "caravan",
+        "cathedral",
+        "chapel",
+        "church",
+        "civic",
+        "college",
+        "commercial",
+        "conservatory",
+        "cowshed",
+        "detached",
+        "detached_house",
+        "dormitory",
+        "farm",
+        "farm_auxiliary",
+        "fire_station",
+        "garage",
+        "garages",
+        "government",
+        "grandstand",
+        "greenhouse",
+        "hangar",
+        "hospital",
+        "hotel",
+        "house",
+        "houseboat",
+        "hut",
+        "industrial",
+        "kindergarten",
+        "kiosk",
+        "library",
+        "manufacture",
+        "mobile_home",
+        "mosque",
+        "office",
+        "offices",
+        "parking",
+        "pavilion",
+        "prison",
+        "public",
+        "religious",
+        "residential",
+        "retail",
+        "roof",
+        "ruins",
+        "school",
+        "semi",
+        "semidetached_house",
+        "service",
+        "shed",
+        "shrine",
+        "silo",
+        "slurry_tank",
+        "sports_centre",
+        "sports_hall",
+        "stable",
+        "stadium",
+        "static_caravan",
+        "stilt_house",
+        "storage_tank",
+        "sty",
+        "supermarket",
+        "synagogue",
+        "temple",
+        "terrace",
+        "toilets",
+        "train_station",
+        "transformer_tower",
+        "transportation",
+        "trullo",
+        "university",
+        "warehouse",
+        "wayside_shrine"
+      ],
+      "title": "BuildingClass",
+      "type": "string"
+    },
+    "BuildingSubtype": {
+      "description": "Building subtype classification.",
+      "enum": [
+        "agricultural",
+        "civic",
+        "commercial",
+        "education",
+        "entertainment",
+        "industrial",
+        "medical",
+        "military",
+        "outbuilding",
+        "religious",
+        "residential",
+        "service",
+        "transportation"
+      ],
+      "title": "BuildingSubtype",
+      "type": "string"
+    },
+    "FacadeMaterial": {
+      "description": "Building facade material classification.",
+      "enum": [
+        "brick",
+        "cement_block",
+        "clay",
+        "concrete",
+        "glass",
+        "metal",
+        "plaster",
+        "plastic",
+        "stone",
+        "timber_framing",
+        "wood"
+      ],
+      "title": "FacadeMaterial",
+      "type": "string"
+    },
+    "NameRule": {
+      "additionalProperties": false,
+      "description": "Name rule with variant and language specification.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "language": {
+          "default": null,
+          "description": "IETF BCP-47 language tag",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$",
+          "title": "Language",
+          "type": "string"
+        },
+        "perspectives": {
+          "$ref": "#/$defs/Perspectives",
+          "default": null,
+          "description": "Political perspectives"
+        },
+        "side": {
+          "default": null,
+          "description": "Side specification",
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "value": {
+          "description": "Name value",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Value",
+          "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/NameVariant",
+          "description": "Name variant type"
+        }
+      },
+      "required": [
+        "value",
+        "variant"
+      ],
+      "title": "NameRule",
+      "type": "object"
+    },
+    "NameVariant": {
+      "description": "Name variant types.",
+      "enum": [
+        "common",
+        "official",
+        "alternate",
+        "short"
+      ],
+      "title": "NameVariant",
+      "type": "string"
+    },
+    "NamesContainer": {
+      "additionalProperties": false,
+      "description": "Multilingual names container.",
+      "properties": {
+        "common": {
+          "additionalProperties": false,
+          "default": null,
+          "description": "Common names by language",
+          "patternProperties": {
+            "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$": {
+              "description": "String with no leading/trailing whitespace",
+              "pattern": "^(\\S.*)?\\S$",
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "description": "IETF BCP-47 language tag"
+          },
+          "title": "Common",
+          "type": "object"
+        },
+        "primary": {
+          "description": "Primary name",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Primary",
+          "type": "string"
+        },
+        "rules": {
+          "default": null,
+          "description": "Name rules",
+          "items": {
+            "$ref": "#/$defs/NameRule"
+          },
+          "title": "Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "title": "NamesContainer",
+      "type": "object"
+    },
+    "PerspectiveMode": {
+      "description": "Perspective mode for disputed names.",
+      "enum": [
+        "accepted_by",
+        "disputed_by"
+      ],
+      "title": "PerspectiveMode",
+      "type": "string"
+    },
+    "Perspectives": {
+      "additionalProperties": false,
+      "description": "Political perspectives container.",
+      "properties": {
+        "countries": {
+          "description": "ISO 3166-1 alpha-2 country codes",
+          "items": {
+            "description": "ISO 3166-1 alpha-2 country code",
+            "maxLength": 2,
+            "minLength": 2,
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Countries",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mode": {
+          "$ref": "#/$defs/PerspectiveMode",
+          "description": "Perspective mode"
+        }
+      },
+      "required": [
+        "mode",
+        "countries"
+      ],
+      "title": "Perspectives",
+      "type": "object"
+    },
+    "RoofMaterial": {
+      "description": "Building roof material classification.",
+      "enum": [
+        "concrete",
+        "copper",
+        "eternit",
+        "glass",
+        "grass",
+        "gravel",
+        "metal",
+        "plastic",
+        "roof_tiles",
+        "slate",
+        "solar_panels",
+        "thatch",
+        "tar_paper",
+        "wood"
+      ],
+      "title": "RoofMaterial",
+      "type": "string"
+    },
+    "RoofOrientation": {
+      "description": "Building roof orientation classification.",
+      "enum": [
+        "across",
+        "along"
+      ],
+      "title": "RoofOrientation",
+      "type": "string"
+    },
+    "RoofShape": {
+      "description": "Building roof shape classification.",
+      "enum": [
+        "dome",
+        "flat",
+        "gabled",
+        "gambrel",
+        "half_hipped",
+        "hipped",
+        "mansard",
+        "onion",
+        "pyramidal",
+        "round",
+        "saltbox",
+        "sawtooth",
+        "skillion",
+        "spherical"
+      ],
+      "title": "RoofShape",
+      "type": "string"
+    },
+    "SourceItem": {
+      "additionalProperties": false,
+      "description": "Source information for a specific property.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "confidence": {
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "update_time": {
+          "default": null,
+          "description": "When this property was last updated",
+          "format": "date-time",
+          "title": "Update Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Building part feature model.",
+  "patternProperties": {
+    "^ext_.*$": {
+      "description": "Additional top-level properties must be prefixed with `ext_`."
+    }
+  },
+  "properties": {
+    "geometry": {
+      "description": "Geometry (Polygon or MultiPolygon)",
+      "oneOf": [
+        {
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "items": {
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "minItems": 4,
+                  "type": "array"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "type": {
+              "const": "MultiPolygon",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "minItems": 4,
+                "type": "array"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "type": {
+              "const": "Polygon",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "type": "object"
+        }
+      ],
+      "title": "Geometry"
+    },
+    "id": {
+      "description": "Feature identifier",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "properties": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "address": {
+          "$ref": "#/$defs/AddressContainer",
+          "default": null,
+          "description": "Address information"
+        },
+        "building_id": {
+          "description": "Parent building ID",
+          "minLength": 1,
+          "title": "Building Id",
+          "type": "string"
+        },
+        "class": {
+          "$ref": "#/$defs/BuildingClass",
+          "default": null,
+          "description": "Building class"
+        },
+        "facade_color": {
+          "default": null,
+          "description": "Facade color (hex)",
+          "pattern": "^#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$",
+          "title": "Facade Color",
+          "type": "string"
+        },
+        "facade_material": {
+          "$ref": "#/$defs/FacadeMaterial",
+          "default": null,
+          "description": "Facade material"
+        },
+        "has_parts": {
+          "default": null,
+          "description": "Building has parts",
+          "title": "Has Parts",
+          "type": "boolean"
+        },
+        "height": {
+          "default": null,
+          "description": "Height of the building in meters",
+          "exclusiveMinimum": 0,
+          "title": "Height",
+          "type": "number"
+        },
+        "is_underground": {
+          "default": null,
+          "description": "Entire building is below ground",
+          "title": "Is Underground",
+          "type": "boolean"
+        },
+        "level": {
+          "default": null,
+          "description": "Z-order level",
+          "title": "Level",
+          "type": "integer"
+        },
+        "min_floor": {
+          "default": null,
+          "description": "Start floor if building is floating",
+          "exclusiveMinimum": 0,
+          "title": "Min Floor",
+          "type": "integer"
+        },
+        "min_height": {
+          "default": null,
+          "description": "Building bottom height in meters",
+          "title": "Min Height",
+          "type": "number"
+        },
+        "names": {
+          "$ref": "#/$defs/NamesContainer",
+          "default": null,
+          "description": "Multilingual names"
+        },
+        "num_floors": {
+          "default": null,
+          "description": "Number of above-ground floors",
+          "exclusiveMinimum": 0,
+          "title": "Num Floors",
+          "type": "integer"
+        },
+        "num_floors_underground": {
+          "default": null,
+          "description": "Number of below-ground floors",
+          "exclusiveMinimum": 0,
+          "title": "Num Floors Underground",
+          "type": "integer"
+        },
+        "roof_color": {
+          "default": null,
+          "description": "Roof color (hex)",
+          "pattern": "^#[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$",
+          "title": "Roof Color",
+          "type": "string"
+        },
+        "roof_direction": {
+          "default": null,
+          "description": "Roof bearing in degrees",
+          "exclusiveMaximum": 360,
+          "minimum": 0,
+          "title": "Roof Direction",
+          "type": "number"
+        },
+        "roof_height": {
+          "default": null,
+          "description": "Roof height in meters",
+          "title": "Roof Height",
+          "type": "number"
+        },
+        "roof_material": {
+          "$ref": "#/$defs/RoofMaterial",
+          "default": null,
+          "description": "Roof material"
+        },
+        "roof_orientation": {
+          "$ref": "#/$defs/RoofOrientation",
+          "default": null,
+          "description": "Roof orientation"
+        },
+        "roof_shape": {
+          "$ref": "#/$defs/RoofShape",
+          "default": null,
+          "description": "Roof shape"
+        },
+        "sources": {
+          "default": null,
+          "description": "Source information",
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "subtype": {
+          "$ref": "#/$defs/BuildingSubtype",
+          "default": null,
+          "description": "Building subtype"
+        },
+        "theme": {
+          "const": "buildings",
+          "description": "Feature theme",
+          "title": "Theme",
+          "type": "string"
+        },
+        "type": {
+          "const": "building_part",
+          "description": "Feature type",
+          "title": "Type",
+          "type": "string"
+        },
+        "version": {
+          "description": "Feature version number",
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "theme",
+        "type",
+        "version",
+        "building_id"
+      ],
+      "type": "object",
+      "unevaluatedProperties": false
+    },
+    "type": {
+      "const": "Feature",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "geometry",
+    "properties",
+    "type"
+  ],
+  "title": "BuildingPart",
+  "type": "object"
+}

@@ -1,0 +1,524 @@
+{
+  "$defs": {
+    "AddressContainer": {
+      "additionalProperties": false,
+      "description": "Address container with flexible admin levels.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "address_levels": {
+          "default": null,
+          "description": "Address levels (1-5)",
+          "items": {
+            "$ref": "#/$defs/AddressLevel"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "title": "Address Levels",
+          "type": "array"
+        },
+        "country": {
+          "default": null,
+          "description": "ISO 3166-1 alpha-2 country code",
+          "maxLength": 2,
+          "minLength": 2,
+          "pattern": "^[A-Z]{2}$",
+          "title": "Country",
+          "type": "string"
+        },
+        "freeform": {
+          "default": null,
+          "description": "Freeform address string",
+          "title": "Freeform",
+          "type": "string"
+        },
+        "locality": {
+          "default": null,
+          "description": "Locality name",
+          "title": "Locality",
+          "type": "string"
+        },
+        "postal_city": {
+          "default": null,
+          "description": "Postal city if different",
+          "title": "Postal City",
+          "type": "string"
+        },
+        "postcode": {
+          "default": null,
+          "description": "Postal code",
+          "title": "Postcode",
+          "type": "string"
+        },
+        "region": {
+          "default": null,
+          "description": "ISO 3166-2 subdivision code",
+          "maxLength": 6,
+          "minLength": 4,
+          "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$",
+          "title": "Region",
+          "type": "string"
+        }
+      },
+      "title": "AddressContainer",
+      "type": "object"
+    },
+    "AddressLevel": {
+      "additionalProperties": false,
+      "description": "Address level with optional value.",
+      "properties": {
+        "value": {
+          "default": null,
+          "description": "Address level value",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "title": "AddressLevel",
+      "type": "object"
+    },
+    "Brand": {
+      "additionalProperties": false,
+      "description": "Brand information for places.",
+      "properties": {
+        "names": {
+          "$ref": "#/$defs/NamesContainer",
+          "description": "Multilingual brand names"
+        },
+        "wikidata": {
+          "default": null,
+          "description": "Wikidata identifier",
+          "pattern": "^Q\\d+$",
+          "title": "Wikidata",
+          "type": "string"
+        }
+      },
+      "required": [
+        "names"
+      ],
+      "title": "Brand",
+      "type": "object"
+    },
+    "Categories": {
+      "additionalProperties": false,
+      "description": "Place categories with primary and alternate classification.",
+      "properties": {
+        "alternate": {
+          "default": null,
+          "description": "Alternate categories",
+          "items": {
+            "description": "Category in snake_case format",
+            "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Alternate",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "primary": {
+          "description": "Primary category (required)",
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "title": "Primary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "title": "Categories",
+      "type": "object"
+    },
+    "NameRule": {
+      "additionalProperties": false,
+      "description": "Name rule with variant and language specification.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "language": {
+          "default": null,
+          "description": "IETF BCP-47 language tag",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$",
+          "title": "Language",
+          "type": "string"
+        },
+        "perspectives": {
+          "$ref": "#/$defs/Perspectives",
+          "default": null,
+          "description": "Political perspectives"
+        },
+        "side": {
+          "default": null,
+          "description": "Side specification",
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "value": {
+          "description": "Name value",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Value",
+          "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/NameVariant",
+          "description": "Name variant type"
+        }
+      },
+      "required": [
+        "value",
+        "variant"
+      ],
+      "title": "NameRule",
+      "type": "object"
+    },
+    "NameVariant": {
+      "description": "Name variant types.",
+      "enum": [
+        "common",
+        "official",
+        "alternate",
+        "short"
+      ],
+      "title": "NameVariant",
+      "type": "string"
+    },
+    "NamesContainer": {
+      "additionalProperties": false,
+      "description": "Multilingual names container.",
+      "properties": {
+        "common": {
+          "additionalProperties": false,
+          "default": null,
+          "description": "Common names by language",
+          "patternProperties": {
+            "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$": {
+              "description": "String with no leading/trailing whitespace",
+              "pattern": "^(\\S.*)?\\S$",
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "description": "IETF BCP-47 language tag"
+          },
+          "title": "Common",
+          "type": "object"
+        },
+        "primary": {
+          "description": "Primary name",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Primary",
+          "type": "string"
+        },
+        "rules": {
+          "default": null,
+          "description": "Name rules",
+          "items": {
+            "$ref": "#/$defs/NameRule"
+          },
+          "title": "Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "title": "NamesContainer",
+      "type": "object"
+    },
+    "PerspectiveMode": {
+      "description": "Perspective mode for disputed names.",
+      "enum": [
+        "accepted_by",
+        "disputed_by"
+      ],
+      "title": "PerspectiveMode",
+      "type": "string"
+    },
+    "Perspectives": {
+      "additionalProperties": false,
+      "description": "Political perspectives container.",
+      "properties": {
+        "countries": {
+          "description": "ISO 3166-1 alpha-2 country codes",
+          "items": {
+            "description": "ISO 3166-1 alpha-2 country code",
+            "maxLength": 2,
+            "minLength": 2,
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Countries",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mode": {
+          "$ref": "#/$defs/PerspectiveMode",
+          "description": "Perspective mode"
+        }
+      },
+      "required": [
+        "mode",
+        "countries"
+      ],
+      "title": "Perspectives",
+      "type": "object"
+    },
+    "SourceItem": {
+      "additionalProperties": false,
+      "description": "Source information for a specific property.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "confidence": {
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "update_time": {
+          "default": null,
+          "description": "When this property was last updated",
+          "format": "date-time",
+          "title": "Update Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Place feature model.",
+  "patternProperties": {
+    "^ext_.*$": {
+      "description": "Additional top-level properties must be prefixed with `ext_`."
+    }
+  },
+  "properties": {
+    "geometry": {
+      "description": "Geometry (Point)",
+      "properties": {
+        "bbox": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "type": "array"
+        },
+        "coordinates": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "type": "array"
+        },
+        "type": {
+          "const": "Point",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Geometry",
+      "type": "object"
+    },
+    "id": {
+      "description": "Feature identifier",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "properties": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "addresses": {
+          "default": null,
+          "description": "Place addresses",
+          "items": {
+            "$ref": "#/$defs/AddressContainer"
+          },
+          "minItems": 1,
+          "title": "Addresses",
+          "type": "array"
+        },
+        "brand": {
+          "$ref": "#/$defs/Brand",
+          "default": null,
+          "description": "Brand information"
+        },
+        "categories": {
+          "$ref": "#/$defs/Categories",
+          "default": null,
+          "description": "Place categories"
+        },
+        "confidence": {
+          "default": null,
+          "description": "Confidence score (0.0-1.0)",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "emails": {
+          "default": null,
+          "description": "Email addresses",
+          "items": {
+            "format": "email",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Emails",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "names": {
+          "$ref": "#/$defs/NamesContainer",
+          "default": null,
+          "description": "Multilingual names"
+        },
+        "phones": {
+          "default": null,
+          "description": "Phone numbers",
+          "items": {
+            "description": "International phone number (+ followed by country code and number)",
+            "pattern": "^\\+\\d{1,3}[\\s\\-\\(\\)0-9]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Phones",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "socials": {
+          "default": null,
+          "description": "Social media URLs",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Socials",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "sources": {
+          "default": null,
+          "description": "Source information",
+          "items": {
+            "$ref": "#/$defs/SourceItem"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "theme": {
+          "const": "places",
+          "description": "Feature theme",
+          "title": "Theme",
+          "type": "string"
+        },
+        "type": {
+          "const": "place",
+          "description": "Feature type",
+          "title": "Type",
+          "type": "string"
+        },
+        "version": {
+          "description": "Feature version number",
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "websites": {
+          "default": null,
+          "description": "Website URLs",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Websites",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "theme",
+        "type",
+        "version"
+      ],
+      "type": "object",
+      "unevaluatedProperties": false
+    },
+    "type": {
+      "const": "Feature",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "geometry",
+    "properties",
+    "type"
+  ],
+  "title": "Place",
+  "type": "object"
+}

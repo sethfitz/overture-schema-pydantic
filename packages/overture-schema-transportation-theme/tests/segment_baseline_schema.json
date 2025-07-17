@@ -1,0 +1,1860 @@
+{
+  "$defs": {
+    "AccessRestrictionRule": {
+      "additionalProperties": false,
+      "description": "Access restriction rule with scoping via when clause.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "access_type": {
+          "$ref": "#/$defs/AccessType",
+          "description": "Access type"
+        },
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "when": {
+          "$ref": "#/$defs/AccessRestrictionWhenClause",
+          "default": null,
+          "description": "Scoping conditions"
+        }
+      },
+      "required": [
+        "access_type"
+      ],
+      "title": "AccessRestrictionRule",
+      "type": "object"
+    },
+    "AccessRestrictionWhenClause": {
+      "additionalProperties": false,
+      "description": "When clause for access restriction rules.",
+      "properties": {
+        "during": {
+          "default": null,
+          "description": "Time periods in OSM opening hours format (e.g., 'Mo-Fr 08:00-17:00')",
+          "title": "During",
+          "type": "string"
+        },
+        "heading": {
+          "default": null,
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
+          "enum": [
+            "forward",
+            "backward"
+          ],
+          "title": "Heading",
+          "type": "string"
+        },
+        "mode": {
+          "default": null,
+          "description": "Transportation modes affected by this rule (car, foot, bike, etc.)",
+          "items": {
+            "$ref": "#/$defs/TravelMode"
+          },
+          "minItems": 1,
+          "title": "Mode",
+          "type": "array"
+        },
+        "recognized": {
+          "default": null,
+          "description": "Legal or social recognition status (as_private, as_employee, as_public, etc.)",
+          "items": {
+            "$ref": "#/$defs/RecognizedStatus"
+          },
+          "minItems": 1,
+          "title": "Recognized",
+          "type": "array"
+        },
+        "using": {
+          "default": null,
+          "description": "Purpose of travel (to_deliver, at_destination, for_through_traffic, etc.)",
+          "items": {
+            "$ref": "#/$defs/PurposeOfUse"
+          },
+          "minItems": 1,
+          "title": "Using",
+          "type": "array"
+        },
+        "vehicle": {
+          "default": null,
+          "description": "Physical vehicle constraints (weight, height, width, length limits)",
+          "items": {
+            "$ref": "#/$defs/VehicleConstraint"
+          },
+          "minItems": 1,
+          "title": "Vehicle",
+          "type": "array"
+        }
+      },
+      "title": "AccessRestrictionWhenClause",
+      "type": "object"
+    },
+    "AccessType": {
+      "description": "Access level enumeration.",
+      "enum": [
+        "allowed",
+        "denied",
+        "designated"
+      ],
+      "title": "AccessType",
+      "type": "string"
+    },
+    "ConnectorReference": {
+      "additionalProperties": false,
+      "description": "Reference to a connector with position information.",
+      "properties": {
+        "at": {
+          "description": "Position along segment (0.0-1.0)",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "At",
+          "type": "number"
+        },
+        "connector_id": {
+          "description": "Connector identifier",
+          "title": "Connector Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "connector_id",
+        "at"
+      ],
+      "title": "ConnectorReference",
+      "type": "object"
+    },
+    "DestinationLabel": {
+      "additionalProperties": false,
+      "description": "Destination label with type classification.",
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/DestinationLabelType",
+          "description": "Label type"
+        },
+        "value": {
+          "description": "Label text",
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "type"
+      ],
+      "title": "DestinationLabel",
+      "type": "object"
+    },
+    "DestinationLabelType": {
+      "description": "Destination label type classification.",
+      "enum": [
+        "unknown",
+        "street",
+        "route_ref",
+        "toward_route_ref"
+      ],
+      "title": "DestinationLabelType",
+      "type": "string"
+    },
+    "DestinationRule": {
+      "additionalProperties": false,
+      "description": "Destination signage rule with scoping via when clause.",
+      "properties": {
+        "final_heading": {
+          "$ref": "#/$defs/HeadingType",
+          "description": "Final direction on target segment"
+        },
+        "from_connector_id": {
+          "description": "Source connector identifier",
+          "title": "From Connector Id",
+          "type": "string"
+        },
+        "labels": {
+          "description": "Destination labels",
+          "items": {
+            "$ref": "#/$defs/DestinationLabel"
+          },
+          "minItems": 1,
+          "title": "Labels",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "symbols": {
+          "default": null,
+          "description": "Route symbols",
+          "items": {
+            "$ref": "#/$defs/DestinationSignSymbol"
+          },
+          "title": "Symbols",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "to_connector_id": {
+          "description": "Target connector identifier",
+          "title": "To Connector Id",
+          "type": "string"
+        },
+        "to_segment_id": {
+          "description": "Target segment identifier",
+          "title": "To Segment Id",
+          "type": "string"
+        },
+        "when": {
+          "$ref": "#/$defs/DestinationWhenClause",
+          "default": null,
+          "description": "Scoping conditions"
+        }
+      },
+      "required": [
+        "from_connector_id",
+        "to_connector_id",
+        "to_segment_id",
+        "final_heading",
+        "labels"
+      ],
+      "title": "DestinationRule",
+      "type": "object"
+    },
+    "DestinationSignSymbol": {
+      "description": "Valid destination sign symbols.",
+      "enum": [
+        "motorway",
+        "airport",
+        "hospital",
+        "center",
+        "industrial",
+        "parking"
+      ],
+      "title": "DestinationSignSymbol",
+      "type": "string"
+    },
+    "DestinationWhenClause": {
+      "additionalProperties": false,
+      "description": "When clause for destination rules.",
+      "properties": {
+        "heading": {
+          "default": null,
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
+          "enum": [
+            "forward",
+            "backward"
+          ],
+          "title": "Heading",
+          "type": "string"
+        }
+      },
+      "title": "DestinationWhenClause",
+      "type": "object"
+    },
+    "HeadingType": {
+      "description": "Heading type classification.",
+      "enum": [
+        "forward",
+        "backward"
+      ],
+      "title": "HeadingType",
+      "type": "string"
+    },
+    "LevelRule": {
+      "additionalProperties": false,
+      "description": "Level/elevation rule with linear referencing.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "value": {
+          "description": "Level/elevation value",
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "LevelRule",
+      "type": "object"
+    },
+    "NameRule": {
+      "additionalProperties": false,
+      "description": "Name rule with variant and language specification.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "language": {
+          "default": null,
+          "description": "IETF BCP-47 language tag",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$",
+          "title": "Language",
+          "type": "string"
+        },
+        "perspectives": {
+          "$ref": "#/$defs/Perspectives",
+          "default": null,
+          "description": "Political perspectives"
+        },
+        "side": {
+          "default": null,
+          "description": "Side specification",
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "value": {
+          "description": "Name value",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Value",
+          "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/NameVariant",
+          "description": "Name variant type"
+        }
+      },
+      "required": [
+        "value",
+        "variant"
+      ],
+      "title": "NameRule",
+      "type": "object"
+    },
+    "NameVariant": {
+      "description": "Name variant types.",
+      "enum": [
+        "common",
+        "official",
+        "alternate",
+        "short"
+      ],
+      "title": "NameVariant",
+      "type": "string"
+    },
+    "NamesContainer": {
+      "additionalProperties": false,
+      "description": "Multilingual names container.",
+      "properties": {
+        "common": {
+          "additionalProperties": false,
+          "default": null,
+          "description": "Common names by language",
+          "patternProperties": {
+            "^[a-z]{2,3}(-[A-Za-z]{2,8})*(-[0-9][A-Za-z0-9]{3})*$": {
+              "description": "String with no leading/trailing whitespace",
+              "pattern": "^(\\S.*)?\\S$",
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "description": "IETF BCP-47 language tag"
+          },
+          "title": "Common",
+          "type": "object"
+        },
+        "primary": {
+          "description": "Primary name",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Primary",
+          "type": "string"
+        },
+        "rules": {
+          "default": null,
+          "description": "Name rules",
+          "items": {
+            "$ref": "#/$defs/NameRule"
+          },
+          "title": "Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "title": "NamesContainer",
+      "type": "object"
+    },
+    "PerspectiveMode": {
+      "description": "Perspective mode for disputed names.",
+      "enum": [
+        "accepted_by",
+        "disputed_by"
+      ],
+      "title": "PerspectiveMode",
+      "type": "string"
+    },
+    "Perspectives": {
+      "additionalProperties": false,
+      "description": "Political perspectives container.",
+      "properties": {
+        "countries": {
+          "description": "ISO 3166-1 alpha-2 country codes",
+          "items": {
+            "description": "ISO 3166-1 alpha-2 country code",
+            "maxLength": 2,
+            "minLength": 2,
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Countries",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mode": {
+          "$ref": "#/$defs/PerspectiveMode",
+          "description": "Perspective mode"
+        }
+      },
+      "required": [
+        "mode",
+        "countries"
+      ],
+      "title": "Perspectives",
+      "type": "object"
+    },
+    "ProhibitedTransitionRule": {
+      "additionalProperties": false,
+      "description": "Prohibited transition (turn restriction) rule.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "final_heading": {
+          "$ref": "#/$defs/HeadingType",
+          "description": "Required final heading"
+        },
+        "sequence": {
+          "description": "Sequence of connectors defining the prohibited path",
+          "items": {
+            "$ref": "#/$defs/ProhibitedTransitionSequence"
+          },
+          "minItems": 1,
+          "title": "Sequence",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "when": {
+          "$ref": "#/$defs/ProhibitedTransitionWhenClause",
+          "default": null,
+          "description": "Scoping conditions"
+        }
+      },
+      "required": [
+        "sequence",
+        "final_heading"
+      ],
+      "title": "ProhibitedTransitionRule",
+      "type": "object"
+    },
+    "ProhibitedTransitionSequence": {
+      "additionalProperties": false,
+      "description": "Sequence entry with connector and segment identifiers.",
+      "properties": {
+        "connector_id": {
+          "description": "Connector identifier",
+          "title": "Connector Id",
+          "type": "string"
+        },
+        "segment_id": {
+          "description": "Segment identifier",
+          "title": "Segment Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "connector_id",
+        "segment_id"
+      ],
+      "title": "ProhibitedTransitionSequence",
+      "type": "object"
+    },
+    "ProhibitedTransitionWhenClause": {
+      "additionalProperties": false,
+      "description": "When clause for prohibited transition rules.",
+      "properties": {
+        "during": {
+          "default": null,
+          "description": "Time periods in OSM opening hours format (e.g., 'Mo-Fr 08:00-17:00')",
+          "title": "During",
+          "type": "string"
+        },
+        "heading": {
+          "default": null,
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
+          "enum": [
+            "forward",
+            "backward"
+          ],
+          "title": "Heading",
+          "type": "string"
+        },
+        "mode": {
+          "default": null,
+          "description": "Transportation modes affected by this rule (car, foot, bike, etc.)",
+          "items": {
+            "$ref": "#/$defs/TravelMode"
+          },
+          "minItems": 1,
+          "title": "Mode",
+          "type": "array"
+        },
+        "recognized": {
+          "default": null,
+          "description": "Legal or social recognition status (as_private, as_employee, as_public, etc.)",
+          "items": {
+            "$ref": "#/$defs/RecognizedStatus"
+          },
+          "minItems": 1,
+          "title": "Recognized",
+          "type": "array"
+        },
+        "using": {
+          "default": null,
+          "description": "Purpose of travel (to_deliver, at_destination, for_through_traffic, etc.)",
+          "items": {
+            "$ref": "#/$defs/PurposeOfUse"
+          },
+          "minItems": 1,
+          "title": "Using",
+          "type": "array"
+        },
+        "vehicle": {
+          "default": null,
+          "description": "Physical vehicle constraints (weight, height, width, length limits)",
+          "items": {
+            "$ref": "#/$defs/VehicleConstraint"
+          },
+          "minItems": 1,
+          "title": "Vehicle",
+          "type": "array"
+        }
+      },
+      "title": "ProhibitedTransitionWhenClause",
+      "type": "object"
+    },
+    "PurposeOfUse": {
+      "description": "Purpose of use enumeration.",
+      "enum": [
+        "to_deliver",
+        "at_destination",
+        "through_traffic",
+        "as_customer",
+        "to_farm"
+      ],
+      "title": "PurposeOfUse",
+      "type": "string"
+    },
+    "RailClass": {
+      "description": "Rail classification enum.",
+      "enum": [
+        "funicular",
+        "light_rail",
+        "monorail",
+        "narrow_gauge",
+        "standard_gauge",
+        "subway",
+        "tram",
+        "unknown"
+      ],
+      "title": "RailClass",
+      "type": "string"
+    },
+    "RailFlagRule": {
+      "additionalProperties": false,
+      "description": "Rail-specific flag rule with geometric scoping only.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "values": {
+          "description": "Rail flag values",
+          "items": {
+            "$ref": "#/$defs/RailFlagType"
+          },
+          "minItems": 1,
+          "title": "Values",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "title": "RailFlagRule",
+      "type": "object"
+    },
+    "RailFlagType": {
+      "description": "Rail-specific flag types.",
+      "enum": [
+        "is_bridge",
+        "is_tunnel",
+        "is_under_construction",
+        "is_abandoned",
+        "is_covered",
+        "is_passenger",
+        "is_freight",
+        "is_disused"
+      ],
+      "title": "RailFlagType",
+      "type": "string"
+    },
+    "RailSegment": {
+      "additionalProperties": false,
+      "description": "Rail segment feature model.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "geometry": {
+          "description": "Geometry (LineString)",
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "type": "array"
+              },
+              "minItems": 2,
+              "type": "array"
+            },
+            "type": {
+              "const": "LineString",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "title": "Geometry",
+          "type": "object"
+        },
+        "id": {
+          "description": "Feature identifier",
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "properties": {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^ext_.*$": {
+              "description": "Additional top-level properties must be prefixed with `ext_`."
+            }
+          },
+          "properties": {
+            "access_restrictions": {
+              "default": [],
+              "description": "Access restriction rules",
+              "items": {
+                "$ref": "#/$defs/AccessRestrictionRule"
+              },
+              "minItems": 1,
+              "title": "Access Restrictions",
+              "type": "array",
+              "uniqueItems": true
+            },
+            "class": {
+              "$ref": "#/$defs/RailClass",
+              "description": "Captures the kind of rail segment"
+            },
+            "connectors": {
+              "default": [],
+              "description": "Connector references",
+              "items": {
+                "$ref": "#/$defs/ConnectorReference"
+              },
+              "title": "Connectors",
+              "type": "array",
+              "uniqueItems": true
+            },
+            "level": {
+              "default": 0,
+              "description": "Z-order of the feature where 0 is visual level",
+              "title": "Level",
+              "type": "integer"
+            },
+            "level_rules": {
+              "default": [],
+              "description": "Defines the Z-order, i.e. stacking order, of the road segment.",
+              "items": {
+                "$ref": "#/$defs/LevelRule"
+              },
+              "title": "Level Rules",
+              "type": "array"
+            },
+            "names": {
+              "$ref": "#/$defs/NamesContainer",
+              "default": null,
+              "description": "Properties defining the names of a feature."
+            },
+            "rail_flags": {
+              "default": null,
+              "description": "Rail-specific flags",
+              "items": {
+                "$ref": "#/$defs/RailFlagRule"
+              },
+              "title": "Rail Flags",
+              "type": "array"
+            },
+            "routes": {
+              "default": [],
+              "description": "Routes this segment belongs to",
+              "items": {
+                "$ref": "#/$defs/RouteReference"
+              },
+              "title": "Routes",
+              "type": "array"
+            },
+            "sources": {
+              "default": null,
+              "description": "Source information",
+              "items": {
+                "$ref": "#/$defs/SourceItem"
+              },
+              "title": "Sources",
+              "type": "array"
+            },
+            "subclass_rules": {
+              "default": [],
+              "description": "Set of subclasses scoped along segment",
+              "items": {
+                "$ref": "#/$defs/SubclassRule"
+              },
+              "title": "Subclass Rules",
+              "type": "array"
+            },
+            "subtype": {
+              "const": "rail",
+              "title": "Subtype",
+              "type": "string"
+            },
+            "theme": {
+              "const": "transportation",
+              "description": "Feature theme",
+              "title": "Theme",
+              "type": "string"
+            },
+            "type": {
+              "const": "segment",
+              "description": "Feature type",
+              "title": "Type",
+              "type": "string"
+            },
+            "version": {
+              "description": "Feature version number",
+              "minimum": 0,
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "theme",
+            "type",
+            "version",
+            "subtype",
+            "class"
+          ],
+          "type": "object",
+          "unevaluatedProperties": false
+        },
+        "type": {
+          "const": "Feature",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "geometry",
+        "properties",
+        "type"
+      ],
+      "title": "RailSegment",
+      "type": "object"
+    },
+    "RecognizedStatus": {
+      "description": "Recognized status enumeration.",
+      "enum": [
+        "as_private",
+        "as_employee",
+        "as_customer",
+        "as_resident",
+        "as_permitted"
+      ],
+      "title": "RecognizedStatus",
+      "type": "string"
+    },
+    "RoadClass": {
+      "description": "Road classification enum.",
+      "enum": [
+        "motorway",
+        "primary",
+        "secondary",
+        "tertiary",
+        "residential",
+        "living_street",
+        "trunk",
+        "unclassified",
+        "service",
+        "pedestrian",
+        "footway",
+        "steps",
+        "path",
+        "track",
+        "cycleway",
+        "bridleway",
+        "unknown"
+      ],
+      "title": "RoadClass",
+      "type": "string"
+    },
+    "RoadFlagRule": {
+      "additionalProperties": false,
+      "description": "Road-specific flag rule with geometric scoping only.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "values": {
+          "description": "Road flag values",
+          "items": {
+            "$ref": "#/$defs/RoadFlagType"
+          },
+          "minItems": 1,
+          "title": "Values",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "title": "RoadFlagRule",
+      "type": "object"
+    },
+    "RoadFlagType": {
+      "description": "Road-specific flag types.",
+      "enum": [
+        "is_bridge",
+        "is_link",
+        "is_tunnel",
+        "is_under_construction",
+        "is_abandoned",
+        "is_covered",
+        "is_indoor"
+      ],
+      "title": "RoadFlagType",
+      "type": "string"
+    },
+    "RoadSegment": {
+      "additionalProperties": false,
+      "description": "Road segment feature model.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "geometry": {
+          "description": "Geometry (LineString)",
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "type": "array"
+              },
+              "minItems": 2,
+              "type": "array"
+            },
+            "type": {
+              "const": "LineString",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "title": "Geometry",
+          "type": "object"
+        },
+        "id": {
+          "description": "Feature identifier",
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "properties": {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^ext_.*$": {
+              "description": "Additional top-level properties must be prefixed with `ext_`."
+            }
+          },
+          "properties": {
+            "access_restrictions": {
+              "default": [],
+              "description": "Access restriction rules",
+              "items": {
+                "$ref": "#/$defs/AccessRestrictionRule"
+              },
+              "minItems": 1,
+              "title": "Access Restrictions",
+              "type": "array",
+              "uniqueItems": true
+            },
+            "class": {
+              "$ref": "#/$defs/RoadClass",
+              "description": "Captures the kind of road and its position in the road network hierarchy."
+            },
+            "connectors": {
+              "default": [],
+              "description": "Connector references",
+              "items": {
+                "$ref": "#/$defs/ConnectorReference"
+              },
+              "title": "Connectors",
+              "type": "array",
+              "uniqueItems": true
+            },
+            "destinations": {
+              "default": null,
+              "description": "Destination labels",
+              "items": {
+                "$ref": "#/$defs/DestinationRule"
+              },
+              "title": "Destinations",
+              "type": "array"
+            },
+            "level": {
+              "default": 0,
+              "description": "Z-order of the feature where 0 is visual level",
+              "title": "Level",
+              "type": "integer"
+            },
+            "level_rules": {
+              "default": [],
+              "description": "Defines the Z-order, i.e. stacking order, of the road segment.",
+              "items": {
+                "$ref": "#/$defs/LevelRule"
+              },
+              "title": "Level Rules",
+              "type": "array"
+            },
+            "names": {
+              "$ref": "#/$defs/NamesContainer",
+              "default": null,
+              "description": "Properties defining the names of a feature."
+            },
+            "prohibited_transitions": {
+              "default": null,
+              "description": "Turn restrictions",
+              "items": {
+                "$ref": "#/$defs/ProhibitedTransitionRule"
+              },
+              "title": "Prohibited Transitions",
+              "type": "array"
+            },
+            "road_flags": {
+              "default": null,
+              "description": "Road-specific flags",
+              "items": {
+                "$ref": "#/$defs/RoadFlagRule"
+              },
+              "title": "Road Flags",
+              "type": "array"
+            },
+            "road_surface": {
+              "default": null,
+              "description": "Road surface rules",
+              "items": {
+                "$ref": "#/$defs/SurfaceRule"
+              },
+              "title": "Road Surface",
+              "type": "array"
+            },
+            "routes": {
+              "default": [],
+              "description": "Routes this segment belongs to",
+              "items": {
+                "$ref": "#/$defs/RouteReference"
+              },
+              "title": "Routes",
+              "type": "array"
+            },
+            "sources": {
+              "default": null,
+              "description": "Source information",
+              "items": {
+                "$ref": "#/$defs/SourceItem"
+              },
+              "title": "Sources",
+              "type": "array"
+            },
+            "speed_limits": {
+              "default": null,
+              "description": "Speed limit rules",
+              "items": {
+                "$ref": "#/$defs/SpeedLimitRule"
+              },
+              "title": "Speed Limits",
+              "type": "array"
+            },
+            "subclass": {
+              "$ref": "#/$defs/SegmentSubclass",
+              "default": null,
+              "description": "Refines expected usage of the segment, must not overlap."
+            },
+            "subclass_rules": {
+              "default": [],
+              "description": "Set of subclasses scoped along segment",
+              "items": {
+                "$ref": "#/$defs/SubclassRule"
+              },
+              "title": "Subclass Rules",
+              "type": "array"
+            },
+            "subtype": {
+              "const": "road",
+              "title": "Subtype",
+              "type": "string"
+            },
+            "theme": {
+              "const": "transportation",
+              "description": "Feature theme",
+              "title": "Theme",
+              "type": "string"
+            },
+            "type": {
+              "const": "segment",
+              "description": "Feature type",
+              "title": "Type",
+              "type": "string"
+            },
+            "version": {
+              "description": "Feature version number",
+              "minimum": 0,
+              "title": "Version",
+              "type": "integer"
+            },
+            "width_rules": {
+              "default": null,
+              "description": "Width rules",
+              "items": {
+                "$ref": "#/$defs/WidthRule"
+              },
+              "minItems": 1,
+              "title": "Width Rules",
+              "type": "array"
+            }
+          },
+          "required": [
+            "theme",
+            "type",
+            "version",
+            "subtype",
+            "class"
+          ],
+          "type": "object",
+          "unevaluatedProperties": false
+        },
+        "type": {
+          "const": "Feature",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "geometry",
+        "properties",
+        "type"
+      ],
+      "title": "RoadSegment",
+      "type": "object"
+    },
+    "RoadSurface": {
+      "description": "Road surface material types.",
+      "enum": [
+        "unknown",
+        "paved",
+        "unpaved",
+        "gravel",
+        "dirt",
+        "paving_stones",
+        "metal"
+      ],
+      "title": "RoadSurface",
+      "type": "string"
+    },
+    "RouteReference": {
+      "additionalProperties": false,
+      "description": "Route reference with linear referencing support.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "name": {
+          "default": null,
+          "description": "Route name",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Name",
+          "type": "string"
+        },
+        "network": {
+          "default": null,
+          "description": "Route network",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Network",
+          "type": "string"
+        },
+        "ref": {
+          "default": null,
+          "description": "Route reference number",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Ref",
+          "type": "string"
+        },
+        "symbol": {
+          "default": null,
+          "description": "Route symbol URL",
+          "minLength": 1,
+          "pattern": "^(\\S.*)?\\S$",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "wikidata": {
+          "default": null,
+          "description": "Wikidata identifier",
+          "pattern": "^Q\\d+$",
+          "title": "Wikidata",
+          "type": "string"
+        }
+      },
+      "title": "RouteReference",
+      "type": "object"
+    },
+    "SegmentSubclass": {
+      "description": "Transportation segment subclassification.",
+      "enum": [
+        "link",
+        "sidewalk",
+        "crosswalk",
+        "parking_aisle",
+        "driveway",
+        "alley",
+        "cycle_crossing"
+      ],
+      "title": "SegmentSubclass",
+      "type": "string"
+    },
+    "SourceItem": {
+      "additionalProperties": false,
+      "description": "Source information for a specific property.",
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "confidence": {
+          "default": null,
+          "description": "Confidence value for ML-derived data",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "dataset": {
+          "description": "Source dataset identifier",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "property": {
+          "description": "JSON Pointer to the property",
+          "title": "Property",
+          "type": "string"
+        },
+        "record_id": {
+          "default": null,
+          "description": "Specific record within dataset",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "update_time": {
+          "default": null,
+          "description": "When this property was last updated",
+          "format": "date-time",
+          "title": "Update Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "property",
+        "dataset"
+      ],
+      "title": "SourceItem",
+      "type": "object"
+    },
+    "Speed": {
+      "additionalProperties": false,
+      "description": "Speed value with unit.",
+      "properties": {
+        "unit": {
+          "description": "Speed unit",
+          "enum": [
+            "km/h",
+            "mph"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "description": "Speed value",
+          "exclusiveMinimum": 0,
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Speed",
+      "type": "object"
+    },
+    "SpeedLimitRule": {
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "max_speed"
+          ]
+        },
+        {
+          "required": [
+            "min_speed"
+          ]
+        }
+      ],
+      "description": "Speed limit rule with scoping via when clause.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "is_max_speed_variable": {
+          "default": null,
+          "description": "Whether maximum speed is variable",
+          "title": "Is Max Speed Variable",
+          "type": "boolean"
+        },
+        "max_speed": {
+          "$ref": "#/$defs/Speed",
+          "default": null,
+          "description": "Maximum speed limit"
+        },
+        "min_speed": {
+          "$ref": "#/$defs/Speed",
+          "default": null,
+          "description": "Minimum speed limit"
+        },
+        "when": {
+          "$ref": "#/$defs/SpeedLimitWhenClause",
+          "default": null,
+          "description": "Scoping conditions"
+        }
+      },
+      "title": "SpeedLimitRule",
+      "type": "object"
+    },
+    "SpeedLimitWhenClause": {
+      "additionalProperties": false,
+      "description": "When clause for speed limit rules.",
+      "properties": {
+        "during": {
+          "default": null,
+          "description": "Time periods in OSM opening hours format (e.g., 'Mo-Fr 08:00-17:00')",
+          "title": "During",
+          "type": "string"
+        },
+        "heading": {
+          "default": null,
+          "description": "Direction of travel: 'forward' follows feature geometry, 'backward' opposes it",
+          "enum": [
+            "forward",
+            "backward"
+          ],
+          "title": "Heading",
+          "type": "string"
+        },
+        "mode": {
+          "default": null,
+          "description": "Transportation modes affected by this rule (car, foot, bike, etc.)",
+          "items": {
+            "$ref": "#/$defs/TravelMode"
+          },
+          "minItems": 1,
+          "title": "Mode",
+          "type": "array"
+        },
+        "recognized": {
+          "default": null,
+          "description": "Legal or social recognition status (as_private, as_employee, as_public, etc.)",
+          "items": {
+            "$ref": "#/$defs/RecognizedStatus"
+          },
+          "minItems": 1,
+          "title": "Recognized",
+          "type": "array"
+        },
+        "using": {
+          "default": null,
+          "description": "Purpose of travel (to_deliver, at_destination, for_through_traffic, etc.)",
+          "items": {
+            "$ref": "#/$defs/PurposeOfUse"
+          },
+          "minItems": 1,
+          "title": "Using",
+          "type": "array"
+        },
+        "vehicle": {
+          "default": null,
+          "description": "Physical vehicle constraints (weight, height, width, length limits)",
+          "items": {
+            "$ref": "#/$defs/VehicleConstraint"
+          },
+          "minItems": 1,
+          "title": "Vehicle",
+          "type": "array"
+        }
+      },
+      "title": "SpeedLimitWhenClause",
+      "type": "object"
+    },
+    "SubclassRule": {
+      "additionalProperties": false,
+      "description": "Subclass rule with linear referencing.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "value": {
+          "description": "Subclass value",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "SubclassRule",
+      "type": "object"
+    },
+    "SurfaceRule": {
+      "additionalProperties": false,
+      "description": "Surface material rule with linear referencing.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "value": {
+          "$ref": "#/$defs/RoadSurface",
+          "description": "Surface material"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "SurfaceRule",
+      "type": "object"
+    },
+    "TravelMode": {
+      "description": "Travel mode enumeration.",
+      "enum": [
+        "car",
+        "foot",
+        "bike",
+        "hgv",
+        "bus",
+        "taxi",
+        "motorcycle",
+        "emergency",
+        "delivery",
+        "vehicle",
+        "motor_vehicle",
+        "truck",
+        "bicycle",
+        "hov"
+      ],
+      "title": "TravelMode",
+      "type": "string"
+    },
+    "VehicleComparison": {
+      "description": "Vehicle comparison operators.",
+      "enum": [
+        "equal",
+        "not_equal",
+        "less_than",
+        "less_than_equal",
+        "greater_than",
+        "greater_than_equal"
+      ],
+      "title": "VehicleComparison",
+      "type": "string"
+    },
+    "VehicleConstraint": {
+      "additionalProperties": false,
+      "description": "Vehicle constraint specification.",
+      "properties": {
+        "comparison": {
+          "$ref": "#/$defs/VehicleComparison",
+          "description": "Comparison operator"
+        },
+        "dimension": {
+          "$ref": "#/$defs/VehicleDimension",
+          "description": "Vehicle dimension"
+        },
+        "unit": {
+          "default": null,
+          "description": "Unit of measurement",
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "description": "Constraint value",
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "dimension",
+        "comparison",
+        "value"
+      ],
+      "title": "VehicleConstraint",
+      "type": "object"
+    },
+    "VehicleDimension": {
+      "description": "Vehicle dimension types.",
+      "enum": [
+        "weight",
+        "height",
+        "width",
+        "length",
+        "axle_load",
+        "axle_count"
+      ],
+      "title": "VehicleDimension",
+      "type": "string"
+    },
+    "WaterSegment": {
+      "additionalProperties": false,
+      "description": "Water segment feature model.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "geometry": {
+          "description": "Geometry (LineString)",
+          "properties": {
+            "bbox": {
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "coordinates": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "type": "array"
+              },
+              "minItems": 2,
+              "type": "array"
+            },
+            "type": {
+              "const": "LineString",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "title": "Geometry",
+          "type": "object"
+        },
+        "id": {
+          "description": "Feature identifier",
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "properties": {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^ext_.*$": {
+              "description": "Additional top-level properties must be prefixed with `ext_`."
+            }
+          },
+          "properties": {
+            "access_restrictions": {
+              "default": [],
+              "description": "Access restriction rules",
+              "items": {
+                "$ref": "#/$defs/AccessRestrictionRule"
+              },
+              "minItems": 1,
+              "title": "Access Restrictions",
+              "type": "array",
+              "uniqueItems": true
+            },
+            "connectors": {
+              "default": [],
+              "description": "Connector references",
+              "items": {
+                "$ref": "#/$defs/ConnectorReference"
+              },
+              "title": "Connectors",
+              "type": "array",
+              "uniqueItems": true
+            },
+            "level": {
+              "default": 0,
+              "description": "Z-order of the feature where 0 is visual level",
+              "title": "Level",
+              "type": "integer"
+            },
+            "level_rules": {
+              "default": [],
+              "description": "Defines the Z-order, i.e. stacking order, of the road segment.",
+              "items": {
+                "$ref": "#/$defs/LevelRule"
+              },
+              "title": "Level Rules",
+              "type": "array"
+            },
+            "names": {
+              "$ref": "#/$defs/NamesContainer",
+              "default": null,
+              "description": "Properties defining the names of a feature."
+            },
+            "routes": {
+              "default": [],
+              "description": "Routes this segment belongs to",
+              "items": {
+                "$ref": "#/$defs/RouteReference"
+              },
+              "title": "Routes",
+              "type": "array"
+            },
+            "sources": {
+              "default": null,
+              "description": "Source information",
+              "items": {
+                "$ref": "#/$defs/SourceItem"
+              },
+              "title": "Sources",
+              "type": "array"
+            },
+            "subclass_rules": {
+              "default": [],
+              "description": "Set of subclasses scoped along segment",
+              "items": {
+                "$ref": "#/$defs/SubclassRule"
+              },
+              "title": "Subclass Rules",
+              "type": "array"
+            },
+            "subtype": {
+              "const": "water",
+              "title": "Subtype",
+              "type": "string"
+            },
+            "theme": {
+              "const": "transportation",
+              "description": "Feature theme",
+              "title": "Theme",
+              "type": "string"
+            },
+            "type": {
+              "const": "segment",
+              "description": "Feature type",
+              "title": "Type",
+              "type": "string"
+            },
+            "version": {
+              "description": "Feature version number",
+              "minimum": 0,
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "theme",
+            "type",
+            "version",
+            "subtype"
+          ],
+          "type": "object",
+          "unevaluatedProperties": false
+        },
+        "type": {
+          "const": "Feature",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "geometry",
+        "properties",
+        "type"
+      ],
+      "title": "WaterSegment",
+      "type": "object"
+    },
+    "WidthRule": {
+      "additionalProperties": false,
+      "description": "Width rule with linear referencing.",
+      "patternProperties": {
+        "^ext_.*$": {
+          "description": "Additional top-level properties must be prefixed with `ext_`."
+        }
+      },
+      "properties": {
+        "between": {
+          "default": null,
+          "description": "Linear referencing range [start, end] where 0=start, 1=end of feature",
+          "items": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Between",
+          "type": "array"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "description": "Width value",
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "WidthRule",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "rail": "#/$defs/RailSegment",
+      "road": "#/$defs/RoadSegment",
+      "water": "#/$defs/WaterSegment"
+    },
+    "propertyName": "subtype"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/RoadSegment"
+    },
+    {
+      "$ref": "#/$defs/RailSegment"
+    },
+    {
+      "$ref": "#/$defs/WaterSegment"
+    }
+  ]
+}
