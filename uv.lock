@@ -9,11 +9,9 @@ resolution-markers = [
 [manifest]
 members = [
     "overture-schema",
-    "overture-schema-address-type",
     "overture-schema-addresses-theme",
     "overture-schema-base-common",
     "overture-schema-base-theme",
-    "overture-schema-bathymetry-type",
     "overture-schema-building-part-type",
     "overture-schema-building-type",
     "overture-schema-buildings-common",
@@ -25,9 +23,6 @@ members = [
     "overture-schema-division-type",
     "overture-schema-divisions-common",
     "overture-schema-divisions-theme",
-    "overture-schema-infrastructure-type",
-    "overture-schema-land-cover-type",
-    "overture-schema-land-type",
     "overture-schema-land-use-type",
     "overture-schema-place-type",
     "overture-schema-places-theme",
