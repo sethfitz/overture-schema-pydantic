@@ -3,7 +3,7 @@ name = "overture-schema-transportation-theme"
 version = "0.1.0"
 description = "Overture Maps transportation theme shared structures"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     "overture-schema-transportation-common",

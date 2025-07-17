@@ -3,7 +3,7 @@ name = "overture-schema"
 version = "0.1.0"
 description = "Complete Overture Maps schema collection with all themes and types"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     # Base theme

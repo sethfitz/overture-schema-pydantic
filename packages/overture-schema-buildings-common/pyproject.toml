@@ -3,7 +3,7 @@ name = "overture-schema-buildings-common"
 version = "0.1.0"
 description = "Common structures shared across Overture Maps building types"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     "overture-schema-validation",

@@ -3,7 +3,7 @@ name = "overture-schema-transportation-common"
 version = "0.1.0"
 description = "Overture Maps transportation common structures and enums"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     "pydantic>=2.0",
