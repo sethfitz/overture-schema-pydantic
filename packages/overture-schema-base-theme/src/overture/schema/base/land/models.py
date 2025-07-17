@@ -5,7 +5,6 @@ from typing import Annotated, Any
 
 from pydantic import Field
 
-from overture.schema.base.common import SurfaceMaterial
 from overture.schema.core.base import (
     OvertureFeature,
     register_model,
@@ -18,6 +17,8 @@ from overture.schema.validation import (
     theme_literal,
     type_literal,
 )
+
+from ..shared import SurfaceMaterial
 
 
 class LandSubtype(str, Enum):
