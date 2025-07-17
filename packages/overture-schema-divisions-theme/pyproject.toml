@@ -1,13 +1,12 @@
 [project]
 name = "overture-schema-divisions-theme"
 version = "0.1.0"
-description = "Overture Maps divisions theme shared structures, division area and division boundary types"
+description = "Overture Maps divisions theme shared structures, division, division area and division boundary types"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "overture-schema-core",
     "overture-schema-divisions-common",
-    "overture-schema-division-type",
     "pydantic>=2.0",
 ]
 
@@ -21,7 +20,6 @@ dev = [
 [tool.uv.sources]
 overture-schema-core = { workspace = true }
 overture-schema-divisions-common = { workspace = true }
-overture-schema-division-type = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
