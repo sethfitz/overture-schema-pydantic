@@ -14,45 +14,6 @@ from overture.schema.core.common import (
     ScopingConditions,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
-from overture.schema.transportation.common import (
-    AccessRestrictionRule as StrictAccessRestrictionRule,
-)
-from overture.schema.transportation.common import (
-    ConnectorReference,
-    RailClass,
-    RoadClass,
-    SegmentSubtype,
-)
-from overture.schema.transportation.common import (
-    DestinationRule as StrictDestinationRule,
-)
-from overture.schema.transportation.common import (
-    LevelRule as StrictLevelRule,
-)
-from overture.schema.transportation.common import (
-    ProhibitedTransitionRule as StrictProhibitedTransitionRule,
-)
-from overture.schema.transportation.common import (
-    RailFlagRule as StrictRailFlagRule,
-)
-from overture.schema.transportation.common import (
-    RoadFlagRule as StrictRoadFlagRule,
-)
-from overture.schema.transportation.common import (
-    RouteReference as StrictRouteReference,
-)
-from overture.schema.transportation.common import (
-    SpeedLimitRule as StrictSpeedLimitRule,
-)
-from overture.schema.transportation.common import (
-    SubclassRule as StrictSubclassRule,
-)
-from overture.schema.transportation.common import (
-    SurfaceRule as StrictSurfaceRule,
-)
-from overture.schema.transportation.common import (
-    WidthRule as StrictWidthRule,
-)
 from overture.schema.validation import (
     CompositeUniqueConstraint,
     ConstraintValidatedModel,
@@ -61,6 +22,46 @@ from overture.schema.validation import (
     required_if,
     theme_literal,
     type_literal,
+)
+
+from ..shared import (
+    AccessRestrictionRule as StrictAccessRestrictionRule,
+)
+from ..shared import (
+    ConnectorReference,
+    RailClass,
+    RoadClass,
+    SegmentSubtype,
+)
+from ..shared import (
+    DestinationRule as StrictDestinationRule,
+)
+from ..shared import (
+    LevelRule as StrictLevelRule,
+)
+from ..shared import (
+    ProhibitedTransitionRule as StrictProhibitedTransitionRule,
+)
+from ..shared import (
+    RailFlagRule as StrictRailFlagRule,
+)
+from ..shared import (
+    RoadFlagRule as StrictRoadFlagRule,
+)
+from ..shared import (
+    RouteReference as StrictRouteReference,
+)
+from ..shared import (
+    SpeedLimitRule as StrictSpeedLimitRule,
+)
+from ..shared import (
+    SubclassRule as StrictSubclassRule,
+)
+from ..shared import (
+    SurfaceRule as StrictSurfaceRule,
+)
+from ..shared import (
+    WidthRule as StrictWidthRule,
 )
 
 
@@ -114,7 +115,12 @@ class Segment(OvertureFeature, ConstraintValidatedModel):
     level: int | None = Field(None, description="Z-order level")
 
     # Connector references
-    connectors: Annotated[list[ConnectorReference], CompositeUniqueConstraint("connector_id", "at")] | None = Field(None, description="Connector references")
+    connectors: (
+        Annotated[
+            list[ConnectorReference], CompositeUniqueConstraint("connector_id", "at")
+        ]
+        | None
+    ) = Field(None, description="Connector references")
 
     # Route references (strict typed with linear referencing)
     routes: list[StrictRouteReference] | None = Field(
@@ -143,8 +149,8 @@ class Segment(OvertureFeature, ConstraintValidatedModel):
     level_rules: list[StrictLevelRule] | None = Field(
         None, description="Level/elevation rules"
     )
-    width_rules: Annotated[list[StrictWidthRule], MinItemsConstraint(1)] | None = (
-        Field(None, description="Width rules")
+    width_rules: Annotated[list[StrictWidthRule], MinItemsConstraint(1)] | None = Field(
+        None, description="Width rules"
     )
 
     # Subtype-specific flags (strict typed)
