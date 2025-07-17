@@ -29,7 +29,6 @@ members = [
     "overture-schema-transportation-common",
     "overture-schema-transportation-theme",
     "overture-schema-validation",
-    "overture-schema-water-type",
 ]
 
 [[package]]
