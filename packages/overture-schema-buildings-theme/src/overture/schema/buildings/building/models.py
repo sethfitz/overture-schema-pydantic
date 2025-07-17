@@ -4,14 +4,6 @@ from typing import Annotated
 
 from pydantic import Field
 
-from overture.schema.buildings.common import (
-    BuildingClass,
-    BuildingSubtype,
-    FacadeMaterial,
-    RoofMaterial,
-    RoofOrientation,
-    RoofShape,
-)
 from overture.schema.core.base import OvertureFeature, register_model
 from overture.schema.core.common import (
     AddressContainer,
@@ -22,6 +14,15 @@ from overture.schema.validation import (
     HexColor,
     theme_literal,
     type_literal,
+)
+
+from ..common import (
+    BuildingClass,
+    BuildingSubtype,
+    FacadeMaterial,
+    RoofMaterial,
+    RoofOrientation,
+    RoofShape,
 )
 
 

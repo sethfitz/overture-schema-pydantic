@@ -1,7 +1,10 @@
 """Building type models for Overture Maps."""
 
 # Re-export common structures for backward compatibility
-from overture.schema.buildings.common import (
+# Register theme-type mappings for strict validation
+from overture.schema.core.base import add_theme_type_mapping
+
+from ..common import (
     BuildingClass,
     BuildingPart,
     BuildingSubtype,
@@ -12,10 +15,6 @@ from overture.schema.buildings.common import (
     RoofOrientation,
     RoofShape,
 )
-
-# Register theme-type mappings for strict validation
-from overture.schema.core.base import add_theme_type_mapping
-
 from .models import Building
 
 add_theme_type_mapping("buildings", "building")
