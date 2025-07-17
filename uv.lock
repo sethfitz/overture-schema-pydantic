@@ -14,7 +14,6 @@ members = [
     "overture-schema-buildings-theme",
     "overture-schema-connector-type",
     "overture-schema-core",
-    "overture-schema-division-boundary-type",
     "overture-schema-division-type",
     "overture-schema-divisions-common",
     "overture-schema-divisions-theme",
