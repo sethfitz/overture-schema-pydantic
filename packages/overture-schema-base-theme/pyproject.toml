@@ -1,7 +1,7 @@
 [project]
 name = "overture-schema-base-theme"
 version = "0.1.0"
-description = "Overture Maps base theme shared structures and models (bathymetry, infrastructure, land, land_cover)"
+description = "Overture Maps base theme shared structures and models (bathymetry, infrastructure, land, land_cover, land_use)"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

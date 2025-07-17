@@ -23,7 +23,6 @@ members = [
     "overture-schema-division-type",
     "overture-schema-divisions-common",
     "overture-schema-divisions-theme",
-    "overture-schema-land-use-type",
     "overture-schema-place-type",
     "overture-schema-places-theme",
     "overture-schema-segment-type",
