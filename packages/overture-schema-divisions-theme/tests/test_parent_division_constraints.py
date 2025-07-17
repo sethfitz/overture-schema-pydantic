@@ -3,7 +3,7 @@
 from enum import Enum
 
 import pytest
-from overture.schema.divisions.common.validation import (
+from overture.schema.divisions.validation import (
     ParentDivisionValidator,
     parent_division_required_unless,
 )

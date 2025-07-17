@@ -13,15 +13,6 @@ from overture.schema.core.common import (
     NamesContainer,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
-from overture.schema.divisions.common import (
-    CapitalOfDivisionItem,
-    DivisionClass,
-    HierarchyItem,
-    Norms,
-    Perspectives,
-    PlaceType,
-    parent_division_required_unless,
-)
 from overture.schema.validation import (
     ConstraintValidatedModel,
     CountryCode,
@@ -32,6 +23,16 @@ from overture.schema.validation import (
     theme_literal,
     type_literal,
 )
+
+from ..shared import (
+    CapitalOfDivisionItem,
+    DivisionClass,
+    HierarchyItem,
+    Norms,
+    Perspectives,
+    PlaceType,
+)
+from ..validation import parent_division_required_unless
 
 
 @parent_division_required_unless("subtype", PlaceType.COUNTRY)
@@ -63,8 +64,15 @@ class Division(OvertureFeature, ConstraintValidatedModel):
     parent_division_id: NoWhitespaceString | None = Field(
         None, min_length=1, description="Parent division identifier"
     )
-    capital_division_ids: Annotated[list[NoWhitespaceString], UniqueItemsConstraint()] | None = Field(None, min_length=1, description="Capital division identifiers")
-    capital_of_divisions: Annotated[list[CapitalOfDivisionItem], MinItemsConstraint(1), UniqueItemsConstraint()] | None = Field(None, description="Divisions this is capital of")
+    capital_division_ids: (
+        Annotated[list[NoWhitespaceString], UniqueItemsConstraint()] | None
+    ) = Field(None, min_length=1, description="Capital division identifiers")
+    capital_of_divisions: (
+        Annotated[
+            list[CapitalOfDivisionItem], MinItemsConstraint(1), UniqueItemsConstraint()
+        ]
+        | None
+    ) = Field(None, description="Divisions this is capital of")
 
     # Political and social context
     perspectives: Perspectives | None = Field(

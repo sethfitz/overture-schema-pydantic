@@ -9,11 +9,6 @@ from overture.schema.core.base import (
     register_model,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
-from overture.schema.divisions.common.models import (
-    AreaBoundaryClass,
-    Perspectives,
-    PlaceType,
-)
 from overture.schema.validation import (
     ConstraintValidatedModel,
     CountryCode,
@@ -23,6 +18,12 @@ from overture.schema.validation import (
     not_required_if,
     theme_literal,
     type_literal,
+)
+
+from ..shared import (
+    AreaBoundaryClass,
+    Perspectives,
+    PlaceType,
 )
 
 

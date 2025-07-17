@@ -12,14 +12,15 @@ from overture.schema.core.common import (
     NamesContainer,
 )
 from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
-from overture.schema.divisions.common.models import (
-    AreaBoundaryClass,
-    PlaceType,
-)
 from overture.schema.validation import (
     MutuallyExclusiveConstraint,
     theme_literal,
     type_literal,
+)
+
+from ..shared import (
+    AreaBoundaryClass,
+    PlaceType,
 )
 
 
@@ -58,9 +59,7 @@ class DivisionArea(
     )
 
     # Territorial designation (exclusive or) - strict boolean validation
-    is_land: bool | None = Field(
-        None, description="Land area designation", strict=True
-    )
+    is_land: bool | None = Field(None, description="Land area designation", strict=True)
     is_territorial: bool | None = Field(
         None, description="Territorial area designation", strict=True
     )

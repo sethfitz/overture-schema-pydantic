@@ -335,7 +335,7 @@
           "uniqueItems": true
         },
         "mode": {
-          "$ref": "#/$defs/overture__schema__divisions__common__models__PerspectiveMode",
+          "$ref": "#/$defs/overture__schema__divisions__shared__PerspectiveMode",
           "description": "Perspective validation mode"
         }
       },
@@ -468,7 +468,7 @@
       "title": "PerspectiveMode",
       "type": "string"
     },
-    "overture__schema__divisions__common__models__PerspectiveMode": {
+    "overture__schema__divisions__shared__PerspectiveMode": {
       "description": "Political perspective validation modes.",
       "enum": [
         "accepted_by",
