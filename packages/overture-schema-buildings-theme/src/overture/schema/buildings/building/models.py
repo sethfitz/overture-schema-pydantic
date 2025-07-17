@@ -16,7 +16,7 @@ from overture.schema.validation import (
     type_literal,
 )
 
-from ..common import (
+from ..shared import (
     BuildingClass,
     BuildingSubtype,
     FacadeMaterial,

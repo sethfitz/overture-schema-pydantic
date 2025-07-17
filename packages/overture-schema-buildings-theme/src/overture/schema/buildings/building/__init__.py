@@ -4,7 +4,7 @@
 # Register theme-type mappings for strict validation
 from overture.schema.core.base import add_theme_type_mapping
 
-from ..common import (
+from ..shared import (
     BuildingClass,
     BuildingPart,
     BuildingSubtype,
