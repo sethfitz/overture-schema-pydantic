@@ -9,7 +9,7 @@ from overture.schema.core.base import (
     OvertureFeature,
     register_model,
 )
-from overture.schema.core.common import (
+from overture.schema.core.names import (
     NamesContainer,
 )
 from overture.schema.validation import (

@@ -8,10 +8,10 @@ from overture.schema.core.base import (
     OvertureFeature,
     register_model,
 )
-from overture.schema.core.common import (
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
+from overture.schema.core.names import (
     NamesContainer,
 )
-from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
     MutuallyExclusiveConstraint,
     theme_literal,

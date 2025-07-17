@@ -1,196 +1,19 @@
-"""Common container structures for Overture Maps features."""
+"""Scoping base classes for conditional rule application in Overture Maps features."""
 
-from enum import Enum
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
-from overture.schema.validation import (
-    MinItemsConstraint,
-)
-from overture.schema.validation.types import (
-    CountryCode,
-    LanguageTag,
-    LinearReferenceRange,
-    RegionCode,
-    TrimmedString,
-)
+from overture.schema.validation import MinItemsConstraint
+from overture.schema.validation.types import LinearReferenceRange
 
 from .base import ExtensibleBaseModel
-
-
-class NameVariant(str, Enum):
-    """Name variant types."""
-
-    COMMON = "common"
-    OFFICIAL = "official"
-    ALTERNATE = "alternate"
-    SHORT = "short"
-
-
-class PerspectiveMode(str, Enum):
-    """Perspective mode for disputed names."""
-
-    ACCEPTED_BY = "accepted_by"
-    DISPUTED_BY = "disputed_by"
-
-
-class NamePerspectives(BaseModel):
-    """Political perspectives for names."""
-
-    mode: PerspectiveMode = Field(..., description="Perspective mode")
-    countries: Annotated[list[CountryCode], MinItemsConstraint(1)] = Field(
-        ..., description="ISO 3166-1 alpha-2 country codes"
-    )
-
-
-class NameRule(BaseModel):
-    """Name rule with variant and language specification."""
-
-    variant: NameVariant = Field(..., description="Name variant type")
-    value: TrimmedString = Field(..., min_length=1, description="Name value")
-    language: LanguageTag | None = Field(
-        None, description="IETF BCP-47 language tag"
-    )
-    perspectives: NamePerspectives | None = Field(
-        None, description="Political perspectives"
-    )
-    between: LinearReferenceRange | None = Field(
-        None, description="Linear referencing range"
-    )
-    side: Literal["left", "right"] | None = Field(
-        None, description="Side specification"
-    )
-
-
-class NamesContainer(ExtensibleBaseModel):
-    """Multilingual names container."""
-
-    primary: TrimmedString = Field(..., min_length=1, description="Primary name")
-    common: dict[LanguageTag, TrimmedString] | None = Field(
-        None, description="Common names by language"
-    )
-    rules: list[NameRule] | None = Field(None, description="Name rules")
-
-
-class LinearReferenceRangeContainer(BaseModel):
-    """Linear reference range container for geometric scoping."""
-
-    between: LinearReferenceRange = Field(..., description="Range between 0.0 and 1.0")
-
-
-class AddressLevel(BaseModel):
-    """Address level with optional value."""
-
-    value: str | None = Field(None, description="Address level value")
-
-
-class AddressContainer(ExtensibleBaseModel):
-    """Address container with flexible admin levels."""
-
-    freeform: str | None = Field(None, description="Freeform address string")
-    locality: str | None = Field(None, description="Locality name")
-    postcode: str | None = Field(None, description="Postal code")
-    region: RegionCode | None = Field(
-        None, description="ISO 3166-2 subdivision code"
-    )
-    country: CountryCode | None = Field(
-        None, description="ISO 3166-1 alpha-2 country code"
-    )
-    address_levels: list[AddressLevel] | None = Field(
-        None, min_length=1, max_length=5, description="Address levels (1-5)"
-    )
-    postal_city: str | None = Field(None, description="Postal city if different")
-
-
-# Linear Referencing Types and Containers
-
-LinearlyReferencedPosition = float
-LinearlyReferencedRange = list[LinearlyReferencedPosition]
-
-
-class TravelMode(str, Enum):
-    """Travel mode enumeration."""
-
-    CAR = "car"
-    FOOT = "foot"
-    BIKE = "bike"
-    HGV = "hgv"
-    BUS = "bus"
-    TAXI = "taxi"
-    MOTORCYCLE = "motorcycle"
-    EMERGENCY = "emergency"
-    DELIVERY = "delivery"
-    VEHICLE = "vehicle"
-    MOTOR_VEHICLE = "motor_vehicle"
-    TRUCK = "truck"
-    BICYCLE = "bicycle"
-    HOV = "hov"
-
-
-class VehicleDimension(str, Enum):
-    """Vehicle dimension types."""
-
-    WEIGHT = "weight"
-    HEIGHT = "height"
-    WIDTH = "width"
-    LENGTH = "length"
-    AXLE_LOAD = "axle_load"
-    AXLE_COUNT = "axle_count"
-
-
-class VehicleComparison(str, Enum):
-    """Vehicle comparison operators."""
-
-    EQUAL = "equal"
-    NOT_EQUAL = "not_equal"
-    LESS_THAN = "less_than"
-    LESS_THAN_EQUAL = "less_than_equal"
-    GREATER_THAN = "greater_than"
-    GREATER_THAN_EQUAL = "greater_than_equal"
-
-
-class PurposeOfUse(str, Enum):
-    """Purpose of use enumeration."""
-
-    TO_DELIVER = "to_deliver"
-    AT_DESTINATION = "at_destination"
-    THROUGH_TRAFFIC = "through_traffic"
-    AS_CUSTOMER = "as_customer"
-    TO_FARM = "to_farm"
-
-
-class RecognizedStatus(str, Enum):
-    """Recognized status enumeration."""
-
-    AS_PRIVATE = "as_private"
-    AS_EMPLOYEE = "as_employee"
-    AS_CUSTOMER = "as_customer"
-    AS_RESIDENT = "as_resident"
-    AS_PERMITTED = "as_permitted"
-
-
-class Speed(BaseModel):
-    """Speed value with unit."""
-
-    value: float = Field(..., gt=0, description="Speed value")
-    unit: Literal["km/h", "mph"] = Field(..., description="Speed unit")
-
-
-class Dimension(BaseModel):
-    """Physical dimension with value and unit."""
-
-    value: float = Field(..., gt=0, description="Dimension value")
-    unit: str = Field(..., description="Dimension unit")
-
-
-class VehicleConstraint(BaseModel):
-    """Vehicle constraint specification."""
-
-    dimension: VehicleDimension = Field(..., description="Vehicle dimension")
-    comparison: VehicleComparison = Field(..., description="Comparison operator")
-    value: float = Field(..., description="Constraint value")
-    unit: str | None = Field(None, description="Unit of measurement")
+from .transportation import (
+    PurposeOfUse,
+    RecognizedStatus,
+    TravelMode,
+    VehicleConstraint,
+)
 
 
 class GeometricRangeScope(ExtensibleBaseModel):
@@ -201,10 +24,13 @@ class GeometricRangeScope(ExtensibleBaseModel):
     for all spatially-scoped rules in the Overture Maps transportation schema.
 
     Examples:
-        Simple geometric scoping:
+        Simple geometric scoping with dimension values:
         ```python
+        # For dimension values, use a simple structure:
+        # Dimension = {"value": float, "unit": str}
+
         class WidthRule(GeometricRangeScope):
-            width: Dimension
+            width: dict[str, str | float]  # {"value": 3.5, "unit": "m"}
         ```
 
         Usage in YAML:
@@ -374,11 +200,9 @@ class RecognizedStatusScope(BaseModel):
         ```
     """
 
-    recognized: Annotated[list[RecognizedStatus], MinItemsConstraint(1)] | None = (
-        Field(
-            None,
-            description="Legal or social recognition status (as_private, as_employee, as_public, etc.)",
-        )
+    recognized: Annotated[list[RecognizedStatus], MinItemsConstraint(1)] | None = Field(
+        None,
+        description="Legal or social recognition status (as_private, as_employee, as_public, etc.)",
     )
 
 
@@ -419,11 +243,9 @@ class VehicleScope(BaseModel):
         ```
     """
 
-    vehicle: Annotated[list[VehicleConstraint], MinItemsConstraint(1)] | None = (
-        Field(
-            None,
-            description="Physical vehicle constraints (weight, height, width, length limits)",
-        )
+    vehicle: Annotated[list[VehicleConstraint], MinItemsConstraint(1)] | None = Field(
+        None,
+        description="Physical vehicle constraints (weight, height, width, length limits)",
     )
 
 

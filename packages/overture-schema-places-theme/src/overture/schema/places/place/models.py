@@ -5,15 +5,17 @@ from typing import Annotated
 
 from pydantic import AnyUrl, BaseModel, EmailStr, Field
 
+from overture.schema.core.addresses import (
+    AddressContainer,
+)
 from overture.schema.core.base import (
     OvertureFeature,
     register_model,
 )
-from overture.schema.core.common import (
-    AddressContainer,
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
+from overture.schema.core.names import (
     NamesContainer,
 )
-from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
     MinItemsConstraint,
     PatternConstraint,
@@ -33,7 +35,10 @@ class PlaceCategories(BaseModel):
     """Place categories with primary and alternate classification."""
 
     primary: CategoryPattern = Field(..., description="Primary category (required)")
-    alternate: Annotated[list[CategoryPattern], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Alternate categories")
+    alternate: (
+        Annotated[list[CategoryPattern], UniqueItemsConstraint(), MinItemsConstraint(1)]
+        | None
+    ) = Field(None, description="Alternate categories")
 
 
 class PlaceBrand(BaseModel):
@@ -104,15 +109,24 @@ class Place(OvertureFeature):
     # Optional complex containers
     names: NamesContainer | None = Field(None, description="Multilingual names")
     brand: PlaceBrand | None = Field(None, description="Brand information")
-    addresses: Annotated[list[AddressContainer], MinItemsConstraint(1)] | None = (
-        Field(None, description="Place addresses")
+    addresses: Annotated[list[AddressContainer], MinItemsConstraint(1)] | None = Field(
+        None, description="Place addresses"
     )
 
     # Contact information
-    websites: Annotated[list[str], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Website URLs")
-    socials: Annotated[list[str], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Social media URLs")
-    emails: Annotated[list[EmailStr], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Email addresses")
-    phones: Annotated[list[PhoneNumber], UniqueItemsConstraint(), MinItemsConstraint(1)] | None = Field(None, description="Phone numbers")
+    websites: (
+        Annotated[list[str], UniqueItemsConstraint(), MinItemsConstraint(1)] | None
+    ) = Field(None, description="Website URLs")
+    socials: (
+        Annotated[list[str], UniqueItemsConstraint(), MinItemsConstraint(1)] | None
+    ) = Field(None, description="Social media URLs")
+    emails: (
+        Annotated[list[EmailStr], UniqueItemsConstraint(), MinItemsConstraint(1)] | None
+    ) = Field(None, description="Email addresses")
+    phones: (
+        Annotated[list[PhoneNumber], UniqueItemsConstraint(), MinItemsConstraint(1)]
+        | None
+    ) = Field(None, description="Phone numbers")
 
     # Quality indicators
     confidence: ConfidenceScore | None = Field(

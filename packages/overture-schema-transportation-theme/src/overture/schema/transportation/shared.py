@@ -5,15 +5,17 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
-from overture.schema.core.common import (
+from overture.schema.core.scoping import (
     GeometricRangeScope,
     HeadingScope,
     PurposeOfUseScope,
     RecognizedStatusScope,
-    Speed,
     TemporalScope,
     TravelModeScope,
     VehicleScope,
+)
+from overture.schema.core.transportation import (
+    Speed,
 )
 from overture.schema.validation import (
     CompositeUniqueConstraint,
@@ -235,10 +237,10 @@ class DestinationRule(BaseModel):
     labels: Annotated[
         list[DestinationLabel], CompositeUniqueConstraint("value", "type")
     ] = Field(..., min_length=1, description="Destination labels")
-    symbols: Annotated[list[DestinationSignSymbol], UniqueItemsConstraint()] | None = Field(None, description="Route symbols")
-    when: DestinationWhenClause | None = Field(
-        None, description="Scoping conditions"
+    symbols: Annotated[list[DestinationSignSymbol], UniqueItemsConstraint()] | None = (
+        Field(None, description="Route symbols")
     )
+    when: DestinationWhenClause | None = Field(None, description="Scoping conditions")
 
 
 class ProhibitedTransitionSequence(BaseModel):

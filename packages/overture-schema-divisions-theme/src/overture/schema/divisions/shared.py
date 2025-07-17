@@ -5,6 +5,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
+from overture.schema.core.names import PerspectiveMode
 from overture.schema.validation import CountryCode, UniqueItemsConstraint
 
 
@@ -40,13 +41,6 @@ class AreaBoundaryClass(str, Enum):
 
     LAND = "land"
     MARITIME = "maritime"
-
-
-class PerspectiveMode(str, Enum):
-    """Political perspective validation modes."""
-
-    ACCEPTED_BY = "accepted_by"
-    DISPUTED_BY = "disputed_by"
 
 
 class Side(str, Enum):

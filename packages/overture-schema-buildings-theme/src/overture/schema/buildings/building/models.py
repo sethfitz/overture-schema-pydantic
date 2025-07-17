@@ -4,12 +4,14 @@ from typing import Annotated
 
 from pydantic import Field
 
-from overture.schema.core.base import OvertureFeature, register_model
-from overture.schema.core.common import (
+from overture.schema.core.addresses import (
     AddressContainer,
+)
+from overture.schema.core.base import OvertureFeature, register_model
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
+from overture.schema.core.names import (
     NamesContainer,
 )
-from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
     HexColor,
     theme_literal,

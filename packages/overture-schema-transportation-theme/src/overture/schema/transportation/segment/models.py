@@ -8,12 +8,14 @@ from overture.schema.core.base import (
     OvertureFeature,
     register_model,
 )
-from overture.schema.core.common import (
-    GeometricRangeScope,
+from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
+from overture.schema.core.names import (
     NamesContainer,
+)
+from overture.schema.core.scoping import (
+    GeometricRangeScope,
     ScopingConditions,
 )
-from overture.schema.core.geometry import Geometry, GeometryTypeConstraint
 from overture.schema.validation import (
     CompositeUniqueConstraint,
     ConstraintValidatedModel,
