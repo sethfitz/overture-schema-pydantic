@@ -28,4 +28,4 @@ properties:
       to_segment_id: overture:transportation:segment:567
       final_heading: backward
   ext_expected_errors:
-    - "propertyDefinitions/destinationLabelType/enum]: value must be one of 'street',"
+    - "value must be one of 'unknown',"
